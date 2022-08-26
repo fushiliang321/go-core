@@ -1,4 +1,4 @@
-module gitee.com/zvc/go-core
+module github.com/fushiliang321/go-core
 
 go 1.19
 
