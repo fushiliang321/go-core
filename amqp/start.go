@@ -3,9 +3,9 @@ package amqp
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/zvc/go-core/amqp/types"
-	amqp2 "gitee.com/zvc/go-core/config/amqp"
-	"gitee.com/zvc/go-core/exception"
+	"github.com/fushiliang321/go-core/amqp/types"
+	amqp2 "github.com/fushiliang321/go-core/config/amqp"
+	"github.com/fushiliang321/go-core/exception"
 	amqp3 "github.com/streadway/amqp"
 	"log"
 	"sync"

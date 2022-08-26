@@ -1,9 +1,9 @@
 package router
 
 import (
-	"gitee.com/zvc/go-core/router/types"
-	"gitee.com/zvc/go-core/server/dispatch"
 	"github.com/fasthttp/router"
+	"github.com/fushiliang321/go-core/router/types"
+	"github.com/fushiliang321/go-core/server/dispatch"
 	"github.com/valyala/fasthttp"
 )
 

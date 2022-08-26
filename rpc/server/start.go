@@ -1,8 +1,8 @@
 package server
 
 import (
-	config "gitee.com/zvc/go-core/config/consul"
-	"gitee.com/zvc/go-core/helper"
+	config "github.com/fushiliang321/go-core/config/consul"
+	"github.com/fushiliang321/go-core/helper"
 	go_jsonrpc "github.com/iloveswift/go-jsonrpc"
 	"reflect"
 	"sync"

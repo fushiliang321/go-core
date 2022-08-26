@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"fmt"
-	"gitee.com/zvc/go-core/exception"
-	"gitee.com/zvc/go-core/helper"
-	"gitee.com/zvc/go-core/router/types"
+	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/router/types"
 	"github.com/valyala/fasthttp"
 )
 

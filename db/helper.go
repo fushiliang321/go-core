@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
-	"gitee.com/zvc/go-core/config/database"
-	"gitee.com/zvc/go-core/db/model"
-	"gitee.com/zvc/go-core/exception"
+	"github.com/fushiliang321/go-core/config/database"
+	"github.com/fushiliang321/go-core/db/model"
+	"github.com/fushiliang321/go-core/exception"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

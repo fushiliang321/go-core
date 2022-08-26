@@ -1,13 +1,13 @@
 package core
 
 import (
-	"gitee.com/zvc/go-core/amqp"
-	"gitee.com/zvc/go-core/consul"
-	"gitee.com/zvc/go-core/exception"
-	"gitee.com/zvc/go-core/rateLimit"
-	rpc "gitee.com/zvc/go-core/rpc/server"
-	"gitee.com/zvc/go-core/server"
-	"gitee.com/zvc/go-core/task"
+	"github.com/fushiliang321/go-core/amqp"
+	"github.com/fushiliang321/go-core/consul"
+	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/rateLimit"
+	rpc "github.com/fushiliang321/go-core/rpc/server"
+	"github.com/fushiliang321/go-core/server"
+	"github.com/fushiliang321/go-core/task"
 	"sync"
 )
 

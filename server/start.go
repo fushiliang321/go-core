@@ -2,10 +2,10 @@ package server
 
 import (
 	"fmt"
-	"gitee.com/zvc/go-core/config/routers"
-	"gitee.com/zvc/go-core/config/server"
-	"gitee.com/zvc/go-core/server/types"
-	"gitee.com/zvc/go-core/server/websocket"
+	"github.com/fushiliang321/go-core/config/routers"
+	"github.com/fushiliang321/go-core/config/server"
+	"github.com/fushiliang321/go-core/server/types"
+	"github.com/fushiliang321/go-core/server/websocket"
 	"github.com/valyala/fasthttp"
 	"sync"
 )

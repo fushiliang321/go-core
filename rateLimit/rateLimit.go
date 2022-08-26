@@ -2,7 +2,7 @@ package rateLimit
 
 import (
 	"errors"
-	"gitee.com/zvc/go-core/config/rateLimit"
+	"github.com/fushiliang321/go-core/config/rateLimit"
 	"sync"
 	"time"
 )

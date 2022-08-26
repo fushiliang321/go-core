@@ -1,8 +1,8 @@
 package event
 
 import (
-	websocket2 "gitee.com/zvc/go-core/server/websocket"
 	"github.com/fasthttp/websocket"
+	websocket2 "github.com/fushiliang321/go-core/server/websocket"
 )
 
 type (

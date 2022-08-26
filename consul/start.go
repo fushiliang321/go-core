@@ -1,7 +1,7 @@
 package consul
 
 import (
-	"gitee.com/zvc/go-core/config/consul"
+	"github.com/fushiliang321/go-core/config/consul"
 	"github.com/hashicorp/consul/api"
 	"sync"
 )

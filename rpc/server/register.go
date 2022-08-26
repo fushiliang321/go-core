@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"gitee.com/zvc/go-core/consul"
+	"github.com/fushiliang321/go-core/consul"
 	"github.com/hashicorp/consul/api"
 	"log"
 	"net"

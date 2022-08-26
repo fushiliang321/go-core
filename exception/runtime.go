@@ -2,9 +2,9 @@ package exception
 
 import (
 	"fmt"
-	"gitee.com/zvc/go-core/config/exceptions"
-	"gitee.com/zvc/go-core/exception/helper"
-	"gitee.com/zvc/go-core/exception/types"
+	"github.com/fushiliang321/go-core/config/exceptions"
+	"github.com/fushiliang321/go-core/exception/helper"
+	"github.com/fushiliang321/go-core/exception/types"
 	"log"
 )
 

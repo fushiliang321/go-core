@@ -2,9 +2,9 @@ package dispatch
 
 import (
 	"fmt"
-	"gitee.com/zvc/go-core/config/middlewares"
-	"gitee.com/zvc/go-core/exception"
-	"gitee.com/zvc/go-core/helper"
+	"github.com/fushiliang321/go-core/config/middlewares"
+	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper"
 	"github.com/valyala/fasthttp"
 )
 
