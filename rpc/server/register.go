@@ -1,8 +1,8 @@
 package server
 
 import (
-	"core/consul"
 	"fmt"
+	"gitee.com/zvc/go-core/consul"
 	"github.com/hashicorp/consul/api"
 	"log"
 	"net"

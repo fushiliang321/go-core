@@ -1,8 +1,8 @@
 package router
 
 import (
-	"core/router/types"
-	"core/server/dispatch"
+	"gitee.com/zvc/go-core/router/types"
+	"gitee.com/zvc/go-core/server/dispatch"
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )

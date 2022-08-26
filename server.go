@@ -1,13 +1,13 @@
 package core
 
 import (
-	"core/amqp"
-	"core/consul"
-	"core/exception"
-	"core/rateLimit"
-	rpc "core/rpc/server"
-	"core/server"
-	"core/task"
+	"gitee.com/zvc/go-core/amqp"
+	"gitee.com/zvc/go-core/consul"
+	"gitee.com/zvc/go-core/exception"
+	"gitee.com/zvc/go-core/rateLimit"
+	rpc "gitee.com/zvc/go-core/rpc/server"
+	"gitee.com/zvc/go-core/server"
+	"gitee.com/zvc/go-core/task"
 	"sync"
 )
 

@@ -1,8 +1,8 @@
 package amqp
 
 import (
-	"core/amqp/types"
-	amqp2 "core/config/amqp"
+	"gitee.com/zvc/go-core/amqp/types"
+	amqp2 "gitee.com/zvc/go-core/config/amqp"
 	amqp3 "github.com/streadway/amqp"
 	"log"
 )

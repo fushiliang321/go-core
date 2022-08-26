@@ -1,7 +1,7 @@
 package exceptions
 
 import (
-	"core/exception/types"
+	"gitee.com/zvc/go-core/exception/types"
 )
 
 type Exceptions struct {

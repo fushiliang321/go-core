@@ -2,10 +2,10 @@ package helper
 
 import (
 	"bytes"
-	"core/helper/types"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"gitee.com/zvc/go-core/helper/types"
 	"github.com/valyala/fasthttp"
 	"math/rand"
 	"net"

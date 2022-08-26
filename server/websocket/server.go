@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	"core/config/server"
 	"encoding/json"
+	"gitee.com/zvc/go-core/config/server"
 	"github.com/fasthttp/websocket"
 	"github.com/valyala/fasthttp"
 	"time"

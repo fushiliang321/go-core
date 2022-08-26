@@ -1,4 +1,4 @@
-module core
+module gitee.com/zvc/go-core
 
 go 1.19
 

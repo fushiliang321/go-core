@@ -1,10 +1,10 @@
 package db
 
 import (
-	"core/config/database"
-	"core/db/model"
-	"core/exception"
 	"fmt"
+	"gitee.com/zvc/go-core/config/database"
+	"gitee.com/zvc/go-core/db/model"
+	"gitee.com/zvc/go-core/exception"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

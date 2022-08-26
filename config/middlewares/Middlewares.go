@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"core/router/types"
+	"gitee.com/zvc/go-core/router/types"
 	"github.com/valyala/fasthttp"
 )
 

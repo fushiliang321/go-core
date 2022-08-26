@@ -1,9 +1,9 @@
 package client
 
 import (
-	"core/consul"
-	"core/exception"
-	"core/helper"
+	"gitee.com/zvc/go-core/consul"
+	"gitee.com/zvc/go-core/exception"
+	"gitee.com/zvc/go-core/helper"
 	jsonrpc "github.com/iloveswift/go-jsonrpc"
 	"log"
 )

@@ -1,15 +1,15 @@
 package dispatch
 
 import (
-	config "core/config/middlewares"
-	"core/config/server"
-	"core/exception"
-	"core/helper"
-	"core/middleware"
-	types2 "core/router/types"
-	"core/server/types"
 	"encoding/json"
 	"fmt"
+	config "gitee.com/zvc/go-core/config/middlewares"
+	"gitee.com/zvc/go-core/config/server"
+	"gitee.com/zvc/go-core/exception"
+	"gitee.com/zvc/go-core/helper"
+	"gitee.com/zvc/go-core/middleware"
+	types2 "gitee.com/zvc/go-core/router/types"
+	"gitee.com/zvc/go-core/server/types"
 	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
 	"log"

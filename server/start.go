@@ -1,11 +1,11 @@
 package server
 
 import (
-	"core/config/routers"
-	"core/config/server"
-	"core/server/types"
-	"core/server/websocket"
 	"fmt"
+	"gitee.com/zvc/go-core/config/routers"
+	"gitee.com/zvc/go-core/config/server"
+	"gitee.com/zvc/go-core/server/types"
+	"gitee.com/zvc/go-core/server/websocket"
 	"github.com/valyala/fasthttp"
 	"sync"
 )

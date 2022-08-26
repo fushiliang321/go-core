@@ -1,8 +1,8 @@
 package middleware
 
 import (
-	"core/config/middlewares"
-	"core/router/types"
+	"gitee.com/zvc/go-core/config/middlewares"
+	"gitee.com/zvc/go-core/router/types"
 )
 
 func GetCoreMiddlewares(handler types.RequestHandler) *middlewares.Middlewares {

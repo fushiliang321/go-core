@@ -1,11 +1,11 @@
 package amqp
 
 import (
-	"core/amqp/types"
-	amqp2 "core/config/amqp"
-	"core/exception"
 	"encoding/json"
 	"fmt"
+	"gitee.com/zvc/go-core/amqp/types"
+	amqp2 "gitee.com/zvc/go-core/config/amqp"
+	"gitee.com/zvc/go-core/exception"
 	amqp3 "github.com/streadway/amqp"
 	"log"
 	"sync"

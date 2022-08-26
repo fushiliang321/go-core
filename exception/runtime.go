@@ -1,10 +1,10 @@
 package exception
 
 import (
-	"core/config/exceptions"
-	"core/exception/helper"
-	"core/exception/types"
 	"fmt"
+	"gitee.com/zvc/go-core/config/exceptions"
+	"gitee.com/zvc/go-core/exception/helper"
+	"gitee.com/zvc/go-core/exception/types"
 	"log"
 )
 

@@ -1,14 +1,14 @@
 package middleware
 
 import (
-	"core/config/server"
-	"core/exception"
-	"core/helper"
-	types2 "core/router/types"
-	"core/server/types"
-	websocket2 "core/server/websocket"
-	"core/server/websocket/event"
 	"fmt"
+	"gitee.com/zvc/go-core/config/server"
+	"gitee.com/zvc/go-core/exception"
+	"gitee.com/zvc/go-core/helper"
+	types2 "gitee.com/zvc/go-core/router/types"
+	"gitee.com/zvc/go-core/server/types"
+	websocket2 "gitee.com/zvc/go-core/server/websocket"
+	"gitee.com/zvc/go-core/server/websocket/event"
 	"github.com/fasthttp/websocket"
 	"github.com/valyala/fasthttp"
 	"log"

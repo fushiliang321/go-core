@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"core/router"
+	"gitee.com/zvc/go-core/router"
 )
 
 var routers = router.New()

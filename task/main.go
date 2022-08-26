@@ -1,7 +1,7 @@
 package task
 
 import (
-	"core/config/task"
+	"gitee.com/zvc/go-core/config/task"
 	"github.com/robfig/cron"
 	"sync"
 )
