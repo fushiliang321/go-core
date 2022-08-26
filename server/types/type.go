@@ -1,0 +1,8 @@
+package types
+
+const SERVER_HTTP = byte(1)
+const SERVER_WEBSOCKET = byte(2)
+
+const SERVER_HTTP_KEY = "SERVER_KEY/1"
+const SERVER_WEBSOCKET_KEY = "SERVER_KEY/2"
+const SERVER_NAME_KEY = "SERVER_NAME_KEY/0"
