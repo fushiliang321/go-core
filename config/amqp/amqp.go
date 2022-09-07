@@ -1,7 +1,7 @@
 package amqp
 
 import (
-	amqp2 "github.com/fushiliang321/go-core/amqp/types"
+	amqp2 "github.com/fushiliang321/go-core/amqp/consumer"
 )
 
 type Amqp struct {

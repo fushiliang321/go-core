@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"github.com/fushiliang321/go-core/amqp/types"
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
-	"github.com/fushiliang321/go-core/exception"
 	amqp3 "github.com/streadway/amqp"
 	"log"
 	"sync"
-	"time"
 )
 
 type Service struct {
@@ -21,106 +19,13 @@ func (Service) Start(wg *sync.WaitGroup) {
 		//有消费者
 		for i := range config.Consumers {
 			con := config.Consumers[i]
-			monitor(con)
+			con.Monitor()
 		}
 	}
-}
-
-func monitor(consumer *types.Consumer) {
-	defer func() {
-		if err := recover(); err != nil {
-			exception.Listener("amqp monitor", err)
-
-			// 监听异常 要重试
-			go func(c *types.Consumer) {
-				time.Sleep(time.Second * 5)
-				monitor(c)
-			}(consumer)
-		}
-	}()
-	if getAmqp() == nil {
-		// 监听失败 要重试
-		go func(c *types.Consumer) {
-			time.Sleep(time.Second * 5)
-			monitor(c)
-		}(consumer)
-		return
-	}
-	channel, err := getAmqp().Consumer.Channel()
-	closeChannel := true
-	defer func() {
-		if closeChannel {
-			channel.Close()
-
-			// 监听失败 要重试
-			go func(c *types.Consumer) {
-				time.Sleep(time.Second * 5)
-				monitor(c)
-			}(consumer)
-		}
-	}()
-	if err != nil {
-		log.Println("consumer channel error", err)
-		return
-	}
-	err = channelInit(channel, consumer.Exchange, consumer.RoutingKey, consumer.Queue, consumer.Type, consumer.Durable)
-	if err != nil {
-		return
-	}
-	msgs, err := channel.Consume(consumer.Queue, "", false, false, false, true, amqp3.Table{})
-	if err != nil {
-		log.Println("consumer consume error", err)
-		return
-	}
-	closeChannel = false
-	handler := consumer.Handler
-	go func() {
-		for d := range msgs {
-			handler(d.Body, d)
-		}
-		log.Println("channel close")
-		// 断开后 要重新监听
-		go func(c *types.Consumer) {
-			time.Sleep(time.Second * 5)
-			monitor(c)
-		}(consumer)
-	}()
-}
-
-func channelInit(channel *amqp3.Channel, Exchange string, RoutingKey string, Queue string, kind string, durable bool) (err error) {
-	if kind == "" {
-		kind = ExchangeTypeDirect
-	}
-	err = channel.ExchangeDeclare(Exchange, kind, durable, false, false, false, nil)
-	if err != nil {
-		log.Println("consumer exchange error", err)
-		return
-	}
-	if Queue == "" {
-		Queue = RoutingKey
-	}
-	q, err := channel.QueueDeclare(
-		Queue,
-		durable,
-		false,
-		false,
-		false,
-		nil,
-	)
-	if err != nil {
-		log.Println("consumer queue error", err)
-		return
-	}
-	err = channel.QueueBind(q.Name, RoutingKey, Exchange, false, nil)
-	if err != nil {
-		log.Println("consumer queue error", err)
-		return
-	}
-	return
 }
 
 func Publish(producer *types.Producer) {
-	Amqp := getAmqp()
+	Amqp := GetAmqp()
 	if Amqp == nil {
 		return
 	}

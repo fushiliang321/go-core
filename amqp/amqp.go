@@ -56,7 +56,7 @@ func amqpIsAvailable() bool {
 	return false
 }
 
-func getAmqp() *types.AmqpConnection {
+func GetAmqp() *types.AmqpConnection {
 	if amqpIsAvailable() {
 		return amqp
 	}
