@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/fushiliang321/go-core/amqp"
+	"github.com/fushiliang321/go-core/amqp/consumer"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/rateLimit"
@@ -34,7 +34,7 @@ func Start() {
 	once.Do(func() {
 		wg := &sync.WaitGroup{}
 		Registers([]Server{
-			amqp.Service{},
+			consumer.Service{},
 			consul.Service{},
 			rpc.Service{},
 			task.Service{},
