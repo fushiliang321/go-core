@@ -1,7 +1,8 @@
 package consumer
 
 import (
-	"github.com/fushiliang321/go-core/amqp"
+	"github.com/fushiliang321/go-core/amqp/connection"
+	"github.com/fushiliang321/go-core/amqp/types"
 	"github.com/fushiliang321/go-core/exception"
 	amqp3 "github.com/streadway/amqp"
 	"log"
@@ -35,12 +36,12 @@ func (consumer *Consumer) Monitor() {
 			go consumer.retryMonitor()
 		}
 	}()
-	if amqp.GetAmqp() == nil {
+	if connection.GetAmqp() == nil {
 		// 监听失败 要重试
 		go consumer.retryMonitor()
 		return
 	}
-	channel, err := amqp.GetAmqp().Consumer.Channel()
+	channel, err := connection.GetAmqp().Consumer.Channel()
 	closeChannel := true
 	defer func() {
 		if closeChannel {
@@ -93,7 +94,7 @@ func (consumer *Consumer) retryMonitor() {
 
 func channelInit(channel *amqp3.Channel, Exchange string, RoutingKey string, Queue string, kind string, durable bool) (err error) {
 	if kind == "" {
-		kind = amqp.ExchangeTypeDirect
+		kind = types.ExchangeTypeDirect
 	}
 	err = channel.ExchangeDeclare(Exchange, kind, durable, false, false, false, nil)
 	if err != nil {

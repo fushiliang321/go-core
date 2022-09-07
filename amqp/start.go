@@ -3,6 +3,7 @@ package amqp
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/types"
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
 	amqp3 "github.com/streadway/amqp"
@@ -25,7 +26,7 @@ func (Service) Start(wg *sync.WaitGroup) {
 }
 
 func Publish(producer *types.Producer) {
-	Amqp := GetAmqp()
+	Amqp := connection.GetAmqp()
 	if Amqp == nil {
 		return
 	}

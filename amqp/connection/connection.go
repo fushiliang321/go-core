@@ -1,22 +1,21 @@
-package amqp
+package connection
 
 import (
-	"github.com/fushiliang321/go-core/amqp/types"
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
 	amqp3 "github.com/streadway/amqp"
 	"log"
+	"sync"
 )
 
-const (
-	ExchangeTypeDirect  = "direct"
-	ExchangeTypeFanout  = "fanout"
-	ExchangeTypeTopic   = "topic"
-	ExchangeTypeHeaders = "headers"
-)
+type AmqpConnection struct {
+	Producer *amqp3.Connection
+	Consumer *amqp3.Connection
+	sync.RWMutex
+}
 
-var amqp = &types.AmqpConnection{}
+var amqp = &AmqpConnection{}
 
-func amqpInit() *types.AmqpConnection {
+func amqpInit() *AmqpConnection {
 	amqp.Lock()
 	defer amqp.Unlock()
 	if amqpIsAvailable() {
@@ -56,7 +55,7 @@ func amqpIsAvailable() bool {
 	return false
 }
 
-func GetAmqp() *types.AmqpConnection {
+func GetAmqp() *AmqpConnection {
 	if amqpIsAvailable() {
 		return amqp
 	}
