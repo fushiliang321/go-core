@@ -28,17 +28,23 @@ func (consumer *Consumer) Monitor() {
 			go consumer.retryMonitor()
 		}
 	}()
-	if connection.GetAmqp() == nil {
+	amqp := connection.GetAmqp()
+	if amqp == nil {
 		// 监听失败 要重试
 		go consumer.retryMonitor()
 		return
 	}
-	channel, err := connection.GetAmqp().Consumer.Channel()
+	channel, err := amqp.Consumer.Channel()
+	if err != nil {
+		log.Println("consumer channel error", err)
+		// 监听失败 要重试
+		go consumer.retryMonitor()
+		return
+	}
 	closeChannel := true
 	defer func() {
 		if closeChannel {
 			channel.Close()
-
 			// 监听失败 要重试
 			go consumer.retryMonitor()
 		}

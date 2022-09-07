@@ -1,63 +1,63 @@
 package connection
 
 import (
-	amqp2 "github.com/fushiliang321/go-core/config/amqp"
-	amqp3 "github.com/streadway/amqp"
+	config "github.com/fushiliang321/go-core/config/amqp"
+	"github.com/streadway/amqp"
 	"log"
 	"sync"
 )
 
 type AmqpConnection struct {
-	Producer *amqp3.Connection
-	Consumer *amqp3.Connection
+	Producer *amqp.Connection
+	Consumer *amqp.Connection
 	sync.RWMutex
 }
 
-var amqp = &AmqpConnection{}
+var connection = &AmqpConnection{}
 
 func amqpInit() *AmqpConnection {
-	amqp.Lock()
-	defer amqp.Unlock()
+	connection.Lock()
+	defer connection.Unlock()
 	if amqpIsAvailable() {
 		//可能获取到锁后已经有其他协程修改了数据
-		return amqp
+		return connection
 	}
-	config := amqp2.Get()
+	config := config.Get()
 	if config.Host == "" || config.Port == "" {
 		return nil
 	}
 	var err error
 	url := "amqp://" + config.User + ":" + config.Password + "@" + config.Host + ":" + config.Port
-	consumer, err := amqp3.Dial(url)
+	consumer, err := amqp.Dial(url)
 	if err != nil {
 		log.Println("amqp err", err)
 		return nil
 	}
-	producer, err := amqp3.Dial(url)
+	producer, err := amqp.Dial(url)
 	if err != nil {
 		log.Println("amqp err", err)
 		return nil
 	}
-	amqp.Consumer = consumer
-	amqp.Producer = producer
-	return amqp
+	connection.Consumer = consumer
+	connection.Producer = producer
+	return connection
 }
 
 // 判断amqp是否可用
 func amqpIsAvailable() bool {
-	if amqp.Consumer != nil && amqp.Producer != nil {
-		if !amqp.Consumer.IsClosed() && !amqp.Producer.IsClosed() {
+	if connection.Consumer != nil && connection.Producer != nil {
+		if !connection.Consumer.IsClosed() && !connection.Producer.IsClosed() {
 			return true
 		}
-		amqp.Consumer.Close()
-		amqp.Producer.Close()
+		connection.Consumer.Close()
+		connection.Producer.Close()
 	}
 	return false
 }
 
 func GetAmqp() *AmqpConnection {
 	if amqpIsAvailable() {
-		return amqp
+		return connection
 	}
 	return amqpInit()
 }
