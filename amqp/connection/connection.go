@@ -22,12 +22,12 @@ func amqpInit() *AmqpConnection {
 		//可能获取到锁后已经有其他协程修改了数据
 		return connection
 	}
-	config := config.Get()
-	if config.Host == "" || config.Port == "" {
+	configData := config.Get()
+	if configData.Host == "" || configData.Port == "" {
 		return nil
 	}
 	var err error
-	url := "amqp://" + config.User + ":" + config.Password + "@" + config.Host + ":" + config.Port
+	url := "amqp://" + configData.User + ":" + configData.Password + "@" + configData.Host + ":" + configData.Port
 	consumer, err := amqp.Dial(url)
 	if err != nil {
 		log.Println("amqp err", err)
