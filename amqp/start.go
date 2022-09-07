@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fushiliang321/go-core/amqp/connection"
+	"github.com/fushiliang321/go-core/amqp/consumer"
 	"github.com/fushiliang321/go-core/amqp/types"
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
 	amqp3 "github.com/streadway/amqp"
@@ -19,7 +20,7 @@ func (Service) Start(wg *sync.WaitGroup) {
 	if len(config.Consumers) > 0 {
 		//有消费者
 		for i := range config.Consumers {
-			con := config.Consumers[i]
+			con := consumer.Consumer{Consumer: config.Consumers[i]}
 			con.Monitor()
 		}
 	}

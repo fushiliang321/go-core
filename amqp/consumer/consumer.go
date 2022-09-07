@@ -9,23 +9,15 @@ import (
 	"time"
 )
 
-type Result = byte
-type ConsumerMessageHandle = func(data []byte) Result
-
 type Consumer struct {
-	Exchange   string
-	RoutingKey string
-	Queue      string
-	Type       string
-	Durable    bool
-	Handler    ConsumerMessageHandle
+	*types.Consumer
 }
 
 const (
-	ACK     = Result(0)
-	NACK    = Result(1)
-	REQUEUE = Result(2)
-	REJECT  = Result(3)
+	ACK     = types.Result(0)
+	NACK    = types.Result(1)
+	REQUEUE = types.Result(2)
+	REJECT  = types.Result(3)
 )
 
 func (consumer *Consumer) Monitor() {

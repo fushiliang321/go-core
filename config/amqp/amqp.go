@@ -1,7 +1,7 @@
 package amqp
 
 import (
-	amqp2 "github.com/fushiliang321/go-core/amqp/consumer"
+	"github.com/fushiliang321/go-core/amqp/types"
 )
 
 type Amqp struct {
@@ -9,11 +9,11 @@ type Amqp struct {
 	Port      string
 	User      string
 	Password  string
-	Consumers []*amqp2.Consumer
+	Consumers []*types.Consumer
 }
 
 var amqp = &Amqp{
-	Consumers: []*amqp2.Consumer{},
+	Consumers: []*types.Consumer{},
 }
 
 func Set(config *Amqp) {
