@@ -16,9 +16,17 @@ type Server interface {
 }
 
 var (
-	servers []Server
-	once    sync.Once
+	once sync.Once
 )
+
+var servers = []Server{
+	amqp.Service{},
+	consul.Service{},
+	rpc.Service{},
+	task.Service{},
+	rateLimit.Service{},
+	server.Service{},
+}
 
 func Register(s Server) {
 	servers = append(servers, s)
@@ -33,14 +41,6 @@ func Start() {
 	}()
 	once.Do(func() {
 		wg := &sync.WaitGroup{}
-		Registers([]Server{
-			amqp.Service{},
-			consul.Service{},
-			rpc.Service{},
-			task.Service{},
-			rateLimit.Service{},
-			server.Service{},
-		})
 		for _, ser := range servers {
 			ser.Start(wg)
 		}
