@@ -15,7 +15,7 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 		conn, err := GetConn(serviceName)
 		if err != nil {
 			exception.Listener("grpc newClient Error: ["+serviceName+"]", err)
-			return nil
+			return *new(t)
 		}
 		defer conn.Close()
 		return fun(conn)
