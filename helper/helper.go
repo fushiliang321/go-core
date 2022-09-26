@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"reflect"
 	"runtime"
 	"strings"
 	"time"
@@ -242,4 +243,16 @@ func ClientAddr(ctx *fasthttp.RequestCtx) string {
 		return ip + ":" + string(port)
 	}
 	return "[" + ip + "]:" + string(port)
+}
+
+// 获取结构体字段
+func GetStructFields(v any) (fields []string) {
+	if reflect.ValueOf(v).Kind() == reflect.Struct {
+		reflectType := reflect.TypeOf(v)
+		numField := reflectType.NumField()
+		for i := 0; i < numField; i++ {
+			fields = append(fields, reflectType.Field(i).Name)
+		}
+	}
+	return
 }
