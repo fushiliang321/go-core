@@ -2,6 +2,8 @@ package consul
 
 import (
 	"github.com/fushiliang321/go-core/config/consul"
+	"github.com/fushiliang321/go-core/config/grpc"
+	"github.com/fushiliang321/go-core/config/rpc"
 	"github.com/hashicorp/consul/api"
 	"sync"
 )
@@ -10,12 +12,24 @@ var consulConfig *consul.Consul
 
 func (Service) Start(wg *sync.WaitGroup) {
 	consulConfig = consul.Get()
+	rpcConfig := rpc.Get()
+	grpcConfig := grpc.Get()
 	initApiConfig()
-	if len(consulConfig.Consumers) > 0 {
-		go func() {
-			// 获取服务信息
-			getData()
-		}()
+
+	consumerServiceNames := []string{}
+	if rpcConfig.Consumers != nil {
+		for _, serviceName := range rpcConfig.Consumers {
+			consumerServiceNames = append(consumerServiceNames, serviceName)
+		}
+	}
+	if grpcConfig.Consumers != nil {
+		for _, serviceName := range grpcConfig.Consumers {
+			consumerServiceNames = append(consumerServiceNames, serviceName)
+		}
+	}
+	if len(consumerServiceNames) > 0 {
+		// 获取服务信息
+		getServiceData(consumerServiceNames)
 	}
 }
 

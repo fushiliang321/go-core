@@ -28,16 +28,16 @@ func (c *Client) Call(method string, params any, res any) (err error) {
 	if err == nil {
 		err = rpcClient.Call(c.serverNameSnake+"/"+method, params, res, false)
 		if err != nil {
-			log.Println("rpcClient error", err)
+			log.Println("rpc rpcClient error", err)
 		}
 	}
 	return
 }
 
 func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
-	node, err := consul.GetNode(name + "Service")
+	node, err := consul.GetNode(name+"Service", "http")
 	if err != nil {
-		exception.Listener("newClient Error: ["+name+"]", err)
+		exception.Listener("rpc newClient Error: ["+name+"]", err)
 		return nil, err
 	}
 	return jsonrpc.NewClient(node.Protocol, node.Address, node.Port)

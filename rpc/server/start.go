@@ -1,10 +1,11 @@
 package server
 
 import (
-	config "github.com/fushiliang321/go-core/config/consul"
+	config "github.com/fushiliang321/go-core/config/rpc"
 	"github.com/fushiliang321/go-core/helper"
 	go_jsonrpc "github.com/iloveswift/go-jsonrpc"
 	"reflect"
+	"strconv"
 	"sync"
 )
 
@@ -12,11 +13,14 @@ type Service struct {
 }
 
 var server go_jsonrpc.ServerInterface
-var checkPort string
+var ip string
+var port int
 
 func init() {
-	checkPort = helper.GetEnvDefault("SERVER_PORT_JSONRPC_HTTP", "9000")
+	checkPort := helper.GetEnvDefault("SERVER_PORT_JSONRPC_HTTP", "9000")
 	server, _ = go_jsonrpc.NewServer("http", "", checkPort)
+	ip = helper.GetLocalIP()
+	port, _ = strconv.Atoi(checkPort)
 }
 
 func (Service) Start(wg *sync.WaitGroup) {

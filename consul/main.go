@@ -24,21 +24,21 @@ func newClient() (client *api.Client, err error) {
 	return
 }
 
-func getData() {
-	for _, serviceName := range consulConfig.Consumers {
-		go syncService(serviceName)
+func getServiceData(consumerServiceNames []string) {
+	for _, serviceName := range consumerServiceNames {
+		go SyncService(serviceName)
 	}
 }
 
 // 同步服务信息
-func syncService(serviceName string) {
+func SyncService(serviceName string) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println("error getService", err)
 		}
 		go func(serviceName string) {
 			time.Sleep(time.Millisecond * 10)
-			syncService(serviceName)
+			SyncService(serviceName)
 		}(serviceName)
 	}()
 	lastIndex, _ := lastIndexMap.LoadOrStore(serviceName, lastIndexDefault)
@@ -68,6 +68,6 @@ func syncService(serviceName string) {
 	services.setServiceNodes(serviceName, serviceNodes)
 }
 
-func GetNode(serviceName string) (node ServiceNode, err error) {
-	return services.getRandomNode(serviceName)
+func GetNode(serviceName string, protocol string) (node ServiceNode, err error) {
+	return services.getRandomNode(serviceName, protocol)
 }

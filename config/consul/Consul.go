@@ -6,14 +6,9 @@ import (
 
 type Consul struct {
 	api.Config
-	Consumers []string
-	Services  []any
 }
 
-var consul = &Consul{
-	Consumers: []string{},
-	Services:  []any{},
-}
+var consul = &Consul{}
 
 func Set(config *Consul) {
 	consul = config

@@ -168,8 +168,8 @@ func GetMacAddrs() (macAddrs []string) {
 	return macAddrs
 }
 
-// 获取本机ip地址
-func GetIPs() (ips []string) {
+// 获取本机所有ip地址
+func GetLocalIPs() (ips []string) {
 	interfaceAddr, err := net.InterfaceAddrs()
 	if err != nil {
 		return ips
@@ -183,6 +183,22 @@ func GetIPs() (ips []string) {
 		}
 	}
 	return ips
+}
+
+// 获取本机ip地址
+func GetLocalIP() string {
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ""
+	}
+	for _, address := range addrs {
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				return ipnet.IP.String()
+			}
+		}
+	}
+	return ""
 }
 
 // 获取客户端ip
