@@ -26,11 +26,11 @@ func init() {
 func (Service) Start(wg *sync.WaitGroup) {
 	consulConfig := config.Get()
 	if len(consulConfig.Services) > 0 {
+		wg.Add(1)
 		go func(wg *sync.WaitGroup) {
-			wg.Add(1)
+			defer wg.Done()
 			// 启动服务监听
 			server.Start()
-			wg.Done()
 		}(wg)
 
 		for _, s := range consulConfig.Services {

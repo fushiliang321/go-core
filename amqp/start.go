@@ -15,7 +15,7 @@ import (
 type Service struct {
 }
 
-func (Service) Start(wg *sync.WaitGroup) {
+func (Service) Start(_ *sync.WaitGroup) {
 	config := amqp2.Get()
 	if len(config.Consumers) > 0 {
 		//有消费者

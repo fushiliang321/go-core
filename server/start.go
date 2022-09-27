@@ -38,6 +38,7 @@ func (Service) Start(wg *sync.WaitGroup) {
 	for addr, s := range serverMap {
 		wg.Add(1)
 		go func(addr string, sers map[byte]server.Server, wg *sync.WaitGroup) {
+			defer wg.Done()
 			http := &server.Server{}
 			ws := http
 			for t := range sers {
@@ -60,7 +61,6 @@ func (Service) Start(wg *sync.WaitGroup) {
 			}); err != nil {
 				fmt.Println("start fasthttp fail", err.Error())
 			}
-			wg.Done()
 		}(addr, s, wg)
 	}
 }

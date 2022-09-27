@@ -14,8 +14,8 @@ func (Service) Start(wg *sync.WaitGroup) {
 	if len(config.Crontabs) == 0 {
 		return
 	}
+	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
-		wg.Add(1)
 		defer wg.Done()
 		c := cron.New()
 		for _, crontab := range config.Crontabs {

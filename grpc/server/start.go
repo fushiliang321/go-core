@@ -17,11 +17,11 @@ func (Service) Start(wg *sync.WaitGroup) {
 		for fun, srv := range config.Services {
 			server.RegisterServer(fun, srv)
 		}
+		wg.Add(1)
 		go func(wg *sync.WaitGroup) {
-			wg.Add(1)
+			defer wg.Done()
 			// 启动服务监听
 			server.Serve()
-			wg.Done()
 		}(wg)
 	}
 }
