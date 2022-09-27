@@ -5,6 +5,7 @@ import (
 	"google.golang.org/grpc"
 	"reflect"
 	"strings"
+	"time"
 )
 
 func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) t) func() t {
@@ -17,7 +18,26 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 			exception.Listener("grpc newClient Error: ["+serviceName+"]", err)
 			return *new(t)
 		}
-		defer conn.Close()
+		defer func() {
+			go func() {
+				startTime := time.Now().Unix()
+				for {
+					time.Sleep(100 * time.Millisecond)
+					state := conn.GetState().String()
+					if state == "IDLE" {
+						if time.Now().Unix()-startTime > 60 {
+							//闲置超过1分钟就关闭
+							conn.Close()
+							return
+						}
+					} else if state != "CONNECTING" {
+						//没有在连接中的就关闭
+						conn.Close()
+						return
+					}
+				}
+			}()
+		}()
 		return fun(conn)
 	}
 }
