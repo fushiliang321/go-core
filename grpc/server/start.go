@@ -14,8 +14,8 @@ func (Service) Start(wg *sync.WaitGroup) {
 	config = grpc.Get()
 	if config.Services != nil && len(config.Services) > 0 {
 		server := listen(config.Host, config.Port)
-		for fun, srv := range config.Services {
-			server.RegisterServer(fun, srv)
+		for _, service := range config.Services {
+			server.RegisterServer(service.Handle, service.RegisterFun)
 		}
 		wg.Add(1)
 		go func(wg *sync.WaitGroup) {

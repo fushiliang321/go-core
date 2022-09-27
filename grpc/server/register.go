@@ -68,7 +68,7 @@ func (s *serverListen) Serve() {
 	}
 }
 
-func (s *serverListen) RegisterServer(fun any, srv any) {
+func (s *serverListen) RegisterServer(srv any, fun any) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println("grpc RegisterServer error:", err)

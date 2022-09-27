@@ -6,20 +6,20 @@ import (
 )
 
 type Service struct {
-	Host     string
-	Port     int
-	Services map[any]any
+	RegisterFun any
+	Handle      any
 }
 
 type Grpc struct {
 	Host      string
 	Port      int
-	Services  map[any]any
+	Services  []Service
 	Consumers []string
 }
 
 var data = &Grpc{
-	Services: map[any]any{},
+	Services:  []Service{},
+	Consumers: []string{},
 }
 
 func Set(config *Grpc) {
