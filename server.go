@@ -4,6 +4,7 @@ import (
 	"github.com/fushiliang321/go-core/amqp"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/exception"
+	grpc "github.com/fushiliang321/go-core/grpc/server"
 	"github.com/fushiliang321/go-core/rateLimit"
 	rpc "github.com/fushiliang321/go-core/rpc/server"
 	"github.com/fushiliang321/go-core/server"
@@ -23,6 +24,7 @@ var servers = []Server{
 	amqp.Service{},
 	consul.Service{},
 	rpc.Service{},
+	grpc.Service{},
 	task.Service{},
 	rateLimit.Service{},
 	server.Service{},
