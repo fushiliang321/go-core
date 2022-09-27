@@ -17,7 +17,6 @@ func (Service) Start(wg *sync.WaitGroup) {
 		for fun, srv := range config.Services {
 			server.RegisterServer(fun, srv)
 		}
-		server.Serve()
 		go func(wg *sync.WaitGroup) {
 			wg.Add(1)
 			// 启动服务监听
