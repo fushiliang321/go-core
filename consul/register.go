@@ -23,9 +23,12 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 	if check != nil {
 		check = setServiceCheckDefaultValue(check)
 	}
+
 	registration := &api.AgentServiceRegistration{
-		Name:    name,               // 服务名称
-		Port:    port,               // 服务端口
+		Name: name, // 服务名称
+		Port: port, // 服务端口
+		ID:   name, //服务id
+		// todo 需要完善服务唯一id生成规则
 		Tags:    []string{protocol}, // tag，可以为空
 		Address: address,            // 服务 IP
 		Meta:    map[string]string{"Protocol": protocol},
@@ -41,15 +44,15 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 
 func setServiceCheckDefaultValue(check *api.AgentServiceCheck) *api.AgentServiceCheck {
 	if check.Timeout == "" {
-		check.Timeout = "3s"
+		check.Timeout = "1s"
 	}
 	if check.Interval == "" {
 		// 健康检查间隔
-		check.Interval = "5s"
+		check.Interval = "1s"
 	}
 	if check.DeregisterCriticalServiceAfter == "" {
 		// check失败后30秒删除本服务，注销时间，相当于过期时间
-		check.DeregisterCriticalServiceAfter = "30s"
+		check.DeregisterCriticalServiceAfter = "90s"
 	}
 	return check
 }
