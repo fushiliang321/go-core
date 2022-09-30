@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/exception"
 	"google.golang.org/grpc"
@@ -15,6 +16,9 @@ type ClientConn struct {
 
 func (cc *ClientConn) Invoke(ctx context.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
 	err := cc.cc.Invoke(ctx, method, args, reply, opts...)
+	if err != nil {
+		fmt.Println("grpc client Invoke error", err)
+	}
 	cc.Close()
 	return err
 }
