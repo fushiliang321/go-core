@@ -3,7 +3,7 @@ package consul
 import (
 	"github.com/fushiliang321/go-core/config/consul"
 	"github.com/fushiliang321/go-core/config/grpc"
-	"github.com/fushiliang321/go-core/config/jsonrpc"
+	"github.com/fushiliang321/go-core/config/jsonRpcHttp"
 	"github.com/hashicorp/consul/api"
 	"sync"
 )
@@ -12,7 +12,7 @@ var consulConfig *consul.Consul
 
 func (Service) Start(wg *sync.WaitGroup) {
 	consulConfig = consul.Get()
-	rpcConfig := jsonrpc.Get()
+	rpcConfig := jsonRpcHttp.Get()
 	grpcConfig := grpc.Get()
 	initApiConfig()
 
