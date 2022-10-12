@@ -32,10 +32,9 @@ func (Service) Start(wg *sync.WaitGroup) {
 			// 启动服务监听
 			server.Start()
 		}(wg)
-
 		for _, s := range consulConfig.Services {
 			RegisterServer(reflect.Indirect(reflect.ValueOf(s)).Type().Name()+"Service", s)
 		}
+		server.Register(new(Health))
 	}
-
 }
