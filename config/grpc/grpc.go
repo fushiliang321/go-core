@@ -1,10 +1,5 @@
 package grpc
 
-import (
-	"github.com/fushiliang321/go-core/helper"
-	"strconv"
-)
-
 type Service struct {
 	RegisterFun any
 	Handle      any
@@ -24,12 +19,6 @@ var data = &Grpc{
 
 func Set(config *Grpc) {
 	data = config
-	if data.Port == 0 {
-		data.Port, _ = strconv.Atoi(helper.GetEnvDefault("SERVER_PORT_GRPC", "9000"))
-	}
-	if data.Host == "" {
-		data.Host = helper.GetEnvDefault("SERVER_ADDRESS_GRPC", "0.0.0.0")
-	}
 }
 
 func Get() *Grpc {
