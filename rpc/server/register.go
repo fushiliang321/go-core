@@ -8,7 +8,7 @@ import (
 
 func RegisterServer(name string, s any) {
 	b, _ := consul.RegisterServer(name, "jsonrpc-http", ip, port, &api.AgentServiceCheck{
-		HTTP:   fmt.Sprintf("http://%s:%d", ip, port, "/"),
+		HTTP:   fmt.Sprintf("http://%s:%d/", ip, port),
 		Method: "POST",
 		Body:   "{\"id\":\"\",\"jsonrpc\":\"2.0\",\"method\":\"./\",\"params\":{}}",
 	})
