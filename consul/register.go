@@ -112,7 +112,6 @@ func getLastServiceId(name string) (maxServiceId string) {
 		if err == nil && id > maxId {
 			maxId = id
 			maxServiceId = v.ID
-			fmt.Println(v.Address, v.Port)
 		}
 	}
 	return
