@@ -1,7 +1,7 @@
 package server
 
 import (
-	config "github.com/fushiliang321/go-core/config/rpc"
+	config "github.com/fushiliang321/go-core/config/jsonrpc"
 	"github.com/fushiliang321/go-core/helper"
 	go_jsonrpc "github.com/iloveswift/go-jsonrpc"
 	"reflect"
