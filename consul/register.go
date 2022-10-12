@@ -2,19 +2,54 @@ package consul
 
 import (
 	"fmt"
+	"github.com/fushiliang321/go-core/exception"
 	"github.com/hashicorp/consul/api"
 	"log"
+	"strconv"
+	"strings"
 )
 
-func newConsulClient() (client *api.Client, err error) {
+var client *api.Client
+
+func newConsulClient() (*api.Client, error) {
+	var err error
+	if client != nil {
+		return client, err
+	}
 	client, err = api.NewClient(GetConfig())
 	if err != nil {
 		fmt.Println("api new client is failed, err:", err)
+		client = nil
 	}
-	return
+	return client, err
+}
+
+func IsRegister(name string, protocol string, address string, port int) bool {
+	client, _ := newConsulClient()
+	services, err := client.Agent().Services()
+	if err != nil {
+		return false
+	}
+	for _, service := range services {
+		if service == nil || service.Service != name || service.Address != address || service.Port != port {
+			continue
+		}
+		MetaProtocol, ok := service.Meta["Protocol"]
+		if !ok || MetaProtocol != protocol {
+			continue
+		}
+		return true
+	}
+	return false
 }
 
 func RegisterServer(name string, protocol string, address string, port int, check *api.AgentServiceCheck) (b bool, err error) {
+	defer func() {
+		exception.Listener("RegisterServer error:", recover())
+	}()
+	if IsRegister(name, protocol, address, port) {
+		return true, nil
+	}
 	client, err := newConsulClient()
 	if err != nil {
 		log.Println("consul client error : ", err)
@@ -23,14 +58,12 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 	if check != nil {
 		check = setServiceCheckDefaultValue(check)
 	}
-
 	registration := &api.AgentServiceRegistration{
-		Name: name, // 服务名称
-		Port: port, // 服务端口
-		ID:   name, //服务id
-		// todo 需要完善服务唯一id生成规则
-		Tags:    []string{protocol}, // tag，可以为空
-		Address: address,            // 服务 IP
+		Name:    name,                               // 服务名称
+		Port:    port,                               // 服务端口
+		ID:      generateId(getLastServiceId(name)), //服务id
+		Tags:    []string{protocol},                 // tag，可以为空
+		Address: address,                            // 服务 IP
 		Meta:    map[string]string{"Protocol": protocol},
 		Check:   check,
 	}
@@ -42,6 +75,7 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 	return true, nil
 }
 
+// 设置健康检测默认值
 func setServiceCheckDefaultValue(check *api.AgentServiceCheck) *api.AgentServiceCheck {
 	if check.Timeout == "" {
 		check.Timeout = "1s"
@@ -55,4 +89,46 @@ func setServiceCheckDefaultValue(check *api.AgentServiceCheck) *api.AgentService
 		check.DeregisterCriticalServiceAfter = "90s"
 	}
 	return check
+}
+
+// 获取最大的服务id
+func getLastServiceId(name string) (maxServiceId string) {
+	maxId := -1
+	maxServiceId = name
+	client, _ := newConsulClient()
+	services, err := client.Agent().Services()
+	if err != nil {
+		return
+	}
+	for _, v := range services {
+		if v == nil || v.Service != name {
+			continue
+		}
+		i := strings.LastIndex(v.ID, "-")
+		if i == -1 {
+			continue
+		}
+		id, err := strconv.Atoi(v.ID[i+1:])
+		if err == nil && id > maxId {
+			maxId = id
+			maxServiceId = v.ID
+			fmt.Println(v.Address, v.Port)
+		}
+	}
+	return
+}
+
+// 生成id
+func generateId(name string) string {
+	i := strings.LastIndex(name, "-")
+	if i == -1 {
+		return name + "-0"
+	}
+	id, err := strconv.Atoi(name[i+1:])
+	name = name[:i]
+	if err != nil {
+		return name + "-0"
+	}
+	idStr := strconv.Itoa(id + 1)
+	return name + "-" + idStr
 }
