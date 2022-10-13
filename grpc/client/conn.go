@@ -1,20 +1,33 @@
 package client
 
 import (
-	"context"
+	goContext "context"
 	"fmt"
 	"github.com/fushiliang321/go-core/consul"
+	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 type ClientConn struct {
 	cc *grpc.ClientConn
 }
 
-func (cc *ClientConn) Invoke(ctx context.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
+func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
+	if ctx == nil {
+		ctx = goContext.Background()
+	}
+	contextData := context.GetAll()
+	if contextData != nil && len(contextData) > 0 {
+		str, err := helper.JsonEncode(contextData)
+		if err == nil {
+			ctx = metadata.AppendToOutgoingContext(ctx, "contextData", str)
+		}
+	}
 	err := cc.cc.Invoke(ctx, method, args, reply, opts...)
 	if err != nil {
 		fmt.Println("grpc client Invoke error", err)
@@ -22,7 +35,7 @@ func (cc *ClientConn) Invoke(ctx context.Context, method string, args, reply int
 	cc.Close()
 	return err
 }
-func (cc *ClientConn) NewStream(ctx context.Context, desc *grpc.StreamDesc, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+func (cc *ClientConn) NewStream(ctx goContext.Context, desc *grpc.StreamDesc, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {
 	return cc.cc.NewStream(ctx, desc, method, opts...)
 }
 func (cc *ClientConn) GetState() connectivity.State {
@@ -31,7 +44,7 @@ func (cc *ClientConn) GetState() connectivity.State {
 func (cc *ClientConn) Target() string {
 	return cc.cc.Target()
 }
-func (cc *ClientConn) WaitForStateChange(ctx context.Context, sourceState connectivity.State) bool {
+func (cc *ClientConn) WaitForStateChange(ctx goContext.Context, sourceState connectivity.State) bool {
 	return cc.cc.WaitForStateChange(ctx, sourceState)
 }
 func (cc *ClientConn) Connect() {

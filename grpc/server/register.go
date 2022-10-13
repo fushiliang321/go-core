@@ -1,14 +1,17 @@
 package server
 
 import (
+	goContext "context"
 	"fmt"
 	"github.com/fushiliang321/go-core/consul"
+	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/hashicorp/consul/api"
 	grpc1 "google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/metadata"
 	"log"
 	"net"
 	"reflect"
@@ -38,10 +41,24 @@ func listen(host string, port int) *serverListen {
 	if err != nil {
 		log.Printf("grpc failed to listen: %v", err)
 	}
+	server := grpc1.NewServer(grpc1.UnaryInterceptor(func(ctx goContext.Context, req interface{}, info *grpc1.UnaryServerInfo, handler grpc1.UnaryHandler) (resp interface{}, err error) {
+		if md, ok := metadata.FromIncomingContext(ctx); ok {
+			contextDataStr := md.Get("contextData")
+			if contextDataStr != nil && len(contextDataStr) > 0 && len(contextDataStr[0]) > 0 {
+				var contextData map[string]any
+				err := helper.JsonDecode(contextDataStr[0], &contextData)
+				if err == nil {
+					context.SetBatch(contextData)
+				}
+			}
+		}
+		return handler(ctx, req)
+	}))
+
 	return &serverListen{
 		host:     host,
 		port:     port,
-		server:   grpc1.NewServer(),
+		server:   server,
 		listener: lis,
 	}
 }
