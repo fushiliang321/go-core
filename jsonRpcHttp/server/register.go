@@ -1,9 +1,9 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/fushiliang321/go-core/consul"
+	"github.com/fushiliang321/go-core/helper"
 	"github.com/hashicorp/consul/api"
 )
 
@@ -21,11 +21,12 @@ func RegisterServer(name string, s any) {
 			Name: name,
 		},
 	}
-	bodyStr, _ := json.Marshal(body)
+
+	bodyStr, _ := helper.JsonEncode(body)
 	b, _ := consul.RegisterServer(name, "jsonrpc-http", ip, port, &api.AgentServiceCheck{
 		HTTP:   fmt.Sprintf("http://%s:%d/", ip, port),
 		Method: "POST",
-		Body:   string(bodyStr),
+		Body:   bodyStr,
 	})
 	if b {
 		server.Register(s)

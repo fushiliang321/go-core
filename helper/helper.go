@@ -147,6 +147,15 @@ func JsonDecode(str string, v any) error {
 	return d.Decode(&v)
 }
 
+// json编码
+func JsonEncode(v any) (string, error) {
+	marshal, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(marshal), nil
+}
+
 // 获取当前日期时间
 func Time() string {
 	t := time.Now()
