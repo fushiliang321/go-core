@@ -14,7 +14,8 @@ import (
 )
 
 type ClientConn struct {
-	cc *grpc.ClientConn
+	cc        *grpc.ClientConn
+	multiplex bool //是否复用连接
 }
 
 func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
@@ -30,9 +31,11 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 	}
 	err := cc.cc.Invoke(ctx, method, args, reply, opts...)
 	if err != nil {
-		fmt.Println("grpc client Invoke error", err)
+		fmt.Println("grpc client Invoke error：", err)
 	}
-	cc.Close()
+	if !cc.multiplex {
+		cc.Close()
+	}
 	return err
 }
 func (cc *ClientConn) NewStream(ctx goContext.Context, desc *grpc.StreamDesc, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {
@@ -60,7 +63,7 @@ func (cc *ClientConn) GetMethodConfig(method string) grpc.MethodConfig {
 	return cc.cc.GetMethodConfig(method)
 }
 
-func GetConn(serviceName string) (grpc.ClientConnInterface, error) {
+func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 	defer func() {
 		exception.Listener("grpc conn exception", recover())
 	}()
@@ -73,6 +76,7 @@ func GetConn(serviceName string) (grpc.ClientConnInterface, error) {
 		return nil, err
 	}
 	return &ClientConn{
-		cc: conn,
+		cc:        conn,
+		multiplex: multiplex,
 	}, nil
 }
