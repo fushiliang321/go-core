@@ -11,29 +11,43 @@ import (
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"sync"
 )
 
 type ClientConn struct {
-	serviceName string
-	cc          *grpc.ClientConn
-	multiplex   bool //是否复用连接
+	serviceName      string
+	cc               *grpc.ClientConn
+	multiplex        bool      //是否复用连接
+	currentLimitChan chan byte //限流通道
+	sync.RWMutex
 }
 
-func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
-	con := cc.cc
+func dial(serviceName string) (*grpc.ClientConn, error) {
+	defer func() {
+		exception.Listener("grpc dial exception", recover())
+	}()
+	node, err := consul.GetNode(serviceName, "grpc")
+	if err != nil {
+		return nil, err
+	}
+	return grpc.Dial(node.Address+":"+node.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+}
+
+func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply interface{}, opts ...grpc.CallOption) (err error) {
+	var con *grpc.ClientConn
 	if !cc.multiplex {
-		state := con.GetState()
-		if state == connectivity.Shutdown || state == connectivity.TransientFailure {
-			//不复用连接的情况下 每次调用都会重新连接
-			//复用连接的情况下不需要自动重新连接，避免重连后会忘记去手动关闭连接
-			if state == connectivity.TransientFailure {
-				cc.cc.Close()
-			}
-			newCc, _ := GetConn(cc.serviceName, cc.multiplex)
-			con = newCc.cc
-			cc.cc = newCc.cc
+		//不复用连接的情况下 每次调用都会重新连接
+		//复用连接的情况下不需要自动重新连接，避免重连后会忘记去手动关闭连接
+		con, err = dial(cc.serviceName)
+		if err != nil {
+			return err
 		}
 		defer con.Close()
+	} else {
+		cc.currentLimitChan <- <-cc.currentLimitChan
+		cc.RLock()
+		defer cc.RUnlock()
+		con = cc.cc
 	}
 	if ctx == nil {
 		ctx = goContext.Background()
@@ -45,7 +59,7 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 			ctx = metadata.AppendToOutgoingContext(ctx, "contextData", str)
 		}
 	}
-	err := con.Invoke(ctx, method, args, reply, opts...)
+	err = con.Invoke(ctx, method, args, reply, opts...)
 	if err != nil {
 		fmt.Println("grpc client Invoke error：", err)
 	}
@@ -88,9 +102,16 @@ func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 	if err != nil {
 		return nil, err
 	}
+	currentLimitChan := make(chan byte, 1)
+	if !multiplex {
+		conn = nil
+	} else {
+		currentLimitChan <- 0
+	}
 	return &ClientConn{
-		serviceName: serviceName,
-		cc:          conn,
-		multiplex:   multiplex,
+		serviceName:      serviceName,
+		cc:               conn,
+		multiplex:        multiplex,
+		currentLimitChan: currentLimitChan,
 	}, nil
 }
