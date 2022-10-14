@@ -14,11 +14,27 @@ import (
 )
 
 type ClientConn struct {
-	cc        *grpc.ClientConn
-	multiplex bool //是否复用连接
+	serviceName string
+	cc          *grpc.ClientConn
+	multiplex   bool //是否复用连接
 }
 
 func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
+	con := cc.cc
+	if !cc.multiplex {
+		state := con.GetState()
+		if state == connectivity.Shutdown || state == connectivity.TransientFailure {
+			//不复用连接的情况下 每次调用都会重新连接
+			//复用连接的情况下不需要自动重新连接，避免重连后会忘记去手动关闭连接
+			if state == connectivity.TransientFailure {
+				cc.cc.Close()
+			}
+			newCc, _ := GetConn(cc.serviceName, cc.multiplex)
+			con = newCc.cc
+			cc.cc = newCc.cc
+		}
+		defer con.Close()
+	}
 	if ctx == nil {
 		ctx = goContext.Background()
 	}
@@ -29,12 +45,9 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 			ctx = metadata.AppendToOutgoingContext(ctx, "contextData", str)
 		}
 	}
-	err := cc.cc.Invoke(ctx, method, args, reply, opts...)
+	err := con.Invoke(ctx, method, args, reply, opts...)
 	if err != nil {
 		fmt.Println("grpc client Invoke error：", err)
-	}
-	if !cc.multiplex {
-		cc.Close()
 	}
 	return err
 }
@@ -76,7 +89,8 @@ func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 		return nil, err
 	}
 	return &ClientConn{
-		cc:        conn,
-		multiplex: multiplex,
+		serviceName: serviceName,
+		cc:          conn,
+		multiplex:   multiplex,
 	}, nil
 }
