@@ -5,8 +5,13 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"github.com/fushiliang321/go-core/helper/types"
 	"github.com/valyala/fasthttp"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -17,6 +22,7 @@ import (
 )
 
 var appName string
+var cacheData = map[string]any{}
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -264,4 +270,42 @@ func GetStructFields(v any) (fields []string) {
 		}
 	}
 	return
+}
+
+// 获取文件内的所有变量名
+func GetFileVariateNameAll(FilePath string) (names []string) {
+	cache, ok := cacheData["GetFileVariateNameAll"]
+	mapData := map[string][]string{}
+	if ok {
+		if mapData1, ok := cache.(map[string][]string); ok {
+			mapData = mapData1
+			if names, ok := mapData[FilePath]; ok {
+				return names
+			}
+		}
+	}
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, FilePath, nil, 0)
+	if err != nil {
+		fmt.Printf("err = %s", err)
+	}
+	for s, object := range f.Scope.Objects {
+		if object.Kind == ast.Var {
+			names = append(names, s)
+		}
+	}
+	mapData[FilePath] = names
+	cacheData["GetFileVariateNameAll"] = mapData
+	return
+}
+
+// 获取当前文件名
+//
+//go:noinline
+func CurrentFile() string {
+	_, file, _, ok := runtime.Caller(1)
+	if !ok {
+		log.Println("Can not get current file info")
+	}
+	return file
 }
