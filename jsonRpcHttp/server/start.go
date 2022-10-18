@@ -19,7 +19,10 @@ var port int
 func initialize() {
 	consulConfig := config.Get()
 	port = consulConfig.Port
-	server, _ = go_jsonrpc.NewServer("http", consulConfig.Host, strconv.Itoa(port))
+
+	server = NewHttpServer(consulConfig.Host, strconv.Itoa(port))
+	//http := server.(*server2.Http)
+	//http.Server
 	ip = helper.GetLocalIP()
 }
 

@@ -2,11 +2,19 @@ package context
 
 import "github.com/timandy/routine"
 
-var local = routine.NewInheritableThreadLocal()
+type Context struct {
+	Local routine.ThreadLocal
+}
+
+func NewInstance() *Context {
+	return &Context{
+		Local: routine.NewInheritableThreadLocal(),
+	}
+}
 
 // 获取全部协程上下文数据
-func GetAll() map[string]any {
-	data := local.Get()
+func (ctx *Context) GetAll() map[string]any {
+	data := ctx.Local.Get()
 	if data != nil {
 		if data, ok := data.(map[string]any); ok {
 			return data
@@ -16,8 +24,8 @@ func GetAll() map[string]any {
 }
 
 // 获取协程上下文数据
-func Get(key string) any {
-	data := local.Get()
+func (ctx *Context) Get(key string) any {
+	data := ctx.Local.Get()
 	if data != nil {
 		if data, ok := data.(map[string]any); ok {
 			if value, ok := data[key]; ok {
@@ -29,22 +37,22 @@ func Get(key string) any {
 }
 
 // 设置协程上下文数据
-func Set(key string, value any) {
+func (ctx *Context) Set(key string, value any) {
 	_map := map[string]any{}
-	data := local.Get()
+	data := ctx.Local.Get()
 	if data != nil {
 		if data, ok := data.(map[string]any); ok {
 			_map = data
 		}
 	}
 	_map[key] = value
-	local.Set(_map)
+	ctx.Local.Set(_map)
 }
 
 // 批量设置协程上下文数据
-func SetBatch(values map[string]any) {
+func (ctx *Context) SetBatch(values map[string]any) {
 	_map := map[string]any{}
-	data := local.Get()
+	data := ctx.Local.Get()
 	if data != nil {
 		if data, ok := data.(map[string]any); ok {
 			_map = data
@@ -53,20 +61,20 @@ func SetBatch(values map[string]any) {
 	for key, value := range values {
 		_map[key] = value
 	}
-	local.Set(_map)
+	ctx.Local.Set(_map)
 }
 
 // 移除协程上下文数据
-func Remove(key string) {
-	data := local.Get()
+func (ctx *Context) Remove(key string) {
+	data := ctx.Local.Get()
 	if data != nil {
 		if data, ok := data.(map[string]any); ok {
 			delete(data, key)
 			if len(data) > 0 {
-				local.Set(data)
+				ctx.Local.Set(data)
 				return
 			}
 		}
-		local.Remove()
+		ctx.Local.Remove()
 	}
 }
