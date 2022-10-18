@@ -35,6 +35,9 @@ func AppName() string {
 
 // 响应成功数据
 func Success(msg string, data any) (res *types.Result) {
+	if data == nil {
+		data = map[string]string{}
+	}
 	return &types.Result{
 		Code:    1,
 		Msg:     msg,
@@ -46,6 +49,9 @@ func Success(msg string, data any) (res *types.Result) {
 
 // 响应错误数据
 func Error(errCode int, msg string, data any) (res *types.Result) {
+	if data == nil {
+		data = map[string]string{}
+	}
 	return &types.Result{
 		Code:    0,
 		Msg:     msg,
