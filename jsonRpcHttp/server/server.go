@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
 	"github.com/iloveswift/go-jsonrpc/common"
 	"reflect"
@@ -13,7 +12,6 @@ type Server struct {
 }
 
 func (svr *Server) Handler(b []byte) []byte {
-	fmt.Println("Handler")
 	data, err := common.ParseRequestBody(b)
 	if err != nil {
 		return jsonE(nil, common.JsonRpc, common.ParseError)
