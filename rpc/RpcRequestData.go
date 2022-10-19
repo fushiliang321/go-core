@@ -1,7 +1,7 @@
 package rpc
 
 type User struct {
-	Id         int    `json:"id"`
+	Id         uint   `json:"id"`
 	Fd         uint64 `json:"fd"`
 	Nickname   string `json:"nickname"`
 	Phone      string `json:"phone"`
@@ -11,7 +11,7 @@ type User struct {
 }
 
 type ServerParams struct {
-	RequestTime      int64   `json:"request_time"`
+	RequestTime      uint64  `json:"request_time"`
 	RequestTimeMilli float64 `json:"request_time_milli"`
 	ServerProtocol   string  `json:"server_protocol"`
 	RemoteAddr       string  `json:"remote_addr"`
@@ -20,7 +20,7 @@ type ServerParams struct {
 }
 
 type RpcRequestData struct {
-	FromId       int               `json:"fromId"`
+	FromId       uint              `json:"fromId"`
 	FromInfo     User              `json:"fromInfo"`
 	Timestamp    int64             `json:"timestamp"`
 	Type         string            `json:"type"`
