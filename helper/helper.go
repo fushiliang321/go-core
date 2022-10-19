@@ -321,23 +321,22 @@ func CurrentFile() string {
 }
 
 // 获取rpc上下文请求数据
-func RpcRequestData() *rpc.RpcRequestData {
+func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
 	ctxData := context.GetAll()
 	if ctxData == nil {
-		return nil
+		return
 	}
 	data := ctxData["internalRequest"]
 	if data == nil {
-		return nil
+		return
 	}
 	mapData, ok := data.(map[string]any)
 	if !ok {
-		return nil
+		return
 	}
-	var rpcRequestData *rpc.RpcRequestData
-	err := MapToStruc[string](mapData, rpcRequestData)
+	err := MapToStruc[string](mapData, &rpcRequestData)
 	if err != nil {
-		return nil
+		return
 	}
 	return rpcRequestData
 }
