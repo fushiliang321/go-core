@@ -75,11 +75,13 @@ func ErrorResponse(ctx *fasthttp.RequestCtx, errCode int, msg string, data any) 
 func MapToStruc[_type interface {
 	int | string
 }](m map[_type]any, s any) (err error) {
-	arr, err := json.Marshal(m)
+	marshal, err := json.Marshal(m)
 	if err != nil {
 		return
 	}
-	return json.Unmarshal(arr, s)
+	d := json.NewDecoder(bytes.NewReader(marshal))
+	d.UseNumber()
+	return d.Decode(s)
 }
 
 // 字符串md5
