@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fushiliang321/go-core/helper/types"
+	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
+	"github.com/fushiliang321/go-core/rpc"
 	"github.com/valyala/fasthttp"
 	"go/ast"
 	"go/parser"
@@ -314,4 +316,26 @@ func CurrentFile() string {
 		log.Println("Can not get current file info")
 	}
 	return file
+}
+
+// 获取rpc上下文请求数据
+func RpcRequestData() *rpc.RpcRequestData {
+	ctxData := context.GetAll()
+	if ctxData == nil {
+		return nil
+	}
+	data := ctxData["internalRequest"]
+	if data == nil {
+		return nil
+	}
+	mapData, ok := data.(map[string]any)
+	if !ok {
+		return nil
+	}
+	var rpcRequestData *rpc.RpcRequestData
+	err := MapToStruc[string](mapData, rpcRequestData)
+	if err != nil {
+		return nil
+	}
+	return rpcRequestData
 }
