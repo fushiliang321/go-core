@@ -49,6 +49,10 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		log.Println(ctx.ID(), "onHandshake")
 		onHandshake(ser, &upgrader)
 	}
+	if ctx.Response.StatusCode() != 200 {
+		//非200的状态需直接返回，不能升级到websocket
+		return
+	}
 	err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
 		ser.Conn = conn
 		if ser.MessageType == 0 {
