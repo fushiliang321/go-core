@@ -21,13 +21,14 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 			multiplex = isMultiplex[0]
 		}
 		conn, err := GetConn(serviceName, multiplex)
+		var client t
 		if err != nil {
 			exception.Listener("grpc newClient Error: ["+serviceName+"]", err)
-			return *new(t)
-		}
-		client := fun(conn)
-		if multiplex {
-			multiplexConns[client] = conn
+		} else {
+			client = fun(conn)
+			if multiplex {
+				multiplexConns[client] = conn
+			}
 		}
 		return client
 	}
