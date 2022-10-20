@@ -17,6 +17,7 @@ import (
 type ClientConn struct {
 	serviceName      string
 	cc               *grpc.ClientConn
+	ccInUse          bool      //连接是否被使用
 	multiplex        bool      //是否复用连接
 	currentLimitChan chan byte //限流通道
 	sync.RWMutex
@@ -37,10 +38,16 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 	var con *grpc.ClientConn
 	if !cc.multiplex {
 		//不复用连接的情况下 每次调用都会重新连接
+		//第一次调用不需要重新连接，直接使用连接，避免浪费
 		//复用连接的情况下不需要自动重新连接，避免重连后会忘记去手动关闭连接
-		con, err = dial(cc.serviceName)
-		if err != nil {
-			return err
+		if cc.ccInUse {
+			con, err = dial(cc.serviceName)
+			if err != nil {
+				return err
+			}
+		} else {
+			cc.ccInUse = true
+			con = cc.cc
 		}
 		defer con.Close()
 	} else {
@@ -103,9 +110,7 @@ func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 		return nil, err
 	}
 	currentLimitChan := make(chan byte, 1)
-	if !multiplex {
-		conn = nil
-	} else {
+	if multiplex {
 		currentLimitChan <- 0
 	}
 	return &ClientConn{
