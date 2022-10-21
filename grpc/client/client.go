@@ -5,7 +5,6 @@ import (
 	"github.com/fushiliang321/go-core/exception"
 	"google.golang.org/grpc"
 	"reflect"
-	"strings"
 )
 
 type ClientGenerateFun[t any] func(isMultiplex ...bool) t
@@ -19,14 +18,6 @@ func init() {
 }
 
 func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
-	client := fun(clientServiceNameExtract{})
-	if reflect.ValueOf(client).NumMethod() > 0 {
-		reflectMethod := reflect.ValueOf(client).Method(0)
-		reflectMethod.Call([]reflect.Value{
-			reflect.ValueOf(ctx),
-			reflect.New(reflectMethod.Type().In(1).Elem()),
-		})
-	}
 	return func(isMultiplex ...bool) t {
 		defer func() {
 			exception.Listener("grpc call exception:", recover())
@@ -50,10 +41,16 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 }
 
 func ClientAuto[t any](fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
-	var t1 = new(t)
-	typeStr := reflect.TypeOf(t1).String()
-	lastIndex := strings.LastIndexAny(reflect.TypeOf(t1).String(), ".")
-	serviceName := typeStr[lastIndex+1 : len(typeStr)-6]
+	client := fun(clientServiceNameExtract{})
+	serviceName := ""
+	if reflect.ValueOf(client).NumMethod() > 0 {
+		reflectMethod := reflect.ValueOf(client).Method(0)
+		ctx1 := context.WithValue(ctx, "serviceName", &serviceName)
+		reflectMethod.Call([]reflect.Value{
+			reflect.ValueOf(ctx1),
+			reflect.New(reflectMethod.Type().In(1).Elem()),
+		})
+	}
 	return NewClient[t](serviceName, fun)
 }
 
