@@ -1,10 +1,10 @@
 package websocket
 
 import (
-	"encoding/json"
 	"github.com/fasthttp/websocket"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/valyala/fasthttp"
+	"log"
 	"time"
 )
 
@@ -38,22 +38,30 @@ func Start() {
 func (s *WsServer) Push(data any) {
 	var msgData []byte
 	switch data.(type) {
-	case []byte:
-		msgData = data.([]byte)
 	case byte:
 		msgData = []byte{data.(byte)}
-	case *[]byte:
-		msgData = *(data.(*[]byte))
 	case *byte:
 		msgData = []byte{*(data.(*byte))}
+	case []byte:
+		msgData = data.([]byte)
+	case *[]byte:
+		msgData = *(data.(*[]byte))
+	case string:
+		msgData = []byte(data.(string))
+	case *string:
+		msgData = []byte(*(data.(*string)))
 	default:
-		var err error
-		msgData, err = json.Marshal(data)
+		err := s.Conn.WriteJSON(data)
 		if err != nil {
-			return
+			log.Println("ws push err:", err)
 		}
+		return
 	}
-	s.Conn.WriteMessage(s.MessageType, msgData)
+	err := s.Conn.WriteMessage(s.MessageType, msgData)
+	if err != nil {
+		log.Println("ws push err:", err)
+		return
+	}
 }
 func (s *WsServer) Disconnect(data []byte) {
 	sender.remove(s.Fd)
