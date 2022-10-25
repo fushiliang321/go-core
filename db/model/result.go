@@ -5,6 +5,12 @@ func (m *Model[t]) Count() (total int64) {
 	return
 }
 
+func (m *Model[t]) Exists() bool {
+	var total int64
+	m.Db.Limit(1).Count(&total)
+	return total > 0
+}
+
 func (m *Model[t]) First() (res t) {
 	m.Db.First(&res)
 	return
