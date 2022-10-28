@@ -1,28 +1,28 @@
 package model
 
-func (m *Model[t]) Count() (total int64) {
-	m.Db.Count(&total)
-	return
+func (m *Model[t]) Count() (total int64, err error) {
+	tx := m.Db.Count(&total)
+	return total, tx.Error
 }
 
-func (m *Model[t]) Exists() bool {
+func (m *Model[t]) Exists() (bool, error) {
 	var total int64
-	m.Db.Limit(1).Count(&total)
-	return total > 0
+	tx := m.Db.Limit(1).Count(&total)
+	return total > 0, tx.Error
 }
 
-func (m *Model[t]) First() (res *t) {
+func (m *Model[t]) First() (res *t, err error) {
 	tx := m.Db.First(&res)
 	if tx.RowsAffected == 0 {
-		return nil
+		return nil, tx.Error
 	}
 	return
 }
 
-func (m *Model[t]) Find() (res *[]t) {
+func (m *Model[t]) Find() (res *[]t, err error) {
 	tx := m.Db.Find(&res)
 	if tx.RowsAffected == 0 {
-		return nil
+		return nil, tx.Error
 	}
 	return
 }
@@ -36,11 +36,11 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 	}
 	lastPage := 0
 	var lists []t
-	total := m.Count()
+	total, _ := m.Count()
 	if total > 0 {
 		lastPage = ((int(total) / limit) + 1)
 		offset := (page - 1) * limit
-		if res := m.Offset(offset).Limit(limit).Find(); res != nil {
+		if res, _ := m.Offset(offset).Limit(limit).Find(); res != nil {
 			lists = *res
 		}
 	}
@@ -53,28 +53,28 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 	}
 }
 
-func (m *Model[t]) Delete() int64 {
+func (m *Model[t]) Delete() (int64, error) {
 	var _t t
 	tx := m.Db.Delete(&_t)
-	return tx.RowsAffected
+	return tx.RowsAffected, tx.Error
 }
 
-func (m *Model[t]) Update(column string, value interface{}) int64 {
+func (m *Model[t]) Update(column string, value interface{}) (int64, error) {
 	tx := m.Db.Update(column, value)
-	return tx.RowsAffected
+	return tx.RowsAffected, tx.Error
 }
 
-func (m *Model[t]) Updates(values interface{}) int64 {
+func (m *Model[t]) Updates(values interface{}) (int64, error) {
 	tx := m.Db.Updates(values)
-	return tx.RowsAffected
+	return tx.RowsAffected, tx.Error
 }
 
-func (m *Model[t]) Pluck(column string, dest any) {
-	m.Db.Pluck(column, dest)
-	return
+func (m *Model[t]) Pluck(column string, dest any) error {
+	tx := m.Db.Pluck(column, dest)
+	return tx.Error
 }
 
-func (m *Model[t]) Create(data t) int64 {
+func (m *Model[t]) Create(data t) (int64, error) {
 	tx := m.Db.Create(data)
-	return tx.RowsAffected
+	return tx.RowsAffected, tx.Error
 }
