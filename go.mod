@@ -6,7 +6,6 @@ require (
 	github.com/fasthttp/router v1.4.11
 	github.com/fasthttp/websocket v1.5.0
 	github.com/hashicorp/consul/api v1.14.0
-	github.com/iloveswift/go-jsonrpc v1.0.2
 	github.com/robfig/cron v1.2.0
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d
 	github.com/streadway/amqp v1.0.0
