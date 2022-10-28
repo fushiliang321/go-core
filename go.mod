@@ -5,10 +5,12 @@ go 1.19
 require (
 	github.com/fasthttp/router v1.4.11
 	github.com/fasthttp/websocket v1.5.0
+	github.com/fushiliang321/jsonrpc v0.0.0-20221028061603-71524c0ce529
 	github.com/hashicorp/consul/api v1.14.0
 	github.com/robfig/cron v1.2.0
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d
 	github.com/streadway/amqp v1.0.0
+	github.com/timandy/routine v1.0.9
 	github.com/valyala/fasthttp v1.39.0
 	google.golang.org/grpc v1.49.0
 	gorm.io/driver/mysql v1.3.6
@@ -19,7 +21,6 @@ require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/fatih/color v1.9.0 // indirect
-	github.com/fushiliang321/jsonrpc v0.0.0-20221028061603-71524c0ce529 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goinggo/mapstructure v0.0.0-20140717182941-194205d9b4a9 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
@@ -36,7 +37,6 @@ require (
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
-	github.com/timandy/routine v1.0.9 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
