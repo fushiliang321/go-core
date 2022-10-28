@@ -11,13 +11,19 @@ func (m *Model[t]) Exists() bool {
 	return total > 0
 }
 
-func (m *Model[t]) First() (res t) {
-	m.Db.First(&res)
+func (m *Model[t]) First() (res *t) {
+	tx := m.Db.First(&res)
+	if tx.RowsAffected == 0 {
+		return nil
+	}
 	return
 }
 
-func (m *Model[t]) Find() (res []t) {
-	m.Db.Find(&res)
+func (m *Model[t]) Find() (res *[]t) {
+	tx := m.Db.Find(&res)
+	if tx.RowsAffected == 0 {
+		return nil
+	}
 	return
 }
 
@@ -29,19 +35,21 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 		limit = 20
 	}
 	lastPage := 0
-	var res []t
+	var lists []t
 	total := m.Count()
 	if total > 0 {
 		lastPage = ((int(total) / limit) + 1)
 		offset := (page - 1) * limit
-		res = m.Offset(offset).Limit(limit).Find()
+		if res := m.Offset(offset).Limit(limit).Find(); res != nil {
+			lists = *res
+		}
 	}
 	return &PaginateData[t]{
 		Page:     page,
 		LastPage: lastPage,
 		Limit:    limit,
 		Total:    int(total),
-		Lists:    res,
+		Lists:    lists,
 	}
 }
 
@@ -64,4 +72,9 @@ func (m *Model[t]) Updates(values interface{}) int64 {
 func (m *Model[t]) Pluck(column string, dest any) {
 	m.Db.Pluck(column, dest)
 	return
+}
+
+func (m *Model[t]) Create(data t) int64 {
+	tx := m.Db.Create(data)
+	return tx.RowsAffected
 }
