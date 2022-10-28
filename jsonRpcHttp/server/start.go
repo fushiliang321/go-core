@@ -3,7 +3,7 @@ package server
 import (
 	config "github.com/fushiliang321/go-core/config/jsonRpcHttp"
 	"github.com/fushiliang321/go-core/helper"
-	go_jsonrpc "github.com/iloveswift/go-jsonrpc"
+	"github.com/fushiliang321/jsonrpc"
 	"reflect"
 	"strconv"
 	"sync"
@@ -12,7 +12,7 @@ import (
 type Service struct {
 }
 
-var server go_jsonrpc.ServerInterface
+var server jsonrpc.ServerInterface
 var ip string
 var port int
 

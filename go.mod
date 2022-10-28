@@ -20,6 +20,7 @@ require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
 	github.com/fatih/color v1.9.0 // indirect
+	github.com/fushiliang321/jsonrpc v0.0.0-20221028061603-71524c0ce529 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goinggo/mapstructure v0.0.0-20140717182941-194205d9b4a9 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

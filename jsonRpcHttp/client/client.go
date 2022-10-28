@@ -4,7 +4,7 @@ import (
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
-	jsonrpc "github.com/iloveswift/go-jsonrpc"
+	"github.com/fushiliang321/jsonrpc"
 	"log"
 )
 

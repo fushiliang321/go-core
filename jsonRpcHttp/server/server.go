@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
-	"github.com/iloveswift/go-jsonrpc/common"
+	"github.com/fushiliang321/jsonrpc/common"
 	"reflect"
 )
 
