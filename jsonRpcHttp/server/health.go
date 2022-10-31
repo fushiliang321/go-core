@@ -4,10 +4,11 @@ type Health struct {
 }
 
 type params struct {
-	Name string `json:"name"`
+	Name string `json:"name,omitempty"`
 }
 
-func (s *Health) Check(params *params, result *string) error {
-	*result = "success"
-	return nil
+var result = "success"
+
+func (s *Health) Check(params *params) (*string, error) {
+	return &result, nil
 }
