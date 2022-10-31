@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/fasthttp/router v1.4.11
 	github.com/fasthttp/websocket v1.5.0
-	github.com/fushiliang321/jsonrpc v0.0.0-20221028061603-71524c0ce529
+	github.com/fushiliang321/jsonrpc v0.0.0-20221031022442-0402362b955a
 	github.com/hashicorp/consul/api v1.14.0
 	github.com/robfig/cron v1.2.0
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d
