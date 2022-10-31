@@ -16,7 +16,7 @@ type Result struct {
 type WsResult struct {
 	Result
 	Path string `json:"path"`
-	Mark string `json:"mark"`
+	Mark string `json:"mark,omitempty"`
 }
 
 var appName string
