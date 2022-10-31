@@ -74,7 +74,7 @@ func (m *Model[t]) Pluck(column string, dest any) error {
 	return tx.Error
 }
 
-func (m *Model[t]) Create(data t) (int64, error) {
+func (m *Model[t]) Create(data *t) (int64, error) {
 	tx := m.Db.Create(data)
 	return tx.RowsAffected, tx.Error
 }
