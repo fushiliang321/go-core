@@ -59,12 +59,12 @@ func (m *Model[t]) Delete() (int64, error) {
 	return tx.RowsAffected, tx.Error
 }
 
-func (m *Model[t]) Update(column string, value interface{}) (int64, error) {
+func (m *Model[t]) Update(column string, value any) (int64, error) {
 	tx := m.Db.Update(column, value)
 	return tx.RowsAffected, tx.Error
 }
 
-func (m *Model[t]) Updates(values interface{}) (int64, error) {
+func (m *Model[t]) Updates(values any) (int64, error) {
 	tx := m.Db.Updates(values)
 	return tx.RowsAffected, tx.Error
 }
@@ -74,7 +74,7 @@ func (m *Model[t]) Pluck(column string, dest any) error {
 	return tx.Error
 }
 
-func (m *Model[t]) Create(data *t) (int64, error) {
+func (m *Model[t]) Create(data any) (int64, error) {
 	tx := m.Db.Create(data)
 	return tx.RowsAffected, tx.Error
 }
