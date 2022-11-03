@@ -1,12 +1,12 @@
 package amqp
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/consumer"
 	"github.com/fushiliang321/go-core/amqp/types"
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
+	"github.com/fushiliang321/go-core/helper"
 	amqp3 "github.com/streadway/amqp"
 	"log"
 	"sync"
@@ -31,6 +31,7 @@ func Publish(producer *types.Producer) {
 	if Amqp == nil {
 		return
 	}
+	var err error
 	channel, err := Amqp.Producer.Channel()
 	if err != nil {
 		log.Println("producer channel error", err)
@@ -40,10 +41,7 @@ func Publish(producer *types.Producer) {
 	if err != nil {
 		return
 	}
-	marshal, err := json.Marshal(producer.Data)
-	if err != nil {
-		return
-	}
+	body, err := helper.AnyToBytes(producer.Data)
 	deliveryMode := amqp3.Persistent
 	if !producer.Persistence {
 		deliveryMode = amqp3.Transient
@@ -51,7 +49,7 @@ func Publish(producer *types.Producer) {
 	err = channel.Publish(producer.Exchange, producer.RoutingKey, false, false, amqp3.Publishing{
 		ContentType:  "text/plain",
 		DeliveryMode: deliveryMode,
-		Body:         marshal,
+		Body:         *body,
 		Expiration:   producer.Expiration,
 		Priority:     producer.Priority,
 	})

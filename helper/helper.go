@@ -9,6 +9,7 @@ import (
 	"github.com/fushiliang321/go-core/helper/types"
 	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
 	"github.com/fushiliang321/go-core/rpc"
+	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
 	"go/ast"
 	"go/parser"
@@ -339,4 +340,26 @@ func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
 		return
 	}
 	return rpcRequestData
+}
+
+func AnyToBytes(data any) (*[]byte, error) {
+	var bts []byte
+	var err error
+	switch data.(type) {
+	case string:
+		bts = strconv.S2B(data.(string))
+	case *string:
+		bts = strconv.S2B(*(data.(*string)))
+	case []byte:
+		bts = data.([]byte)
+	case *[]byte:
+		return data.(*[]byte), nil
+	case byte:
+		bts = []byte{data.(byte)}
+	case *byte:
+		bts = []byte{*(data.(*byte))}
+	default:
+		bts, err = json.Marshal(data)
+	}
+	return &bts, err
 }
