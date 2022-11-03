@@ -75,7 +75,7 @@ func (consumer *Consumer) monitor() {
 		log.Println("consumer channel error", err)
 		return
 	}
-	err = channelInit(consumer.channel, consumer.Exchange, consumer.RoutingKey, consumer.Queue, consumer.Type, consumer.Durable)
+	err = channelInit(consumer.channel, consumer.Exchange, consumer.RoutingKey, consumer.Queue, consumer.Type, consumer.Durable, consumer.AutoDeletedExchange, consumer.AutoDeletedQueue)
 	if err != nil {
 		return
 	}
@@ -127,11 +127,11 @@ func (c *Consumer) Close() {
 	}
 }
 
-func channelInit(channel *amqp3.Channel, Exchange string, RoutingKey string, Queue string, kind string, durable bool) (err error) {
+func channelInit(channel *amqp3.Channel, Exchange string, RoutingKey string, Queue string, kind string, durable bool, AutoDeletedExchange bool, AutoDeletedQueue bool) (err error) {
 	if kind == "" {
 		kind = types.ExchangeTypeDirect
 	}
-	err = channel.ExchangeDeclare(Exchange, kind, durable, false, false, false, nil)
+	err = channel.ExchangeDeclare(Exchange, kind, durable, AutoDeletedExchange, false, false, nil)
 	if err != nil {
 		log.Println("consumer exchange error", err)
 		return
@@ -142,7 +142,7 @@ func channelInit(channel *amqp3.Channel, Exchange string, RoutingKey string, Que
 	q, err := channel.QueueDeclare(
 		Queue,
 		durable,
-		false,
+		AutoDeletedQueue,
 		false,
 		false,
 		nil,
