@@ -1,7 +1,6 @@
 package amqp
 
 import (
-	"fmt"
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/consumer"
 	"github.com/fushiliang321/go-core/amqp/types"
@@ -56,5 +55,4 @@ func Publish(producer *types.Producer) {
 	if err != nil {
 		log.Println("publish producer error", err)
 	}
-	fmt.Println("Publish  end")
 }
