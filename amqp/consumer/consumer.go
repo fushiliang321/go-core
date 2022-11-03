@@ -1,16 +1,23 @@
 package consumer
 
+import "C"
 import (
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/types"
 	"github.com/fushiliang321/go-core/exception"
 	amqp3 "github.com/streadway/amqp"
 	"log"
+	"sync"
 	"time"
 )
 
+type status = int8
+
 type Consumer struct {
 	*types.Consumer
+	status  status
+	channel *amqp3.Channel
+	sync.Mutex
 }
 
 const (
@@ -18,9 +25,22 @@ const (
 	NACK    = types.Result(1)
 	REQUEUE = types.Result(2)
 	REJECT  = types.Result(3)
+
+	STATUS_START = 1
+	STATUS_CLOSE = 0
 )
 
-func (consumer *Consumer) Monitor() {
+func (c *Consumer) Start() {
+	c.status = STATUS_START
+	c.monitor()
+}
+
+func (consumer *Consumer) monitor() {
+	consumer.Lock()
+	defer consumer.Unlock()
+	if consumer.status != STATUS_START {
+		return
+	}
 	defer func() {
 		if err := recover(); err != nil {
 			exception.Listener("amqp monitor", err)
@@ -34,7 +54,8 @@ func (consumer *Consumer) Monitor() {
 		go consumer.retryMonitor()
 		return
 	}
-	channel, err := amqp.Consumer.Channel()
+	var err error
+	consumer.channel, err = amqp.Consumer.Channel()
 	if err != nil {
 		log.Println("consumer channel error", err)
 		// 监听失败 要重试
@@ -44,7 +65,9 @@ func (consumer *Consumer) Monitor() {
 	closeChannel := true
 	defer func() {
 		if closeChannel {
-			channel.Close()
+			if consumer.channel != nil {
+				consumer.channel.Close()
+			}
 			// 监听失败 要重试
 			go consumer.retryMonitor()
 		}
@@ -53,11 +76,11 @@ func (consumer *Consumer) Monitor() {
 		log.Println("consumer channel error", err)
 		return
 	}
-	err = channelInit(channel, consumer.Exchange, consumer.RoutingKey, consumer.Queue, consumer.Type, consumer.Durable)
+	err = channelInit(consumer.channel, consumer.Exchange, consumer.RoutingKey, consumer.Queue, consumer.Type, consumer.Durable)
 	if err != nil {
 		return
 	}
-	msgs, err := channel.Consume(consumer.Queue, "", false, false, false, true, amqp3.Table{})
+	msgs, err := consumer.channel.Consume(consumer.Queue, "", false, false, false, true, amqp3.Table{})
 	if err != nil {
 		log.Println("consumer consume error", err)
 		return
@@ -85,9 +108,24 @@ func (consumer *Consumer) Monitor() {
 	}()
 }
 
+// 重新监听
 func (consumer *Consumer) retryMonitor() {
+	if consumer.status != STATUS_START {
+		return
+	}
 	time.Sleep(time.Second * 5)
-	consumer.Monitor()
+	consumer.monitor()
+}
+
+// 关闭监听
+func (c *Consumer) Close() {
+	c.Lock()
+	defer c.Unlock()
+	c.status = STATUS_CLOSE
+	if c.channel != nil {
+		c.channel.Close()
+		c.channel = nil
+	}
 }
 
 func channelInit(channel *amqp3.Channel, Exchange string, RoutingKey string, Queue string, kind string, durable bool) (err error) {

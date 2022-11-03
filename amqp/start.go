@@ -21,7 +21,7 @@ func (Service) Start(_ *sync.WaitGroup) {
 		//有消费者
 		for i := range config.Consumers {
 			con := consumer.Consumer{Consumer: config.Consumers[i]}
-			con.Monitor()
+			con.Start()
 		}
 	}
 }
