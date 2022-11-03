@@ -1,6 +1,5 @@
 package consumer
 
-import "C"
 import (
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/types"
