@@ -44,10 +44,16 @@ func Publish(producer *types.Producer) {
 	if err != nil {
 		return
 	}
+	deliveryMode := amqp3.Persistent
+	if !producer.Persistence {
+		deliveryMode = amqp3.Transient
+	}
 	err = channel.Publish(producer.Exchange, producer.RoutingKey, false, false, amqp3.Publishing{
 		ContentType:  "text/plain",
-		DeliveryMode: amqp3.Persistent,
+		DeliveryMode: deliveryMode,
 		Body:         marshal,
+		Expiration:   producer.Expiration,
+		Priority:     producer.Priority,
 	})
 	if err != nil {
 		log.Println("publish producer error", err)
