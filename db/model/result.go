@@ -35,7 +35,7 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 		limit = 20
 	}
 	lastPage := 0
-	var lists []t
+	lists := []t{}
 	total, _ := m.Count()
 	if total > 0 {
 		lastPage = ((int(total) / limit) + 1)
