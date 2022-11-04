@@ -37,9 +37,12 @@ func AppName() string {
 }
 
 // 响应成功数据
-func Success(msg string, data any) (res *types.Result) {
-	if data == nil {
+func Success(msg string, datas ...any) (res *types.Result) {
+	var data any
+	if len(datas) == 0 || datas[0] == nil {
 		data = map[string]string{}
+	} else {
+		data = datas[0]
 	}
 	return &types.Result{
 		Code:    1,
@@ -51,9 +54,12 @@ func Success(msg string, data any) (res *types.Result) {
 }
 
 // 响应错误数据
-func Error(errCode int, msg string, data any) (res *types.Result) {
-	if data == nil {
+func Error(errCode int, msg string, datas ...any) (res *types.Result) {
+	var data any
+	if len(datas) == 0 || datas[0] == nil {
 		data = map[string]string{}
+	} else {
+		data = datas[0]
 	}
 	return &types.Result{
 		Code:    0,
@@ -65,7 +71,13 @@ func Error(errCode int, msg string, data any) (res *types.Result) {
 }
 
 // 响应错误数据
-func ErrorResponse(ctx *fasthttp.RequestCtx, errCode int, msg string, data any) {
+func ErrorResponse(ctx *fasthttp.RequestCtx, errCode int, msg string, datas ...any) {
+	var data any
+	if len(datas) == 0 || datas[0] == nil {
+		data = map[string]string{}
+	} else {
+		data = datas[0]
+	}
 	ctx.Response.SetStatusCode(errCode)
 	res := types.Result{}
 	res.Error(errCode, msg, data)
