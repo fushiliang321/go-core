@@ -13,18 +13,24 @@ func (m *Model[t]) Exists() (bool, error) {
 
 func (m *Model[t]) First() (res *t, err error) {
 	tx := m.Db.First(&res)
-	if tx.RowsAffected == 0 {
-		return nil, tx.Error
+	if tx.Error != nil {
+		res = nil
+		if tx.Error.Error() != "record not found" {
+			return res, tx.Error
+		}
 	}
-	return
+	return res, nil
 }
 
 func (m *Model[t]) Find() (res *[]t, err error) {
 	tx := m.Db.Find(&res)
-	if tx.RowsAffected == 0 {
-		return nil, tx.Error
+	if tx.Error != nil {
+		res = nil
+		if tx.Error.Error() != "record not found" {
+			return res, tx.Error
+		}
 	}
-	return
+	return res, nil
 }
 
 func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
