@@ -30,7 +30,7 @@ func init() {
 }
 
 func filter(str string) string {
-	reg, err := regexp.Compile("[^a-zA-Z0-9_$>.\"-]+")
+	reg, err := regexp.Compile("[^a-zA-Z0-9_$>./[/]\"-]+")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +63,8 @@ func (m *Model[t]) Where(where map[string]any) *Model[t] {
 			operator = getOperator(vArr[0])
 			value = vArr[1]
 		default:
-			value = fmt.Sprint(v)
+			//value = fmt.Sprint(v)
+			value = v
 		}
 		k = filter(k)
 		switch operator {
