@@ -28,12 +28,6 @@ type serverListen struct {
 	listener net.Listener
 }
 
-var ip string
-
-func init() {
-	ip = helper.GetLocalIP()
-}
-
 func listen(host string, port int) *serverListen {
 	address := host + ":" + strconv.Itoa(port)
 	// 监听端口
@@ -71,6 +65,8 @@ func (s *serverListen) Serve() {
 		}
 	}()
 	serviceInfos := s.server.GetServiceInfo()
+	consulConfig := consul.GetConfig()
+	ip := helper.GetLocalIP(consulConfig.Address)
 	for serviceName := range serviceInfos {
 		b, err := consul.RegisterServer(serviceName, "grpc", ip, s.port, &api.AgentServiceCheck{
 			GRPC: fmt.Sprintf("%v:%v/%v", ip, s.port, HEALTHCHECK_SERVICE),

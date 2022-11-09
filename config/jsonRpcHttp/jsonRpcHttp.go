@@ -7,7 +7,7 @@ type JsonRpcHttp struct {
 	Services  []any
 }
 
-var consul = &JsonRpcHttp{
+var jsonRpcHttp = &JsonRpcHttp{
 	Host:      "",
 	Port:      0,
 	Consumers: []string{},
@@ -15,9 +15,9 @@ var consul = &JsonRpcHttp{
 }
 
 func Set(config *JsonRpcHttp) {
-	consul = config
+	jsonRpcHttp = config
 }
 
 func Get() *JsonRpcHttp {
-	return consul
+	return jsonRpcHttp
 }

@@ -224,24 +224,49 @@ func GetLocalIPs() (ips []string) {
 	return ips
 }
 
-// 获取本机ip地址
-func GetLocalIP() string {
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		return ""
-	}
-	for _, address := range addrs {
-		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
-			if ipnet.IP.To4() != nil {
-				return ipnet.IP.String()
+// 获取本机ip地址，默认获取对外的ip地址
+func GetLocalIP(address ...string) string {
+	var err error
+	address = append(address, []string{
+		"223.5.5.5:53", "8.8.8.8:53",
+	}...)
+	for _, addr := range address {
+		ip := net.ParseIP(addr)
+		if ip != nil {
+			switch IpType(ip.String()) {
+			case 4:
+				addr = (addr + ":80")
+			case 6:
+				addr = ("[" + addr + "]:80")
 			}
 		}
+		conn, err := net.Dial("udp", addr)
+		if err != nil {
+			continue
+		}
+		defer conn.Close()
+		localAddr := conn.LocalAddr().(*net.UDPAddr)
+		return localAddr.IP.String()
 	}
+	log.Println("GetLocalIP error：", err)
 	return ""
 }
 
+// 判断ip类型
+func IpType(ip string) uint8 {
+	for i := 0; i < len(ip); i++ {
+		switch ip[i] {
+		case '.':
+			return 4
+		case ':':
+			return 6
+		}
+	}
+	return 0
+}
+
 // 获取客户端ip
-func ClientIP(ctx *fasthttp.RequestCtx) (string, int) {
+func ClientIP(ctx *fasthttp.RequestCtx) (string, uint8) {
 	cip := ctx.Request.Header.Peek("client-ip")
 	var ip net.IP
 	if cip != nil {
@@ -253,15 +278,7 @@ func ClientIP(ctx *fasthttp.RequestCtx) (string, int) {
 		return "", 0
 	}
 	s := ip.String()
-	for i := 0; i < len(s); i++ {
-		switch s[i] {
-		case '.':
-			return s, 4
-		case ':':
-			return s, 6
-		}
-	}
-	return "", 0
+	return s, IpType(s)
 }
 
 // 获取客户端地址（ip+port）

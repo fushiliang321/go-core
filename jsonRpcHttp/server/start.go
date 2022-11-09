@@ -2,6 +2,7 @@ package server
 
 import (
 	config "github.com/fushiliang321/go-core/config/jsonRpcHttp"
+	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/jsonrpc"
 	"reflect"
@@ -17,13 +18,13 @@ var ip string
 var port int
 
 func initialize() {
-	consulConfig := config.Get()
-	port = consulConfig.Port
+	jsonRpcHttpConfig := config.Get()
+	port = jsonRpcHttpConfig.Port
 
-	server = NewHttpServer(consulConfig.Host, strconv.Itoa(port))
-	//http := server.(*server2.Http)
-	//http.Server
-	ip = helper.GetLocalIP()
+	server = NewHttpServer(jsonRpcHttpConfig.Host, strconv.Itoa(port))
+
+	consulConfig := consul.GetConfig()
+	ip = helper.GetLocalIP(consulConfig.Address)
 }
 
 func (Service) Start(wg *sync.WaitGroup) {
