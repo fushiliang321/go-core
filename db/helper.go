@@ -34,12 +34,15 @@ func db() *gorm.DB {
 
 func Model[T any]() *model.Model[T] {
 	var t T
-	_db1 := db().Model(t)
-	return &model.Model[T]{
-		Db: _db1,
-	}
+	return SetDb[T](db().Model(t))
 }
 
 func Db() *gorm.DB {
 	return db()
+}
+
+func SetDb[T any](db *gorm.DB) *model.Model[T] {
+	return &model.Model[T]{
+		Db: db,
+	}
 }
