@@ -18,7 +18,6 @@ func (c clientServiceNameExtract) Invoke(ctx context.Context, method string, arg
 	serviceNamePtr := ctx.Value("serviceName").(*string)
 	*serviceNamePtr = method[:strings.Index(method, "/")]
 	consumers = append(consumers, *serviceNamePtr)
-	ctx = context.WithValue(ctx, "key1", "modify from v21")
 	return nil
 }
 func (c clientServiceNameExtract) NewStream(ctx context.Context, desc *grpc.StreamDesc, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {
