@@ -12,6 +12,7 @@ type ClientGenerateFun[t any] func(isMultiplex ...bool) t
 var multiplexConns = map[any]*ClientConn{}
 
 var ctx context.Context
+var nilConn = nilCon{}
 
 func init() {
 	ctx = context.Background()
@@ -42,16 +43,19 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 
 func ClientAuto[t any](fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
 	client := fun(clientServiceNameExtract{})
-	serviceName := ""
+	name := ""
 	if reflect.ValueOf(client).NumMethod() > 0 {
 		reflectMethod := reflect.ValueOf(client).Method(0)
-		ctx1 := context.WithValue(ctx, "serviceName", &serviceName)
-		reflectMethod.Call([]reflect.Value{
-			reflect.ValueOf(ctx1),
+		res := reflectMethod.Call([]reflect.Value{
+			reflect.ValueOf(ctx),
 			reflect.New(reflectMethod.Type().In(1).Elem()),
 		})
+		err := res[1].Interface()
+		if serviceNameType, ok := err.(serviceName); ok {
+			name = serviceNameType.name
+		}
 	}
-	return NewClient[t](serviceName, fun)
+	return NewClient[t](name, fun)
 }
 
 // 关闭复用客户端
