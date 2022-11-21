@@ -7,6 +7,7 @@ import (
 )
 
 type clientServiceNameExtract struct {
+	connType
 }
 
 type serviceName struct {
@@ -15,6 +16,10 @@ type serviceName struct {
 }
 
 var consumers = []string{}
+
+func GetConsumers() []string {
+	return consumers
+}
 
 func (c clientServiceNameExtract) Invoke(ctx context.Context, method string, args interface{}, reply interface{}, opts ...grpc.CallOption) error {
 	if method[0] == '/' {
@@ -25,12 +30,4 @@ func (c clientServiceNameExtract) Invoke(ctx context.Context, method string, arg
 	}
 	consumers = append(consumers, name.name)
 	return name
-}
-
-func (c clientServiceNameExtract) NewStream(ctx context.Context, desc *grpc.StreamDesc, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {
-	return nil, nil
-}
-
-func GetConsumers() []string {
-	return consumers
 }

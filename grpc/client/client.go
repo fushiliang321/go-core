@@ -12,7 +12,6 @@ type ClientGenerateFun[t any] func(isMultiplex ...bool) t
 var multiplexConns = map[any]*ClientConn{}
 
 var ctx context.Context
-var nilConn = nilCon{}
 
 func init() {
 	ctx = context.Background()
@@ -31,11 +30,14 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 		var client t
 		if err != nil {
 			exception.Listener("grpc newClient Error:["+serviceName+"]", err)
-		} else {
-			client = fun(conn)
-			if multiplex {
-				multiplexConns[client] = conn
-			}
+			return fun(ErrCon{
+				error: err,
+			})
+		}
+
+		client = fun(conn)
+		if multiplex {
+			multiplexConns[client] = conn
 		}
 		return client
 	}
