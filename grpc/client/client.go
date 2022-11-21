@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-type ClientGenerateFun[t any] func(isMultiplex ...bool) (t, error)
+type ClientGenerateFun[t any] func(isMultiplex ...bool) t
 
 var multiplexConns = map[any]*ClientConn{}
 
@@ -18,7 +18,7 @@ func init() {
 }
 
 func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
-	return func(isMultiplex ...bool) (t, error) {
+	return func(isMultiplex ...bool) t {
 		defer func() {
 			exception.Listener("grpc call exception:", recover())
 		}()
@@ -30,14 +30,13 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 		var client t
 		if err != nil {
 			exception.Listener("grpc newClient Error:["+serviceName+"]", err)
-			return nil, err
 		} else {
 			client = fun(conn)
 			if multiplex {
 				multiplexConns[client] = conn
 			}
 		}
-		return client, nil
+		return client
 	}
 }
 
