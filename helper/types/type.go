@@ -1,6 +1,7 @@
 package types
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"os"
@@ -46,10 +47,26 @@ func (res *Result) Error(errCode int, msg string, data any) {
 	res.Service = appName
 }
 
+// 转成json
 func (res *Result) JsonMarshal() (marshal []byte) {
 	marshal, err := json.Marshal(res)
 	if err != nil {
 		log.Printf("server result err:%s\n", err)
+		return
+	}
+	return
+}
+
+// 转为指定类型数据
+func (res *Result) ToType(_type *any) {
+	marshal, err := json.Marshal(res)
+	if err != nil {
+		return
+	}
+	d := json.NewDecoder(bytes.NewReader(marshal))
+	d.UseNumber()
+	err = d.Decode(_type)
+	if err != nil {
 		return
 	}
 	return
