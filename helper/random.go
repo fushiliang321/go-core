@@ -56,13 +56,8 @@ func randString(n int, bytes string) string {
 	return *(*string)(unsafe.Pointer(&b))
 }
 
-// 获取指定长度的随机字符串,自定义字符串
+// 获取指定长度的随机字符串,可自定义字符串
 func RandString(n int, bytes ...string) string {
-	var (
-		letterIdxBits = 6
-		letterIdxMask = 1<<letterIdxBits - 1
-		letterStr     string
-	)
 	switch len(bytes) {
 	case 0:
 		return randString(n, letterBytes)
@@ -73,8 +68,12 @@ func RandString(n int, bytes ...string) string {
 		case RangeLetter1:
 			return randString(n, letterBytes1)
 		}
-		letterStr = bytes[0]
 	}
+	var (
+		letterIdxBits = 3
+		letterIdxMask = 1<<letterIdxBits - 1
+		letterStr     = bytes[0]
+	)
 	bytesLen := len(letterStr)
 
 	for ; letterIdxMask < bytesLen; letterIdxBits++ {
