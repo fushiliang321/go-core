@@ -46,10 +46,20 @@ func (m *Model[t]) SetDB(db *gorm.DB) *Model[t] {
 	return m
 }
 
-func (m *Model[t]) Where(where map[string]any) *Model[t] {
+func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
 	if where == nil {
 		return m
 	}
+	if args == nil {
+		if w, ok := where.(map[string]any); ok {
+			return m._where(w)
+		}
+	}
+	m.Db = m.Db.Where(where, args)
+	return m
+}
+
+func (m *Model[t]) _where(where map[string]any) *Model[t] {
 	for k, v := range where {
 		var value any
 		operator := "="
@@ -63,7 +73,6 @@ func (m *Model[t]) Where(where map[string]any) *Model[t] {
 			operator = getOperator(vArr[0])
 			value = vArr[1]
 		default:
-			//value = fmt.Sprint(v)
 			value = v
 		}
 		k = filter(k)
