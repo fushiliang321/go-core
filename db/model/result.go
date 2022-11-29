@@ -8,7 +8,7 @@ func (m *Model[t]) Count() (total int64, err error) {
 func (m *Model[t]) Exists() (bool, error) {
 	var total int64
 	tx := m.Db.Limit(1).Count(&total)
-	return total > 0, tx.Error
+	return total == 1, tx.Error
 }
 
 func (m *Model[t]) First() (res *t, err error) {
