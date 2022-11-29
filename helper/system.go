@@ -2,16 +2,13 @@ package helper
 
 import (
 	"log"
-	"math/rand"
 	"net"
 	"os"
-	"time"
 )
 
 var appName string
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
 	appName = GetEnvDefault("APP_NAME", "")
 }
 
