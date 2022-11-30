@@ -58,7 +58,7 @@ func (res *Result) JsonMarshal() (marshal []byte) {
 }
 
 // 转为指定类型数据
-func (res *Result) ToType(_type any) {
+func (res *Result) To(_type any) {
 	marshal, err := json.Marshal(res)
 	if err != nil {
 		return
