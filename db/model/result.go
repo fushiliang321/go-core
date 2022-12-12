@@ -44,7 +44,11 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 	lists := []t{}
 	total, _ := m.Count()
 	if total > 0 {
-		lastPage = ((int(total) / limit) + 1)
+		totalInt := int(total)
+		lastPage = (totalInt / limit)
+		if (totalInt % limit) > 0 {
+			lastPage++
+		}
 		offset := (page - 1) * limit
 		if res, _ := m.Offset(offset).Limit(limit).Find(); res != nil {
 			lists = *res
