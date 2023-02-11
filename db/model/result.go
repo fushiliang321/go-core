@@ -1,5 +1,7 @@
 package model
 
+import "gorm.io/gorm"
+
 func (m *Model[t]) Count() (total int64, err error) {
 	tx := m.Db.Count(&total)
 	return total, tx.Error
@@ -15,7 +17,7 @@ func (m *Model[t]) First() (res *t, err error) {
 	tx := m.Db.First(&res)
 	if tx.Error != nil {
 		res = nil
-		if tx.Error.Error() != "record not found" {
+		if tx.Error != gorm.ErrRecordNotFound {
 			return res, tx.Error
 		}
 	}
@@ -26,7 +28,7 @@ func (m *Model[t]) Find() (res *[]t, err error) {
 	tx := m.Db.Find(&res)
 	if tx.Error != nil {
 		res = nil
-		if tx.Error.Error() != "record not found" {
+		if tx.Error != gorm.ErrRecordNotFound {
 			return res, tx.Error
 		}
 	}
