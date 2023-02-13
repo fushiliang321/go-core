@@ -55,7 +55,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 	}
 	err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
 		defer func() {
-			conn.Close()
+			ser.Disconnect(nil)
 			if err := recover(); err != nil {
 				exception.Listener("ws handler", recover())
 			}
@@ -85,7 +85,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		conn.SetPingHandler(func(appData string) error {
 			//响应ping帧
 			ser.LastResponseTimestamp = time.Now().Unix()
-			ser.Pong([]byte{1}, time.Time{})
+			ser.Pong([]byte{1}, websocket2.DeadlineDefault)
 			return nil
 		})
 
@@ -122,7 +122,6 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 			}
 		}
 		websocket2.RemoveServer(ser)
-		ser.Disconnect(nil)
 	})
 	if err != nil {
 		websocket2.RemoveServer(ser)

@@ -26,10 +26,15 @@ type WsServer struct {
 	Status                byte
 }
 
-const WsServerStatusClose = 0 //连接关闭
-const WsServerStatusOpen = 1  //连接开启
-
-var messageType = 0 //消息类型 0客户端定义 1文本 2二进制
+const (
+	WsServerStatusClose = 0 //连接关闭
+	WsServerStatusOpen  = 1 //连接开启
+) //连接关闭
+var (
+	DeadlineDefault   = time.Time{} //默认截止时间
+	DataFramesDefault = []byte{}    //默认数据帧
+	messageType       = 0           //消息类型 0客户端定义 1文本 2二进制
+)
 
 func Start() {
 	config := server.Get()
@@ -64,6 +69,7 @@ func (s *WsServer) init() {
 					log.Println("ws write message err:", err)
 				}
 			} else {
+				s.Conn
 				if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline); err != nil {
 					log.Println("ws write control err:", err)
 				}
@@ -95,6 +101,9 @@ func (s *WsServer) Ping(data []byte, deadline time.Time) {
 	if s.Status != WsServerStatusOpen {
 		return
 	}
+	if data == nil {
+		data = DataFramesDefault
+	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PingMessage,
 		data:        &data,
@@ -105,6 +114,9 @@ func (s *WsServer) Ping(data []byte, deadline time.Time) {
 func (s *WsServer) Pong(data []byte, deadline time.Time) {
 	if s.Status != WsServerStatusOpen {
 		return
+	}
+	if data == nil {
+		data = DataFramesDefault
 	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PongMessage,
@@ -119,10 +131,13 @@ func (s *WsServer) Disconnect(data []byte) {
 	}
 	sender.remove(s.Fd)
 	s.Status = WsServerStatusClose
+	if data == nil {
+		data = DataFramesDefault
+	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.CloseMessage,
 		data:        &data,
-		deadline:    &time.Time{},
+		deadline:    &DeadlineDefault,
 	}
 }
 
