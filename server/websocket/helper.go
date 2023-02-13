@@ -1,19 +1,21 @@
 package websocket
 
 import (
-	"github.com/fasthttp/websocket"
 	"github.com/valyala/fasthttp"
 	"time"
 )
 
 func SetServer(ctx *fasthttp.RequestCtx) (ser *WsServer) {
-	ser = &WsServer{}
-	ser.Ctx = ctx
-	ser.Fd = ctx.ID()
+	ser = &WsServer{
+		Ctx:                   ctx,
+		Fd:                    ctx.ID(),
+		Status:                WsServerStatusOpen,
+		LastResponseTimestamp: time.Now().Unix(),
+	}
 	if messageType != 0 {
 		ser.MessageType = messageType
 	}
-	ser.LastResponseTimestamp = time.Now().Unix()
+	ser.init()
 	sender.add(ser)
 	return
 }
@@ -60,7 +62,7 @@ func heartbeatCheck(interval int64, idleTime int64) {
 					//超时断开连接
 					ser.Disconnect([]byte("timeout"))
 				} else {
-					ser.Conn.WriteControl(websocket.PingMessage, []byte{1}, time.Time{})
+					ser.Ping([]byte{1}, time.Time{})
 				}
 			} else {
 				//类型有问题的就删掉

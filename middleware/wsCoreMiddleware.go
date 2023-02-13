@@ -79,7 +79,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 
 		conn.SetPingHandler(func(appData string) error {
 			ser.LastResponseTimestamp = time.Now().Unix()
-			conn.WriteControl(websocket.PongMessage, []byte{1}, time.Time{})
+			ser.Pong([]byte{1}, time.Time{})
 			return nil
 		})
 
