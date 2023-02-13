@@ -37,8 +37,8 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 	defer func() {
 		exception.Listener("ws process", recover())
 	}()
-	ws, wsOk := ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
-	if !wsOk {
+	ws, ok := ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
+	if !ok {
 		ctx.Response.SetStatusCode(500)
 		return helper.Error(500, fmt.Sprintln("upgrader exception:"), nil)
 	}
@@ -54,6 +54,12 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		return
 	}
 	err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
+		defer func() {
+			conn.Close()
+			if err := recover(); err != nil {
+				exception.Listener("ws handler", recover())
+			}
+		}()
 		ser.Conn = conn
 		if ser.MessageType == 0 {
 			if conn.Subprotocol() == "BinaryMessage" {
@@ -62,15 +68,14 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 				ser.MessageType = websocket.TextMessage
 			}
 		}
-		onOpen, ok := ws.Callbacks[event.ON_OPEN].(event.OnOpen)
-		if ok {
+
+		if onOpen, ok := ws.Callbacks[event.ON_OPEN].(event.OnOpen); ok {
 			log.Println(ctx.ID(), "onOpen")
 			onOpen(ser)
 		}
 
 		conn.SetCloseHandler(func(code int, text string) error {
-			onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose)
-			if ok {
+			if onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose); ok {
 				log.Println(ctx.ID(), "onClose")
 				onClose(ser, code, text)
 			}
@@ -78,6 +83,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		})
 
 		conn.SetPingHandler(func(appData string) error {
+			//响应ping帧
 			ser.LastResponseTimestamp = time.Now().Unix()
 			ser.Pong([]byte{1}, time.Time{})
 			return nil
@@ -90,28 +96,25 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 				return nil
 			})
 		}
-
-		onMessage, ok := ws.Callbacks[event.ON_MESSAGE].(event.OnMessage)
-		if ok {
+		var err error
+		if onMessage, ok := ws.Callbacks[event.ON_MESSAGE].(event.OnMessage); ok {
+			var recErr any
 			for {
-				_, p, err := conn.ReadMessage()
+				var p []byte
+				_, p, err = conn.ReadMessage()
 				if err != nil {
 					break
 				}
 				ser.LastResponseTimestamp = time.Now().Unix()
-				func(on event.OnMessage, ser *websocket2.WsServer, p []byte) {
-					defer func() {
-						if err := recover(); err != nil {
-							helper.ErrorResponse(ctx, 500, fmt.Sprintln("ws onMessage exception:", err), nil)
-							exception.Listener("ws onMessage exception", err)
-						}
-					}()
-					on(ser, p)
-				}(onMessage, ser, p)
+				callOnMessage(onMessage, ser, p)
+				if recErr = recover(); recErr != nil {
+					ser.Push(helper.Error(500, fmt.Sprintln("ws onMessage exception:", recErr), nil))
+					exception.Listener("ws onMessage exception", recErr)
+				}
 			}
 		} else {
 			for {
-				_, _, err := conn.ReadMessage()
+				_, _, err = conn.ReadMessage()
 				if err != nil {
 					break
 				}
@@ -119,12 +122,21 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 			}
 		}
 		websocket2.RemoveServer(ser)
+		ser.Disconnect(nil)
 	})
 	if err != nil {
 		websocket2.RemoveServer(ser)
-		log.Println("upgrader exception:", err)
 		ctx.Response.SetStatusCode(500)
 		return helper.Error(500, fmt.Sprintln("upgrader exception:", err), nil)
 	}
+	return
+}
+
+// 调用OnMessage方法
+func callOnMessage(on event.OnMessage, ser *websocket2.WsServer, p []byte) (rec any) {
+	defer func() {
+		rec = recover()
+	}()
+	on(ser, p)
 	return
 }

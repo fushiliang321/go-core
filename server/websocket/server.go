@@ -3,6 +3,7 @@ package websocket
 import (
 	"github.com/fasthttp/websocket"
 	"github.com/fushiliang321/go-core/config/server"
+	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/valyala/fasthttp"
 	"log"
@@ -50,8 +51,13 @@ func Start() {
 func (s *WsServer) init() {
 	s.ConnWriteChan = make(chan *ConnWriteChanParams, 1)
 	go func() {
-		var err error
-		var writeData *ConnWriteChanParams
+		defer func() {
+			exception.Listener("ws dispose exception", recover())
+		}()
+		var (
+			err       error
+			writeData *ConnWriteChanParams
+		)
 		for writeData = range s.ConnWriteChan {
 			if writeData.messageType == s.MessageType {
 				if err = s.Conn.WriteMessage(s.MessageType, *writeData.data); err != nil {
