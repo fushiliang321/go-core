@@ -69,7 +69,6 @@ func (s *WsServer) init() {
 					log.Println("ws write message err:", err)
 				}
 			} else {
-				s.Conn
 				if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline); err != nil {
 					log.Println("ws write control err:", err)
 				}
