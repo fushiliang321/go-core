@@ -55,7 +55,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 	}
 	err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
 		defer func() {
-			ser.Disconnect(nil)
+			conn.Close()
 			if err := recover(); err != nil {
 				exception.Listener("ws handler", recover())
 			}
