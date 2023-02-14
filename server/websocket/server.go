@@ -29,7 +29,8 @@ type WsServer struct {
 const (
 	WsServerStatusClose = 0 //连接关闭
 	WsServerStatusOpen  = 1 //连接开启
-) //连接关闭
+)
+
 var (
 	DeadlineDefault   = time.Time{} //默认截止时间
 	DataFramesDefault = []byte{}    //默认数据帧
@@ -57,7 +58,6 @@ func (s *WsServer) init() {
 	s.ConnWriteChan = make(chan *ConnWriteChanParams, 1)
 	go func() {
 		defer func() {
-			close(s.ConnWriteChan)
 			exception.Listener("ws dispose exception", recover())
 		}()
 		var (
