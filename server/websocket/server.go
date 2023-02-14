@@ -57,6 +57,7 @@ func (s *WsServer) init() {
 	s.ConnWriteChan = make(chan *ConnWriteChanParams, 1)
 	go func() {
 		defer func() {
+			close(s.ConnWriteChan)
 			exception.Listener("ws dispose exception", recover())
 		}()
 		var (
@@ -64,20 +65,20 @@ func (s *WsServer) init() {
 			writeData *ConnWriteChanParams
 		)
 		for writeData = range s.ConnWriteChan {
-			if writeData.messageType == s.MessageType {
+			switch writeData.messageType {
+			case s.MessageType: //发送消息帧
 				if err = s.Conn.WriteMessage(s.MessageType, *writeData.data); err != nil {
 					log.Println("ws write message err:", err)
 				}
-			} else {
+			case websocket.CloseMessage: //发送关闭帧
+				s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline)
+				s.Conn.Close()
+			default: //发送其他控制帧
 				if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline); err != nil {
 					log.Println("ws write control err:", err)
 				}
-				if writeData.messageType == websocket.CloseMessage {
-					s.Conn.Close()
-				}
 			}
 		}
-		close(s.ConnWriteChan)
 	}()
 }
 
@@ -124,6 +125,17 @@ func (s *WsServer) Pong(data []byte, deadline time.Time) {
 	}
 }
 
+// 连接已断开
+func (s *WsServer) Close() {
+	if s.Status != WsServerStatusOpen {
+		return
+	}
+	sender.remove(s.Fd)
+	s.Status = WsServerStatusClose
+	close(s.ConnWriteChan)
+}
+
+// 主动断开连接
 func (s *WsServer) Disconnect(data []byte) {
 	if s.Status != WsServerStatusOpen {
 		return

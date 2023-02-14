@@ -75,6 +75,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		}
 
 		conn.SetCloseHandler(func(code int, text string) error {
+			ser.Close()
 			if onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose); ok {
 				log.Println(ctx.ID(), "onClose")
 				onClose(ser, code, text)
@@ -121,7 +122,6 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 				ser.LastResponseTimestamp = time.Now().Unix()
 			}
 		}
-		websocket2.RemoveServer(ser)
 	})
 	if err != nil {
 		websocket2.RemoveServer(ser)
