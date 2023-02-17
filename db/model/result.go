@@ -81,28 +81,6 @@ func (m *Model[t]) Updates(values any) (int64, error) {
 	return tx.RowsAffected, tx.Error
 }
 
-func (m *Model[t]) Inc(column string, values ...int) (int64, error) {
-	var v int
-	if len(values) > 0 && values[0] > 1 {
-		v = values[0]
-	} else {
-		v = 1
-	}
-	tx := m.Db.Update(column, gorm.Expr(column+"+ ?", v))
-	return tx.RowsAffected, tx.Error
-}
-
-func (m *Model[t]) Dec(column string, values ...int) (int64, error) {
-	var v int
-	if len(values) > 0 && values[0] > 1 {
-		v = values[0]
-	} else {
-		v = 1
-	}
-	tx := m.Db.Update(column, gorm.Expr(column+"+ ?", v))
-	return tx.RowsAffected, tx.Error
-}
-
 func (m *Model[t]) Pluck(column string, dest any) error {
 	tx := m.Db.Pluck(column, dest)
 	return tx.Error
