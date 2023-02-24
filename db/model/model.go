@@ -57,7 +57,7 @@ func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
 			return m._where(w)
 		}
 	}
-	m.Db = m.Db.Where(where, args)
+	m.Db = m.Db.Where(where, args...)
 	return m
 }
 
