@@ -28,7 +28,7 @@ func (m *Model[t]) First() (*t, error) {
 
 func (m *Model[t]) Find() (*[]t, error) {
 	var res []t
-	tx := m.Db.Find(res)
+	tx := m.Db.Find(&res)
 	if tx.Error != nil {
 		if tx.Error == gorm.ErrRecordNotFound {
 			return nil, nil
