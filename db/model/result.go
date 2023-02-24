@@ -47,7 +47,7 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 	total, _ := m.Count()
 	if total > 0 {
 		totalInt := int(total)
-		lastPage = (totalInt / limit)
+		lastPage = totalInt / limit
 		if (totalInt % limit) > 0 {
 			lastPage++
 		}
@@ -66,8 +66,8 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 }
 
 func (m *Model[t]) Delete() (int64, error) {
-	var _t t
-	tx := m.Db.Delete(&_t)
+	var _t *t
+	tx := m.Db.Delete(_t)
 	return tx.RowsAffected, tx.Error
 }
 
@@ -88,7 +88,7 @@ func (m *Model[t]) Inc(column string, values ...int) (int64, error) {
 	} else {
 		v = 1
 	}
-	tx := m.Db.Update(column, gorm.Expr(column+"+ ?", v))
+	tx := m.Db.Update(column, gorm.Expr(column+" + ?", v))
 	return tx.RowsAffected, tx.Error
 }
 
@@ -99,7 +99,7 @@ func (m *Model[t]) Dec(column string, values ...int) (int64, error) {
 	} else {
 		v = 1
 	}
-	tx := m.Db.Update(column, gorm.Expr(column+"- ?", v))
+	tx := m.Db.Update(column, gorm.Expr(column+" - ?", v))
 	return tx.RowsAffected, tx.Error
 }
 
