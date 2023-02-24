@@ -1,12 +1,12 @@
 package redis
 
-import "github.com/go-redis/redis/v8"
+import "github.com/go-redis/redis/v9"
 
 type Z = redis.Z
 type ZRangeBy = redis.ZRangeBy
 
 // 添加元素
-func ZAdd(key string, members ...*Z) (int64, error) {
+func ZAdd(key string, members ...Z) (int64, error) {
 	return client().ZAdd(_ctx, key, members...).Result()
 }
 

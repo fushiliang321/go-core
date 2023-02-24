@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	redisConfig "github.com/fushiliang321/go-core/config/redis"
-	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v9"
 	"strconv"
 )
 
