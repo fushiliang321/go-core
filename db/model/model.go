@@ -52,6 +52,8 @@ func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
 	}
 	if args == nil {
 		if w, ok := where.(map[string]any); ok {
+			return m._where(&w)
+		} else if w, ok := where.(*map[string]any); ok {
 			return m._where(w)
 		}
 	}
@@ -59,10 +61,11 @@ func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
 	return m
 }
 
-func (m *Model[t]) _where(where map[string]any) *Model[t] {
-	for k, v := range where {
+func (m *Model[t]) _where(where *map[string]any) *Model[t] {
+	var operator string
+	for k, v := range *where {
 		var value any
-		operator := "="
+		operator = "="
 		switch v.(type) {
 		case []any:
 			vArr := v.([]any)
