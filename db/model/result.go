@@ -13,26 +13,30 @@ func (m *Model[t]) Exists() (bool, error) {
 	return total == 1, tx.Error
 }
 
-func (m *Model[t]) First() (res *t, err error) {
-	tx := m.Db.First(res)
+func (m *Model[t]) First() (*t, error) {
+	var res t
+	tx := m.Db.First(&res)
 	if tx.Error != nil {
-		res = nil
-		if tx.Error != gorm.ErrRecordNotFound {
-			return res, tx.Error
+		if tx.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		} else {
+			return nil, tx.Error
 		}
 	}
-	return res, nil
+	return &res, nil
 }
 
-func (m *Model[t]) Find() (res *[]t, err error) {
+func (m *Model[t]) Find() (*[]t, error) {
+	var res []t
 	tx := m.Db.Find(res)
 	if tx.Error != nil {
-		res = nil
-		if tx.Error != gorm.ErrRecordNotFound {
-			return res, tx.Error
+		if tx.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		} else {
+			return nil, tx.Error
 		}
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
