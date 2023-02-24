@@ -14,7 +14,7 @@ func (m *Model[t]) Exists() (bool, error) {
 }
 
 func (m *Model[t]) First() (res *t, err error) {
-	tx := m.Db.First(&res)
+	tx := m.Db.First(res)
 	if tx.Error != nil {
 		res = nil
 		if tx.Error != gorm.ErrRecordNotFound {
@@ -25,7 +25,7 @@ func (m *Model[t]) First() (res *t, err error) {
 }
 
 func (m *Model[t]) Find() (res *[]t, err error) {
-	tx := m.Db.Find(&res)
+	tx := m.Db.Find(res)
 	if tx.Error != nil {
 		res = nil
 		if tx.Error != gorm.ErrRecordNotFound {
