@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-type Service struct {
-}
+type Service struct{}
+
 type tokenBucket struct {
 	global int //全局令牌桶
 	//paths       map[string]int //地址令牌桶
@@ -72,7 +72,7 @@ func bucketInit() *tokenBucket {
 func (bucket *tokenBucket) charge() {
 	bucket.Lock()
 	defer bucket.Unlock()
-	bucket.global = (bucket.global + configData.Create)
+	bucket.global = bucket.global + configData.Create
 	if bucket.global > configData.Capacity {
 		bucket.global = configData.Capacity
 	}

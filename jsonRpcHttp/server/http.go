@@ -30,11 +30,17 @@ func (p *Http) Start() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", p.handleFunc)
 	var url = fmt.Sprintf("%s:%s", p.Ip, p.Port)
-	http.ListenAndServe(url, mux)
+	err := http.ListenAndServe(url, mux)
+	if err != nil {
+		fmt.Println("json rpc http server start error", err)
+	}
 }
 
 func (p *Http) Register(s interface{}) {
-	p.Server.Register(s)
+	err := p.Server.Register(s)
+	if err != nil {
+		fmt.Println("json rpc http server register error", err)
+	}
 }
 
 func (p *Http) SetBuffer(bs int) {

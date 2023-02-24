@@ -8,8 +8,7 @@ import (
 	"time"
 )
 
-type Service struct {
-}
+type Service struct{}
 
 var apiConfig *api.Config
 var services = Services{}
@@ -42,15 +41,15 @@ func SyncService(serviceName string) {
 		}(serviceName)
 	}()
 	lastIndex, _ := lastIndexMap.LoadOrStore(serviceName, lastIndexDefault)
-	client, _ := newClient()
-	sers, metainfo, err := client.Health().Service(serviceName, "", true, &api.QueryOptions{
+	_client, _ := newClient()
+	sers, metaInfo, err := _client.Health().Service(serviceName, "", true, &api.QueryOptions{
 		WaitIndex: lastIndex.(uint64), // 同步点，这个调用将一直阻塞，直到有新的更新
 	})
 	if err != nil {
 		fmt.Println("error retrieving instances from Consul: ", err)
 		return
 	}
-	lastIndexMap.Store(serviceName, metainfo.LastIndex)
+	lastIndexMap.Store(serviceName, metaInfo.LastIndex)
 	serviceNodes := []ServiceNode{}
 	for _, ser := range sers {
 		for _, check := range ser.Checks {

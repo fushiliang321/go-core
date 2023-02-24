@@ -5,8 +5,7 @@ import (
 	"sync"
 )
 
-type Service struct {
-}
+type Service struct{}
 
 var config *grpc.Grpc
 

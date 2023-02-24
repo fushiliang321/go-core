@@ -29,9 +29,9 @@ const (
 	STATUS_CLOSE = 0
 )
 
-func (c *Consumer) Start() {
-	c.status = STATUS_START
-	c.monitor()
+func (consumer *Consumer) Start() {
+	consumer.status = STATUS_START
+	consumer.monitor()
 }
 
 func (consumer *Consumer) monitor() {
@@ -117,13 +117,13 @@ func (consumer *Consumer) retryMonitor() {
 }
 
 // 关闭监听
-func (c *Consumer) Close() {
-	c.Lock()
-	defer c.Unlock()
-	c.status = STATUS_CLOSE
-	if c.channel != nil {
-		c.channel.Close()
-		c.channel = nil
+func (consumer *Consumer) Close() {
+	consumer.Lock()
+	defer consumer.Unlock()
+	consumer.status = STATUS_CLOSE
+	if consumer.channel != nil {
+		consumer.channel.Close()
+		consumer.channel = nil
 	}
 }
 
