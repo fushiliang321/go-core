@@ -70,8 +70,8 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 }
 
 func (m *Model[t]) Delete() (int64, error) {
-	var _t *t
-	tx := m.Db.Delete(_t)
+	var _t t
+	tx := m.Db.Delete(&_t)
 	return tx.RowsAffected, tx.Error
 }
 
