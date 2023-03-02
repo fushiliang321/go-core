@@ -1,6 +1,9 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"database/sql"
+	"gorm.io/gorm"
+)
 
 func (m *Model[t]) Count() (total int64, err error) {
 	tx := m.Db.Count(&total)
@@ -9,8 +12,20 @@ func (m *Model[t]) Count() (total int64, err error) {
 
 func (m *Model[t]) Exists() (bool, error) {
 	var total int64
-	tx := m.Db.Limit(1).Count(&total)
-	return total == 1, tx.Error
+	var err error
+	tx := m.Db.Limit(1).Select("1").Row()
+	err = tx.Err()
+	if err != nil {
+		return false, err
+	}
+	err = tx.Scan(&total)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			err = nil
+		}
+		return false, err
+	}
+	return total != 0, tx.Err()
 }
 
 func (m *Model[t]) First() (*t, error) {
