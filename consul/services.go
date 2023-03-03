@@ -15,12 +15,18 @@ type ServiceNode struct {
 	Protocol    string
 }
 type ServiceNodes struct {
-	nodes []ServiceNode
+	nodes []*ServiceNode
 }
 
 type Services struct {
 	maps sync.Map
 }
+
+var (
+	HttpProtocol = "http"
+	TcpProtocol  = "tcp"
+	GrpcProtocol = "grpc"
+)
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -31,7 +37,7 @@ func (sers *Services) isExistService(serviceName string) (ok bool) {
 	return
 }
 
-func (sers *Services) setServiceNodes(serviceName string, serviceNodes []ServiceNode) {
+func (sers *Services) setServiceNodes(serviceName string, serviceNodes []*ServiceNode) {
 	nodeMap := map[string]ServiceNodes{}
 	tcpNodes := ServiceNodes{}
 	httpNodes := ServiceNodes{}
@@ -40,22 +46,23 @@ func (sers *Services) setServiceNodes(serviceName string, serviceNodes []Service
 		if node.ServiceName != serviceName {
 			continue
 		}
-		if node.Protocol == "tcp" {
+		switch node.Protocol {
+		case TcpProtocol:
 			tcpNodes.nodes = append(tcpNodes.nodes, node)
-		} else if node.Protocol == "http" {
+		case HttpProtocol:
 			httpNodes.nodes = append(httpNodes.nodes, node)
-		} else if node.Protocol == "grpc" {
+		case GrpcProtocol:
 			grpcNodes.nodes = append(grpcNodes.nodes, node)
 		}
 	}
-	nodeMap["tcp"] = tcpNodes
-	nodeMap["http"] = httpNodes
-	nodeMap["grpc"] = grpcNodes
+	nodeMap[TcpProtocol] = tcpNodes
+	nodeMap[HttpProtocol] = httpNodes
+	nodeMap[GrpcProtocol] = grpcNodes
 
 	sers.maps.Store(serviceName, nodeMap)
 }
 
-func (sers *Services) getRandomNode(serviceName string, protocol string) (node ServiceNode, err error) {
+func (sers *Services) getRandomNode(serviceName string, protocol string) (node *ServiceNode, err error) {
 	res, ok := sers.maps.Load(serviceName)
 	if !ok {
 		err = errors.New("没有匹配到服务数据")

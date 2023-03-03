@@ -3,7 +3,7 @@ module github.com/fushiliang321/go-core
 go 1.19
 
 require (
-	github.com/fasthttp/router v1.4.16
+	github.com/fasthttp/router v1.4.17
 	github.com/fasthttp/websocket v1.5.1
 	github.com/fushiliang321/jsonrpc v0.0.0-20221101082715-5cff2d4915a8
 	github.com/go-redis/redis/v9 v9.0.0-rc.1
@@ -35,7 +35,7 @@ require (
 	github.com/hashicorp/serf v0.10.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/klauspost/compress v1.15.15 // indirect
+	github.com/klauspost/compress v1.16.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -44,6 +44,6 @@ require (
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
-	google.golang.org/genproto v0.0.0-20230223222841-637eb2293923 // indirect
+	google.golang.org/genproto v0.0.0-20230301171018-9ab4bdc49ad5 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )

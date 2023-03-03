@@ -35,7 +35,7 @@ func (c *Client) Call(method string, params any, res any) (err error) {
 }
 
 func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
-	node, err := consul.GetNode(name+"Service", "http")
+	node, err := consul.GetNode(name+"Service", consul.HttpProtocol)
 	if err != nil {
 		exception.Listener("rpc newClient Error: ["+name+"]", err)
 		return nil, err

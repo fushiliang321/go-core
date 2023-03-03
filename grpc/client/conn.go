@@ -27,7 +27,7 @@ func dial(serviceName string) (*grpc.ClientConn, error) {
 	defer func() {
 		exception.Listener("grpc dial exception", recover())
 	}()
-	node, err := consul.GetNode(serviceName, "grpc")
+	node, err := consul.GetNode(serviceName, consul.GrpcProtocol)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 	defer func() {
 		exception.Listener("grpc conn exception", recover())
 	}()
-	node, err := consul.GetNode(serviceName, "grpc")
+	node, err := consul.GetNode(serviceName, consul.GrpcProtocol)
 	if err != nil {
 		return nil, err
 	}
