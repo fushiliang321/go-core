@@ -52,27 +52,27 @@ func SyncService(serviceName string) {
 		return
 	}
 	lastIndexMap.Store(serviceName, metaInfo.LastIndex)
-	serviceNodes := []ServiceNode{}
+	serviceNodes := []*ServiceNode{}
 	var (
-		ser   api.ServiceEntry
-		check api.HealthCheck
+		ser   *api.ServiceEntry
+		check *api.HealthCheck
 	)
 	for _, ser = range sers {
 		for _, check = range ser.Checks {
-			if check.Status == "passing" && check.Type != "" {
+			if check.Status == api.HealthPassing && check.Type != "" {
 				node := &ServiceNode{}
 				node.Status = check.Status
 				node.ServiceName = check.ServiceName
 				node.Protocol = check.Type
 				node.Address = ser.Service.Address
 				node.Port = strconv.Itoa(ser.Service.Port)
-				serviceNodes = append(serviceNodes, *node)
+				serviceNodes = append(serviceNodes, node)
 			}
 		}
 	}
 	services.setServiceNodes(serviceName, serviceNodes)
 }
 
-func GetNode(serviceName string, protocol string) (node ServiceNode, err error) {
+func GetNode(serviceName string, protocol string) (node *ServiceNode, err error) {
 	return services.getRandomNode(serviceName, protocol)
 }
