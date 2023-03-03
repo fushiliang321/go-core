@@ -75,7 +75,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		}
 
 		conn.SetCloseHandler(func(code int, text string) error {
-			ser.Close()
+			ser.OnClose()
 			if onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose); ok {
 				log.Println(ctx.ID(), "onClose")
 				onClose(ser, code, text)

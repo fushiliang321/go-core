@@ -27,8 +27,9 @@ type WsServer struct {
 }
 
 const (
-	WsServerStatusClose = 0 //连接关闭
-	WsServerStatusOpen  = 1 //连接开启
+	WsServerStatusClose     = 0 //连接关闭
+	WsServerStatusOpen      = 1 //连接开启
+	WsServerStatusBeClosing = 2 //连接正在关闭
 )
 
 var (
@@ -65,27 +66,27 @@ func (s *WsServer) init() {
 			writeData *ConnWriteChanParams
 		)
 		for writeData = range s.ConnWriteChan {
-			switch writeData.messageType {
-			case s.MessageType: //发送消息帧
-				func() {
-					defer func() {
-						exception.Listener("ws write message exception", recover())
-					}()
-					if s.Status == WsServerStatusClose {
-						return
-					}
+			if s.Status == WsServerStatusClose {
+				return
+			}
+			func() {
+				defer func() {
+					exception.Listener("ws write message exception", recover())
+				}()
+				switch writeData.messageType {
+				case s.MessageType: //发送消息帧
 					if err = s.Conn.WriteMessage(s.MessageType, *writeData.data); err != nil {
 						log.Println("ws write message err:", err)
 					}
-				}()
-			case websocket.CloseMessage: //发送关闭帧
-				s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline)
-				s.Conn.Close()
-			default: //发送其他控制帧
-				if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline); err != nil {
-					log.Println("ws write control err:", err)
+				case websocket.CloseMessage: //发送关闭帧
+					s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline)
+					s.Conn.Close()
+				default: //发送其他控制帧
+					if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline); err != nil {
+						log.Println("ws write control err:", err)
+					}
 				}
-			}
+			}()
 		}
 	}()
 }
@@ -133,8 +134,8 @@ func (s *WsServer) Pong(data []byte, deadline time.Time) {
 	}
 }
 
-// 连接已断开
-func (s *WsServer) Close() {
+// 连接断开事件处理
+func (s *WsServer) OnClose() {
 	if s.Status == WsServerStatusClose {
 		return
 	}
@@ -149,7 +150,7 @@ func (s *WsServer) Disconnect(data []byte) {
 		return
 	}
 	sender.remove(s.Fd)
-	s.Status = WsServerStatusClose
+	s.Status = WsServerStatusBeClosing
 	if data == nil {
 		data = DataFramesDefault
 	}
