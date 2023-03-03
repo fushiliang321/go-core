@@ -13,7 +13,7 @@ import (
 type ConnWriteChanParams struct {
 	messageType int
 	data        *[]byte
-	deadline    *time.Time
+	deadline    time.Time
 }
 
 type WsServer struct {
@@ -71,7 +71,8 @@ func (s *WsServer) init() {
 			}
 			func() {
 				defer func() {
-					exception.Listener("ws write message exception", recover())
+					log.Println("["+string(s.Fd)+"]ws write message exception", writeData)
+					exception.Listener("["+string(s.Fd)+"]ws write message exception", recover())
 				}()
 				switch writeData.messageType {
 				case s.MessageType: //发送消息帧
@@ -79,10 +80,10 @@ func (s *WsServer) init() {
 						log.Println("ws write message err:", err)
 					}
 				case websocket.CloseMessage: //发送关闭帧
-					s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline)
+					s.Conn.WriteControl(writeData.messageType, *writeData.data, writeData.deadline)
 					s.Conn.Close()
 				default: //发送其他控制帧
-					if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline); err != nil {
+					if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, writeData.deadline); err != nil {
 						log.Println("ws write control err:", err)
 					}
 				}
@@ -116,7 +117,7 @@ func (s *WsServer) Ping(data []byte, deadline time.Time) {
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PingMessage,
 		data:        &data,
-		deadline:    &deadline,
+		deadline:    deadline,
 	}
 }
 
@@ -130,7 +131,7 @@ func (s *WsServer) Pong(data []byte, deadline time.Time) {
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PongMessage,
 		data:        &data,
-		deadline:    &deadline,
+		deadline:    deadline,
 	}
 }
 
@@ -157,7 +158,7 @@ func (s *WsServer) Disconnect(data []byte) {
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.CloseMessage,
 		data:        &data,
-		deadline:    &DeadlineDefault,
+		deadline:    DeadlineDefault,
 	}
 }
 
