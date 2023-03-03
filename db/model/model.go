@@ -62,8 +62,13 @@ func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
 }
 
 func (m *Model[t]) _where(where *map[string]any) *Model[t] {
-	var operator string
-	for k, v := range *where {
+	var (
+		operator string
+		k        string
+		v        any
+	)
+
+	for k, v = range *where {
 		var value any
 		operator = "="
 		switch v.(type) {

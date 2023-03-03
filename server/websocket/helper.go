@@ -50,14 +50,19 @@ func heartbeatCheck(interval int64, idleTime int64) {
 	if idleTime <= 0 {
 		idleTime = interval * 2
 	}
+	var (
+		nowTime int64
+		ok      bool
+		ser     *WsServer
+	)
 	for {
 		time.Sleep(sleep)
-		nowTime := time.Now().Unix()
-		sender.servers.Range(func(key, value any) bool {
+		nowTime = time.Now().Unix()
+		sender.servers.Range(func(fd, value any) bool {
 			defer func() {
 				recover()
 			}()
-			if ser, ok := value.(*WsServer); ok {
+			if ser, ok = value.(*WsServer); ok {
 				if nowTime-ser.LastResponseTimestamp > idleTime {
 					//超时断开连接
 					ser.Disconnect([]byte("timeout"))
@@ -66,7 +71,7 @@ func heartbeatCheck(interval int64, idleTime int64) {
 				}
 			} else {
 				//类型有问题的就删掉
-				sender.remove(key.(uint64))
+				sender.remove(fd.(uint64))
 			}
 			return true
 		})

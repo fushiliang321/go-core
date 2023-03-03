@@ -16,8 +16,7 @@ func (sender *Sender) add(ser *WsServer) {
 
 func (sender *Sender) get(fd uint64) (s *WsServer, o bool) {
 	if ser, ok := sender.servers.Load(fd); ok {
-		s, o = ser.(*WsServer)
-		if !o {
+		if s, o = ser.(*WsServer); !o {
 			//类型有问题的就删掉
 			sender.remove(fd)
 		}

@@ -39,26 +39,44 @@ func (Service) Start(wg *sync.WaitGroup) {
 		wg.Add(1)
 		go func(addr string, sers map[byte]server.Server, wg *sync.WaitGroup) {
 			defer wg.Done()
-			http := &server.Server{}
-			ws := http
-			for t := range sers {
-				ser := sers[t]
+			var (
+				httpServer *server.Server
+				wsServer   *server.Server
+				err        error
+			)
+			for _, ser := range sers {
 				switch ser.Type {
 				case types.SERVER_WEBSOCKET:
-					ws = &ser
+					wsServer = &ser
 				case types.SERVER_HTTP:
-					http = &ser
+					httpServer = &ser
 				}
 			}
-			if err := fasthttp.ListenAndServe(addr, func(ctx *fasthttp.RequestCtx) {
-				if ws.Type == types.SERVER_WEBSOCKET {
-					ctx.SetUserValue(types.SERVER_WEBSOCKET_KEY, ws)
+
+			if httpServer != nil {
+				if wsServer == nil {
+					//http服务器
+					err = fasthttp.ListenAndServe(addr, func(ctx *fasthttp.RequestCtx) {
+						ctx.SetUserValue(types.SERVER_HTTP_KEY, httpServer)
+						r.Handler(ctx)
+					})
+				} else {
+					//http+ws服务器
+					err = fasthttp.ListenAndServe(addr, func(ctx *fasthttp.RequestCtx) {
+						ctx.SetUserValue(types.SERVER_HTTP_KEY, httpServer)
+						ctx.SetUserValue(types.SERVER_WEBSOCKET_KEY, wsServer)
+						r.Handler(ctx)
+					})
 				}
-				if http.Type == types.SERVER_HTTP {
-					ctx.SetUserValue(types.SERVER_HTTP_KEY, http)
-				}
-				r.Handler(ctx)
-			}); err != nil {
+			} else if wsServer != nil {
+				//ws服务器
+				err = fasthttp.ListenAndServe(addr, func(ctx *fasthttp.RequestCtx) {
+					ctx.SetUserValue(types.SERVER_WEBSOCKET_KEY, wsServer)
+					r.Handler(ctx)
+				})
+			}
+
+			if err != nil {
 				fmt.Println("start fasthttp fail", err.Error())
 			}
 		}(addr, s, wg)

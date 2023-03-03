@@ -16,7 +16,7 @@ func (Service) Start(wg *sync.WaitGroup) {
 	grpcConfig := grpc.Get()
 	initApiConfig()
 
-	consumerServiceNames := []string{}
+	var consumerServiceNames []string
 	if rpcConfig.Consumers != nil {
 		for _, serviceName := range rpcConfig.Consumers {
 			consumerServiceNames = append(consumerServiceNames, serviceName)

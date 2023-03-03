@@ -25,12 +25,13 @@ func newConsulClient() (*api.Client, error) {
 }
 
 func IsRegister(name string, protocol string, address string, port int) bool {
-	client, _ := newConsulClient()
-	services, err := client.Agent().Services()
+	_client, _ := newConsulClient()
+	_services, err := _client.Agent().Services()
 	if err != nil {
 		return false
 	}
-	for _, service := range services {
+	var service *api.AgentService
+	for _, service = range _services {
 		if service == nil || service.Service != name || service.Address != address || service.Port != port {
 			continue
 		}
@@ -50,7 +51,7 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 	if IsRegister(name, protocol, address, port) {
 		return true, nil
 	}
-	client, err := newConsulClient()
+	_client, err := newConsulClient()
 	if err != nil {
 		log.Println("consul client error : ", err)
 		return
@@ -67,7 +68,7 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 		Meta:    map[string]string{"Protocol": protocol},
 		Check:   check,
 	}
-	err = client.Agent().ServiceRegister(registration)
+	err = _client.Agent().ServiceRegister(registration)
 	if err != nil {
 		log.Println("register server error : ", err)
 		return
@@ -93,14 +94,18 @@ func setServiceCheckDefaultValue(check *api.AgentServiceCheck) *api.AgentService
 
 // 获取最大的服务id
 func getLastServiceId(name string) (maxServiceId string) {
+	var (
+		err error
+		id  int
+	)
 	maxId := -1
 	maxServiceId = name
-	client, _ := newConsulClient()
-	services, err := client.Agent().Services()
+	_client, _ := newConsulClient()
+	_services, err := _client.Agent().Services()
 	if err != nil {
 		return
 	}
-	for _, v := range services {
+	for _, v := range _services {
 		if v == nil || v.Service != name {
 			continue
 		}
@@ -108,7 +113,7 @@ func getLastServiceId(name string) (maxServiceId string) {
 		if i == -1 {
 			continue
 		}
-		id, err := strconv.Atoi(v.ID[i+1:])
+		id, err = strconv.Atoi(v.ID[i+1:])
 		if err == nil && id > maxId {
 			maxId = id
 			maxServiceId = v.ID

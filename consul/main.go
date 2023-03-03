@@ -10,10 +10,12 @@ import (
 
 type Service struct{}
 
-var apiConfig *api.Config
-var services = Services{}
-var lastIndexMap sync.Map
-var lastIndexDefault uint64
+var (
+	apiConfig        *api.Config
+	services         = Services{}
+	lastIndexMap     sync.Map
+	lastIndexDefault uint64
+)
 
 func newClient() (client *api.Client, err error) {
 	client, err = api.NewClient(apiConfig)
@@ -51,10 +53,14 @@ func SyncService(serviceName string) {
 	}
 	lastIndexMap.Store(serviceName, metaInfo.LastIndex)
 	serviceNodes := []ServiceNode{}
-	for _, ser := range sers {
-		for _, check := range ser.Checks {
+	var (
+		ser   api.ServiceEntry
+		check api.HealthCheck
+	)
+	for _, ser = range sers {
+		for _, check = range ser.Checks {
 			if check.Status == "passing" && check.Type != "" {
-				node := new(ServiceNode)
+				node := &ServiceNode{}
 				node.Status = check.Status
 				node.ServiceName = check.ServiceName
 				node.Protocol = check.Type

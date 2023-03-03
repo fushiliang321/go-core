@@ -16,8 +16,10 @@ type tokenBucket struct {
 	sync.Mutex
 }
 
-var tokenBucketMap sync.Map
-var configData *rateLimit.RateLimit
+var (
+	tokenBucketMap sync.Map
+	configData     *rateLimit.RateLimit
+)
 
 func (Service) Start(_ *sync.WaitGroup) {
 	configData = rateLimit.Get()
@@ -25,11 +27,16 @@ func (Service) Start(_ *sync.WaitGroup) {
 		return
 	}
 	go func() {
+		var (
+			t      int64
+			ok     bool
+			bucket *tokenBucket
+		)
 		for {
 			time.Sleep(time.Second)
-			t := time.Now().Unix()
+			t = time.Now().Unix()
 			tokenBucketMap.Range(func(key, value any) bool {
-				bucket, ok := value.(*tokenBucket)
+				bucket, ok = value.(*tokenBucket)
 				if !ok || (t-bucket.lastUseTime) > configData.IdleTime {
 					bucket = nil
 					tokenBucketMap.Delete(key)
@@ -56,7 +63,7 @@ func Process(key string, path string) error {
 	if bucket.global < 1 {
 		return errors.New("请求频率超出")
 	}
-	bucket.global = (bucket.global - configData.Consume)
+	bucket.global = bucket.global - configData.Consume
 	bucket.lastUseTime = time.Now().Unix()
 	return nil
 }

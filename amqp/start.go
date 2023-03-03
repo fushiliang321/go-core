@@ -18,8 +18,10 @@ func (Service) Start(_ *sync.WaitGroup) {
 	config := amqp2.Get()
 	if len(config.Consumers) > 0 {
 		//有消费者
-		for i := range config.Consumers {
-			con := consumer.Consumer{Consumer: config.Consumers[i]}
+		for _, _consumer := range config.Consumers {
+			con := consumer.Consumer{
+				Consumer: _consumer,
+			}
 			con.Start()
 		}
 	}
