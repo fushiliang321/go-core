@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"fmt"
 	"github.com/fasthttp/websocket"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/exception"
@@ -71,8 +72,10 @@ func (s *WsServer) init() {
 			}
 			func() {
 				defer func() {
-					log.Println("["+string(s.Fd)+"]ws write message exception", writeData)
-					exception.Listener("["+string(s.Fd)+"]ws write message exception", recover())
+					if err := recover(); err != nil {
+						log.Println("["+fmt.Sprintln(s.Fd)+"]ws write message exception", writeData)
+						exception.Listener("["+fmt.Sprintln(s.Fd)+"]ws write message exception", err)
+					}
 				}()
 				switch writeData.messageType {
 				case s.MessageType: //发送消息帧
