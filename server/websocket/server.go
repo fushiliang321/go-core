@@ -67,9 +67,17 @@ func (s *WsServer) init() {
 		for writeData = range s.ConnWriteChan {
 			switch writeData.messageType {
 			case s.MessageType: //发送消息帧
-				if err = s.Conn.WriteMessage(s.MessageType, *writeData.data); err != nil {
-					log.Println("ws write message err:", err)
-				}
+				func() {
+					defer func() {
+						exception.Listener("ws write message exception", recover())
+					}()
+					if s.Status == WsServerStatusClose {
+						return
+					}
+					if err = s.Conn.WriteMessage(s.MessageType, *writeData.data); err != nil {
+						log.Println("ws write message err:", err)
+					}
+				}()
 			case websocket.CloseMessage: //发送关闭帧
 				s.Conn.WriteControl(writeData.messageType, *writeData.data, *writeData.deadline)
 				s.Conn.Close()
@@ -127,7 +135,7 @@ func (s *WsServer) Pong(data []byte, deadline time.Time) {
 
 // 连接已断开
 func (s *WsServer) Close() {
-	if s.Status != WsServerStatusOpen {
+	if s.Status == WsServerStatusClose {
 		return
 	}
 	sender.remove(s.Fd)
