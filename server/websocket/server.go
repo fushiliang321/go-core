@@ -72,8 +72,8 @@ func (s *WsServer) init() {
 			func() {
 				defer func() {
 					if err := recover(); err != nil {
-						log.Println("["+fmt.Sprintln(s.Fd)+"]ws write message exception", writeData)
-						exception.Listener("["+fmt.Sprintln(s.Fd)+"]ws write message exception", err)
+						log.Println("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, *writeData.data, writeData.deadline)
+						exception.Listener("["+fmt.Sprint(s.Fd)+"]ws write message exception", err)
 					}
 				}()
 				switch writeData.messageType {
