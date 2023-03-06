@@ -116,6 +116,9 @@ func (s *WsServer) Ping(data []byte, deadline time.Time) {
 	if data == nil {
 		data = DataFramesDefault
 	}
+
+	log.Println("["+fmt.Sprint(s.Fd)+"] ping ", data, deadline)
+
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PingMessage,
 		data:        data,
