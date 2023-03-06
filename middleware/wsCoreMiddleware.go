@@ -15,8 +15,7 @@ import (
 	"time"
 )
 
-type WebsocketCoreMiddleware struct {
-}
+type WebsocketCoreMiddleware struct{}
 
 var upgraderDefault = websocket.FastHTTPUpgrader{
 	ReadBufferSize:  1024,
@@ -86,7 +85,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		conn.SetPingHandler(func(appData string) error {
 			//响应ping帧
 			ser.LastResponseTimestamp = time.Now().Unix()
-			ser.Pong([]byte{1}, websocket2.DeadlineDefault)
+			ser.Pong([]byte{1}, time.Time{})
 			return nil
 		})
 

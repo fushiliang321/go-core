@@ -34,9 +34,8 @@ const (
 )
 
 var (
-	DeadlineDefault   = time.Time{} //默认截止时间
-	DataFramesDefault = []byte{}    //默认数据帧
-	messageType       = 0           //消息类型 0客户端定义 1文本 2二进制
+	DataFramesDefault = []byte{} //默认数据帧
+	messageType       = 0        //消息类型 0客户端定义 1文本 2二进制
 )
 
 func Start() {
@@ -161,7 +160,7 @@ func (s *WsServer) Disconnect(data []byte) {
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.CloseMessage,
 		data:        &data,
-		deadline:    DeadlineDefault,
+		deadline:    time.Time{},
 	}
 }
 

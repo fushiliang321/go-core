@@ -67,7 +67,7 @@ func heartbeatCheck(interval int64, idleTime int64) {
 					//超时断开连接
 					ser.Disconnect([]byte("timeout"))
 				} else {
-					ser.Ping([]byte{1}, DeadlineDefault)
+					ser.Ping([]byte{1}, time.Time{})
 				}
 			} else {
 				//类型或者连接状态有问题的就删掉
