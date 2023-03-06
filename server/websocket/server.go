@@ -13,7 +13,7 @@ import (
 
 type ConnWriteChanParams struct {
 	messageType int
-	data        *[]byte
+	data        []byte
 	deadline    time.Time
 }
 
@@ -72,20 +72,20 @@ func (s *WsServer) init() {
 			func() {
 				defer func() {
 					if err := recover(); err != nil {
-						log.Println("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, *writeData.data, writeData.deadline)
+						log.Println("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, writeData.data, writeData.deadline, s.Conn.NetConn())
 						exception.Listener("["+fmt.Sprint(s.Fd)+"]ws write message exception", err)
 					}
 				}()
 				switch writeData.messageType {
 				case s.MessageType: //发送消息帧
-					if err = s.Conn.WriteMessage(s.MessageType, *writeData.data); err != nil {
+					if err = s.Conn.WriteMessage(s.MessageType, writeData.data); err != nil {
 						log.Println("ws write message err:", err)
 					}
 				case websocket.CloseMessage: //发送关闭帧
-					s.Conn.WriteControl(writeData.messageType, *writeData.data, writeData.deadline)
+					s.Conn.WriteControl(writeData.messageType, writeData.data, writeData.deadline)
 					s.Conn.Close()
 				default: //发送其他控制帧
-					if err = s.Conn.WriteControl(writeData.messageType, *writeData.data, writeData.deadline); err != nil {
+					if err = s.Conn.WriteControl(writeData.messageType, writeData.data, writeData.deadline); err != nil {
 						log.Println("ws write control err:", err)
 					}
 				}
@@ -105,7 +105,7 @@ func (s *WsServer) Push(data any) {
 	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: s.MessageType,
-		data:        bytes,
+		data:        *bytes,
 	}
 }
 
@@ -118,7 +118,7 @@ func (s *WsServer) Ping(data []byte, deadline time.Time) {
 	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PingMessage,
-		data:        &data,
+		data:        data,
 		deadline:    deadline,
 	}
 }
@@ -132,7 +132,7 @@ func (s *WsServer) Pong(data []byte, deadline time.Time) {
 	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PongMessage,
-		data:        &data,
+		data:        data,
 		deadline:    deadline,
 	}
 }
@@ -159,7 +159,7 @@ func (s *WsServer) Disconnect(data []byte) {
 	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.CloseMessage,
-		data:        &data,
+		data:        data,
 		deadline:    time.Time{},
 	}
 }
