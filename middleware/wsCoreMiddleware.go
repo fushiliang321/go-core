@@ -98,7 +98,6 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		}
 		var err error
 		if onMessage, ok := ws.Callbacks[event.ON_MESSAGE].(event.OnMessage); ok {
-			var recErr any
 			for {
 				var p []byte
 				_, p, err = conn.ReadMessage()
@@ -107,15 +106,10 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 				}
 				ser.LastResponseTimestamp = time.Now().Unix()
 				callOnMessage(onMessage, ser, p)
-				if recErr = recover(); recErr != nil {
-					ser.Push(helper.Error(500, fmt.Sprintln("ws onMessage exception:", recErr), nil))
-					exception.Listener("ws onMessage exception", recErr)
-				}
 			}
 		} else {
 			for {
-				_, _, err = conn.ReadMessage()
-				if err != nil {
+				if _, _, err = conn.ReadMessage(); err != nil {
 					break
 				}
 				ser.LastResponseTimestamp = time.Now().Unix()
@@ -131,9 +125,12 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 }
 
 // 调用OnMessage方法
-func callOnMessage(on event.OnMessage, ser *websocket2.WsServer, p []byte) (rec any) {
+func callOnMessage(on event.OnMessage, ser *websocket2.WsServer, p []byte) (err any) {
 	defer func() {
-		rec = recover()
+		if err = recover(); err != nil {
+			ser.Push(helper.Error(500, fmt.Sprintln("ws onMessage exception:", err)))
+			exception.Listener("ws onMessage exception", err)
+		}
 	}()
 	on(ser, p)
 	return
