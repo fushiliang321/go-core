@@ -17,10 +17,16 @@ import (
 const gzipMinSize = 10000 //触发gzip压缩的最小长度
 
 func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
-	middlewares := config.Get()
 	coreMiddlewares := middleware.GetCoreMiddlewares(handler)
+	middlewares := &config.Middlewares{
+		Http: []config.Middleware{},
+		WS:   []config.Middleware{},
+	}
+	*middlewares = *config.Get()
 	middlewares.Http = append(middlewares.Http, coreMiddlewares.Http...)
 	middlewares.WS = append(middlewares.WS, coreMiddlewares.WS...)
+	middlewaresHttpLen := len(middlewares.Http)
+	middlewaresWsLen := len(middlewares.WS)
 
 	return func(ctx *fasthttp.RequestCtx) {
 		defer func() {
@@ -34,14 +40,18 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 		handlers := requestHandler{}
 		switch {
 		case httpOk:
-			handlers.len = len(middlewares.Http)
+			handlers.len = middlewaresHttpLen
 			handlers.middlewares = make([]config.Middleware, handlers.len)
 			copy(handlers.middlewares, middlewares.Http)
 			ctx.RemoveUserValue(types.SERVER_WEBSOCKET_KEY)
 		case wsOk && "websocket" == strings.ToLower(string(ctx.Request.Header.Peek("Upgrade"))):
-			handlers.len = len(middlewares.WS)
+			handlers.len = middlewaresWsLen
 			handlers.middlewares = make([]config.Middleware, handlers.len)
 			copy(handlers.middlewares, middlewares.WS)
+		default:
+			//未知的协议，就直接返回空数据
+			ctx.Write([]byte{})
+			return
 		}
 		ctx.RemoveUserValue(types.SERVER_HTTP_KEY)
 		res := handlers.Process(ctx)
