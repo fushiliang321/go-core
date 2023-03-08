@@ -73,6 +73,7 @@ func (s *WsServer) init() {
 				defer func() {
 					if err := recover(); err != nil {
 						log.Println("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, writeData.data, writeData.deadline, s.Conn.NetConn())
+						s.Conn.Close()
 						exception.Listener("["+fmt.Sprint(s.Fd)+"]ws write message exception", err)
 					}
 				}()
@@ -116,9 +117,6 @@ func (s *WsServer) Ping(data []byte, deadline time.Time) {
 	if data == nil {
 		data = DataFramesDefault
 	}
-
-	log.Println("["+fmt.Sprint(s.Fd)+"] ping ", data, deadline)
-
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: websocket.PingMessage,
 		data:        data,
