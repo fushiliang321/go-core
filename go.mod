@@ -7,7 +7,7 @@ require (
 	github.com/fasthttp/websocket v1.5.1
 	github.com/fushiliang321/jsonrpc v0.0.0-20221101082715-5cff2d4915a8
 	github.com/go-redis/redis/v9 v9.0.0-rc.1
-	github.com/hashicorp/consul/api v1.19.1
+	github.com/hashicorp/consul/api v1.20.0
 	github.com/robfig/cron v1.2.0
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee
 	github.com/streadway/amqp v1.0.0
@@ -41,9 +41,9 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/sys v0.5.0 // indirect
-	golang.org/x/text v0.7.0 // indirect
-	google.golang.org/genproto v0.0.0-20230301171018-9ab4bdc49ad5 // indirect
+	golang.org/x/net v0.8.0 // indirect
+	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/text v0.8.0 // indirect
+	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 )
