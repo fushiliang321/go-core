@@ -74,8 +74,8 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 		}
 		con = cc.cc
 		defer func() {
-			cc.cc.Close()
 			cc.cc = nil
+			con.Close()
 		}()
 	}
 	if ctx == nil {
