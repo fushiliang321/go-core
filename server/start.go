@@ -39,17 +39,18 @@ func (Service) Start(wg *sync.WaitGroup) {
 		wg.Add(1)
 		go func(addr string, sers map[byte]server.Server, wg *sync.WaitGroup) {
 			defer wg.Done()
+
 			var (
-				httpServer *server.Server
-				wsServer   *server.Server
+				httpServer = &server.Server{}
+				wsServer   = &server.Server{}
 				err        error
 			)
 			for _, ser := range sers {
 				switch ser.Type {
 				case types.SERVER_WEBSOCKET:
-					wsServer = &ser
+					*wsServer = ser
 				case types.SERVER_HTTP:
-					httpServer = &ser
+					*httpServer = ser
 				}
 			}
 
