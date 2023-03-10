@@ -26,7 +26,7 @@ func RemoveServer(ser *WsServer) {
 }
 
 func Check(fd uint64) (ok bool) {
-	_, ok = sender.servers.Load(fd)
+	_, ok = sender.Load(fd)
 	return
 }
 
@@ -58,7 +58,7 @@ func heartbeatCheck(interval int64, idleTime int64) {
 	for {
 		time.Sleep(sleep)
 		nowTime = time.Now().Unix()
-		sender.servers.Range(func(fd, value any) bool {
+		sender.Range(func(fd, value any) bool {
 			defer func() {
 				recover()
 			}()
@@ -75,5 +75,6 @@ func heartbeatCheck(interval int64, idleTime int64) {
 			}
 			return true
 		})
+		ser = nil
 	}
 }
