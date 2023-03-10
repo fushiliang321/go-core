@@ -12,10 +12,18 @@ import (
 	"github.com/fushiliang321/go-core/server/websocket/event"
 	"github.com/valyala/fasthttp"
 	"log"
+	"strconv"
+	"sync"
 	"time"
 )
 
-type WebsocketCoreMiddleware struct{}
+type (
+	WebsocketCoreMiddleware struct{}
+	wsError                 struct {
+		code int
+		text string
+	}
+)
 
 var upgraderDefault = websocket.FastHTTPUpgrader{
 	ReadBufferSize:  1024,
@@ -53,13 +61,30 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		return
 	}
 	err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
-		defer func() {
-			conn.Close()
-			if err := recover(); err != nil {
-				exception.Listener("ws handler", recover())
-			}
-		}()
 		ser.Conn = conn
+
+		do := sync.Once{}
+		closeHandler := func(code int, text string) error {
+			defer func() {
+				exception.Listener("ws on close handler", recover())
+			}()
+
+			do.Do(func() {
+				conn.Close()
+				ser.OnClose()
+				if onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose); ok {
+					log.Println(ctx.ID(), "onClose")
+					onClose(ser, code, text)
+				}
+			})
+			return nil
+		}
+
+		defer func() {
+			exception.Listener("ws handler", recover())
+			closeHandler(0, "")
+		}()
+
 		if ser.MessageType == 0 {
 			if conn.Subprotocol() == "BinaryMessage" {
 				ser.MessageType = websocket.BinaryMessage
@@ -73,14 +98,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 			onOpen(ser)
 		}
 
-		conn.SetCloseHandler(func(code int, text string) error {
-			ser.OnClose()
-			if onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose); ok {
-				log.Println(ctx.ID(), "onClose")
-				onClose(ser, code, text)
-			}
-			return nil
-		})
+		conn.SetCloseHandler(closeHandler)
 
 		conn.SetPingHandler(func(appData string) error {
 			//响应ping帧
@@ -102,6 +120,8 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 				var p []byte
 				_, p, err = conn.ReadMessage()
 				if err != nil {
+					_wsError := errAnalysis(err)
+					closeHandler(_wsError.code, _wsError.text)
 					break
 				}
 				ser.LastResponseTimestamp = time.Now().Unix()
@@ -110,6 +130,8 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		} else {
 			for {
 				if _, _, err = conn.ReadMessage(); err != nil {
+					_wsError := errAnalysis(err)
+					closeHandler(_wsError.code, _wsError.text)
 					break
 				}
 				ser.LastResponseTimestamp = time.Now().Unix()
@@ -134,4 +156,22 @@ func callOnMessage(on event.OnMessage, ser *websocket2.WsServer, p []byte) (err 
 	}()
 	on(ser, p)
 	return
+}
+
+func errAnalysis(_err error) *wsError {
+	code := 0
+	str := _err.Error()
+	if len(str) > 20 {
+		str = str[17:21]
+		i, err := strconv.Atoi(str)
+		if err == nil {
+			if strconv.Itoa(i) == str {
+				code = i
+			}
+		}
+	}
+	return &wsError{
+		code: code,
+		text: _err.Error(),
+	}
 }
