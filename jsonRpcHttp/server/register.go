@@ -8,17 +8,18 @@ import (
 )
 
 type checkBody struct {
-	Jsonrpc string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Params  params `json:"params"`
+	Jsonrpc string  `json:"jsonrpc"`
+	Method  string  `json:"method"`
+	Params  *params `json:"params"`
 }
 
 func RegisterServer(name string, s any) {
 	body := checkBody{
 		Jsonrpc: "2.0",
 		Method:  "Health.Check",
-		Params: params{
-			Name: name,
+		Params: &params{
+			Name:     name,
+			Protocol: "jsonrpc-http",
 		},
 	}
 

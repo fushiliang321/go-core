@@ -10,12 +10,13 @@ import (
 	"sync"
 )
 
-type Service struct {
-}
+type Service struct{}
 
-var server jsonrpc.ServerInterface
-var ip string
-var port int
+var (
+	server jsonrpc.ServerInterface
+	ip     string
+	port   int
+)
 
 func initialize() {
 	jsonRpcHttpConfig := config.Get()
