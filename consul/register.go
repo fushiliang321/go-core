@@ -11,7 +11,7 @@ import (
 
 var (
 	client               *api.Client
-	serviceRegistrations map[string]*api.AgentServiceRegistration //全局的服务注册信息
+	serviceRegistrations = map[string]*api.AgentServiceRegistration{} //全局的服务注册信息
 )
 
 func ServiceRegistrations() *map[string]*api.AgentServiceRegistration {
