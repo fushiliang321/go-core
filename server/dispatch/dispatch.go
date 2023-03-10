@@ -40,15 +40,16 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 		_, wsOk := ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
 		handlers := requestHandler{}
 		switch {
+		case wsOk && "websocket" == strings.ToLower(string(ctx.Request.Header.Peek("Upgrade"))):
+			//优先判断websocket请求，避免同时开启http和websocket时无法升级到websocket
+			handlers.len = middlewaresWsLen
+			handlers.middlewares = make([]config.Middleware, handlers.len)
+			copy(handlers.middlewares, middlewares.WS)
 		case httpOk:
 			handlers.len = middlewaresHttpLen
 			handlers.middlewares = make([]config.Middleware, handlers.len)
 			copy(handlers.middlewares, middlewares.Http)
 			ctx.RemoveUserValue(types.SERVER_WEBSOCKET_KEY)
-		case wsOk && "websocket" == strings.ToLower(string(ctx.Request.Header.Peek("Upgrade"))):
-			handlers.len = middlewaresWsLen
-			handlers.middlewares = make([]config.Middleware, handlers.len)
-			copy(handlers.middlewares, middlewares.WS)
 		default:
 			//未知的协议，就直接返回空数据
 			ctx.Write([]byte{})
