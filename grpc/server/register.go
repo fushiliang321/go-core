@@ -67,20 +67,24 @@ func (s *serverListen) Serve() {
 	serviceInfos := s.server.GetServiceInfo()
 	consulConfig := consul.GetConfig()
 	ip := helper.GetLocalIP(consulConfig.Address)
+	serviceNames := []string{}
 	for serviceName := range serviceInfos {
 		b, err := consul.RegisterServer(serviceName, "grpc", ip, s.port, &api.AgentServiceCheck{
-			GRPC: fmt.Sprintf("%v:%v/%v", ip, s.port, HEALTHCHECK_SERVICE),
+			GRPC: fmt.Sprintf("%v:%v/%v", ip, s.port, HEALTHCHECK_SERVICE+"."+serviceName),
 		})
-		if !b {
+		if b {
+			serviceNames = append(serviceNames, serviceName)
+		} else {
 			log.Printf("grpc consul register error: %v", err)
 		}
 	}
-	s.RegisterHealthServer()
+	s.RegisterHealthServer(serviceNames)
 	if err := s.server.Serve(s.listener); err != nil {
 		log.Printf("grpc failed to serve: %v", err)
 	}
 }
 
+// 注册服务
 func (s *serverListen) RegisterServer(srv any, fun any) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -108,8 +112,14 @@ func (s *serverListen) RegisterServer(srv any, fun any) {
 	})
 }
 
-func (s *serverListen) RegisterHealthServer() {
+// 注册健康检测服务
+func (s *serverListen) RegisterHealthServer(serviceNames []string) {
+	if len(serviceNames) == 0 {
+		return
+	}
 	healthserver := health.NewServer()
-	healthserver.SetServingStatus(HEALTHCHECK_SERVICE, healthpb.HealthCheckResponse_SERVING)
+	for _, name := range serviceNames {
+		healthserver.SetServingStatus(HEALTHCHECK_SERVICE+"."+name, healthpb.HealthCheckResponse_SERVING)
+	}
 	healthpb.RegisterHealthServer(s.server, healthserver)
 }
