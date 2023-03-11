@@ -29,10 +29,11 @@ func initialize() {
 }
 
 func (Service) Start(wg *sync.WaitGroup) {
-	consulConfig := config.Get()
-	if consulConfig.Services == nil || len(consulConfig.Services) == 0 {
+	config := config.Get()
+	if config.Services == nil || len(config.Services) == 0 {
 		return
 	}
+	serviceRegistrations = make(map[string]*registerInfo, len(config.Services))
 	initialize()
 	wg.Add(1)
 	go func(wg *sync.WaitGroup) {
@@ -40,7 +41,7 @@ func (Service) Start(wg *sync.WaitGroup) {
 		// 启动服务监听
 		server.Start()
 	}(wg)
-	for _, s := range consulConfig.Services {
+	for _, s := range config.Services {
 		RegisterServer(reflect.Indirect(reflect.ValueOf(s)).Type().Name()+"Service", s)
 	}
 	server.Register(new(Health))
