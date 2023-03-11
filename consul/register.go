@@ -94,7 +94,7 @@ func setServiceCheckDefaultValue(check *api.AgentServiceCheck) *api.AgentService
 		check.Interval = "1s"
 	}
 	if check.DeregisterCriticalServiceAfter == "" {
-		// check失败后30秒删除本服务，注销时间，相当于过期时间
+		// check失败后90秒删除本服务，注销时间，相当于过期时间
 		check.DeregisterCriticalServiceAfter = "90s"
 	}
 	return check
