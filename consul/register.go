@@ -10,13 +10,8 @@ import (
 )
 
 var (
-	client               *api.Client
-	serviceRegistrations = map[string]*api.AgentServiceRegistration{} //全局的服务注册信息
+	client *api.Client
 )
-
-func ServiceRegistrations() *map[string]*api.AgentServiceRegistration {
-	return &serviceRegistrations
-}
 
 func newConsulClient() (*api.Client, error) {
 	var err error
@@ -80,7 +75,6 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 		log.Println("register server error : ", err)
 		return
 	}
-	serviceRegistrations[name] = registration
 	return true, nil
 }
 
