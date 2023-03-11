@@ -1,21 +1,29 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/fushiliang321/jsonrpc/common"
 	"io"
 	"net/http"
+)
+
+type (
+	Http struct {
+		Ip         string
+		Port       string
+		Server     Server
+		BufferSize int
+	}
+	ErrorResponse struct {
+		Code int
+		Text string
+	}
 )
 
 const (
 	BufferSize = 1024
 )
-
-type Http struct {
-	Ip         string
-	Port       string
-	Server     Server
-	BufferSize int
-}
 
 func NewHttpServer(ip string, port string) *Http {
 	return &Http{
@@ -62,5 +70,28 @@ func (p *Http) handleFunc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	res := p.Server.Handler(data)
-	w.Write(res)
+
+	var internalErr *common.InternalErr
+
+	switch res.(type) {
+	case common.ErrorResponse:
+		_res := res.(common.ErrorResponse)
+		if _internalErr, ok := _res.Error.Data.(common.InternalErr); ok && _internalErr.Data != nil {
+			internalErr = &_internalErr
+		}
+	case common.ErrorNotifyResponse:
+		_res := res.(common.ErrorNotifyResponse)
+		if _internalErr, ok := _res.Error.Data.(common.InternalErr); ok && _internalErr.Data != nil {
+			internalErr = &_internalErr
+		}
+	}
+
+	if internalErr != nil {
+		if errData, ok := internalErr.Data.(ErrorResponse); ok {
+			w.WriteHeader(errData.Code)
+		}
+	}
+
+	marshal, _ := json.Marshal(res)
+	w.Write(marshal)
 }

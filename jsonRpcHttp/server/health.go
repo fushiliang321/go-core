@@ -1,8 +1,8 @@
 package server
 
 import (
-	"errors"
-	"time"
+	"github.com/fushiliang321/jsonrpc/common"
+	"github.com/valyala/fasthttp"
 )
 
 type Health struct{}
@@ -14,20 +14,26 @@ var (
 
 func (s *Health) Check(params *registerInfo) (*string, error) {
 	if len(serviceRegistrations) == 0 {
-		//需要延迟响应，等待客户端请求超时
-		time.Sleep(time.Minute)
-		return &resultError, errors.New("服务不存在")
+		//没有注册的服务
+		return &resultError, common.NewInternalErr(resultError, ErrorResponse{
+			Code: fasthttp.StatusGone,
+			Text: resultError,
+		})
 	}
 	registration, ok := serviceRegistrations[params.Name]
 	if !ok {
-		//需要延迟响应，等待客户端请求超时
-		time.Sleep(time.Minute)
-		return &resultError, errors.New("服务不存在")
+		//检测的服务没有注册
+		return &resultError, common.NewInternalErr(resultError, ErrorResponse{
+			Code: fasthttp.StatusGone,
+			Text: resultError,
+		})
 	}
 	if registration.Protocol != params.Protocol {
-		//需要延迟响应，等待客户端请求超时
-		time.Sleep(time.Minute)
-		return &resultError, errors.New("服务不存在")
+		//服务的协议不一致
+		return &resultError, common.NewInternalErr(resultError, ErrorResponse{
+			Code: fasthttp.StatusGone,
+			Text: resultError,
+		})
 	}
 	return &resultSuccess, nil
 }

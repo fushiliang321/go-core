@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/fasthttp/router v1.4.17
 	github.com/fasthttp/websocket v1.5.1
-	github.com/fushiliang321/jsonrpc v0.0.0-20221101082715-5cff2d4915a8
+	github.com/fushiliang321/jsonrpc v1.1.2
 	github.com/go-redis/redis/v9 v9.0.0-rc.1
 	github.com/hashicorp/consul/api v1.20.0
 	github.com/robfig/cron v1.2.0
@@ -26,7 +26,7 @@ require (
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/goinggo/mapstructure v0.0.0-20140717182941-194205d9b4a9 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.4.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
@@ -45,5 +45,5 @@ require (
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
+	google.golang.org/protobuf v1.29.0 // indirect
 )

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
 	"github.com/fushiliang321/jsonrpc/common"
 	"reflect"
@@ -11,31 +10,29 @@ type Server struct {
 	common.Server
 }
 
-func (svr *Server) Handler(b []byte) []byte {
+func (svr *Server) Handler(b []byte) any {
 	data, err := common.ParseRequestBody(b)
 	if err != nil {
 		return jsonE(nil, common.JsonRpc, common.ParseError)
 	}
-	var res interface{}
+	var res any
 	if reflect.ValueOf(data).Kind() == reflect.Slice {
-		var resList []interface{}
-		for _, v := range data.([]interface{}) {
-			r := svr.SingleHandler(v.(map[string]interface{}))
+		var resList []any
+		for _, v := range data.([]any) {
+			r := svr.SingleHandler(v.(map[string]any))
 			resList = append(resList, r)
 		}
 		res = resList
 	} else if reflect.ValueOf(data).Kind() == reflect.Map {
-		r := svr.SingleHandler(data.(map[string]interface{}))
+		r := svr.SingleHandler(data.(map[string]any))
 		res = r
 	} else {
 		return jsonE(nil, common.JsonRpc, common.InvalidRequest)
 	}
-
-	response, _ := json.Marshal(res)
-	return response
+	return res
 }
 
-func (svr *Server) SingleHandler(jsonMap map[string]interface{}) interface{} {
+func (svr *Server) SingleHandler(jsonMap map[string]any) any {
 	if ctx, ok := jsonMap["context"]; ok {
 		if ctx, ok := ctx.(map[string]any); ok {
 			context.SetBatch(ctx)
@@ -44,7 +41,6 @@ func (svr *Server) SingleHandler(jsonMap map[string]interface{}) interface{} {
 	return svr.Server.SingleHandler(jsonMap)
 }
 
-func jsonE(id interface{}, jsonRpc string, errCode int) []byte {
-	e, _ := json.Marshal(common.E(id, jsonRpc, errCode))
-	return e
+func jsonE(id any, jsonRpc string, errCode int) any {
+	return common.E(id, jsonRpc, errCode)
 }
