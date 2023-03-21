@@ -20,14 +20,7 @@ type PaginateData[t any] struct {
 	Lists    []t `json:"lists"`
 }
 
-var operators = []string{"=", "<", "<=", ">", ">=", "<>", "<=>", "!=", "like", "not like", "in", "not in", "between", "not between"}
-var operatorMap = map[string]byte{}
-
-func init() {
-	for _, operator := range operators {
-		operatorMap[operator] = 0
-	}
-}
+var operatorMap = map[string]byte{"=": 0, "<": 0, "<=": 0, ">": 0, ">=": 0, "<>": 0, "<=>": 0, "!=": 0, "like": 0, "not like": 0, "in": 0, "not in": 0, "between": 0, "not between": 0}
 
 func filter(str string) string {
 	reg, err := regexp.Compile("[^a-zA-Z0-9_$>./[/]\"-]+")
