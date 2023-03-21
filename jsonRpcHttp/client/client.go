@@ -2,6 +2,7 @@ package client
 
 import (
 	"github.com/fushiliang321/go-core/consul"
+	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/jsonrpc"
@@ -26,7 +27,7 @@ func (c *Client) Call(method string, params any, res any) (err error) {
 	}()
 	rpcClient, err := newRpcClient(c.serverName)
 	if err == nil {
-		err = rpcClient.Call(c.serverNameSnake+"/"+method, params, res, false)
+		err = rpcClient.Call(c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
 		if err != nil {
 			log.Println("rpc rpcClient error", err)
 		}
