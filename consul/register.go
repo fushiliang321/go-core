@@ -81,15 +81,28 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 // 设置健康检测默认值
 func setServiceCheckDefaultValue(check *api.AgentServiceCheck) *api.AgentServiceCheck {
 	if check.Timeout == "" {
-		check.Timeout = "1s"
+		//请求超时时间
+		if consulConfig.HealthCheck.Timeout == "" {
+			check.Timeout = "2s"
+		} else {
+			check.Timeout = consulConfig.HealthCheck.Timeout
+		}
 	}
 	if check.Interval == "" {
 		// 健康检查间隔
-		check.Interval = "1s"
+		if consulConfig.HealthCheck.Interval == "" {
+			check.Timeout = "3s"
+		} else {
+			check.Timeout = consulConfig.HealthCheck.Interval
+		}
 	}
 	if check.DeregisterCriticalServiceAfter == "" {
 		// check失败后90秒删除本服务，注销时间，相当于过期时间
-		check.DeregisterCriticalServiceAfter = "90s"
+		if consulConfig.HealthCheck.DeregisterCriticalServiceAfter == "" {
+			check.Timeout = "90s"
+		} else {
+			check.Timeout = consulConfig.HealthCheck.DeregisterCriticalServiceAfter
+		}
 	}
 	return check
 }
