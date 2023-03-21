@@ -44,21 +44,29 @@ func ClientAddr(ctx *fasthttp.RequestCtx) string {
 
 // 获取rpc上下文请求数据
 func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
-	ctxData := context.GetAll()
-	if ctxData == nil {
-		return
-	}
-	data := ctxData["internalRequest"]
+	data := context.Get("internalRequest")
 	if data == nil {
 		return
 	}
-	mapData, ok := data.(map[string]any)
-	if !ok {
-		return
-	}
-	err := MapToStruc[string](mapData, &rpcRequestData)
-	if err != nil {
+	switch data.(type) {
+	case rpc.RpcRequestData:
+		rpcRequestData = data.(rpc.RpcRequestData)
+	case map[string]any:
+		mapData, ok := data.(map[string]any)
+		if !ok {
+			return
+		}
+		err := MapToStruc[string](mapData, &rpcRequestData)
+		if err != nil {
+			return
+		}
+	default:
 		return
 	}
 	return rpcRequestData
+}
+
+// 设置rpc上下文请求数据
+func SetRpcRequestData(rpcRequestData rpc.RpcRequestData) {
+	context.Set("internalRequest", rpcRequestData)
 }
