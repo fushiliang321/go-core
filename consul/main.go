@@ -13,7 +13,7 @@ var (
 	services  = Services{}
 
 	serviceMap     map[string]*serviceMonitor
-	serviceMapLock sync.Locker
+	serviceMapLock sync.Mutex
 )
 
 func newClient() (client *api.Client, err error) {
