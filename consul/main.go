@@ -12,7 +12,7 @@ var (
 	apiConfig *api.Config
 	services  = Services{}
 
-	serviceMap     map[string]*serviceMonitor
+	serviceMap     = map[string]*serviceMonitor{}
 	serviceMapLock sync.Mutex
 )
 
