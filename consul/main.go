@@ -3,18 +3,17 @@ package consul
 import (
 	"fmt"
 	"github.com/hashicorp/consul/api"
-	"strconv"
 	"sync"
-	"time"
 )
 
 type Service struct{}
 
 var (
-	apiConfig        *api.Config
-	services         = Services{}
-	lastIndexMap     sync.Map
-	lastIndexDefault uint64
+	apiConfig *api.Config
+	services  = Services{}
+
+	serviceMap     map[string]*serviceMonitor
+	serviceMapLock sync.Locker
 )
 
 func newClient() (client *api.Client, err error) {
@@ -25,52 +24,33 @@ func newClient() (client *api.Client, err error) {
 	return
 }
 
-func getServiceData(consumerServiceNames []string) {
+func AddServices(consumerServiceNames []string) {
 	for _, serviceName := range consumerServiceNames {
-		go SyncService(serviceName)
+		go AddService(serviceName)
 	}
 }
 
-// 同步服务信息
-func SyncService(serviceName string) {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println("error getService", err)
-		}
-		go func(serviceName string) {
-			time.Sleep(time.Millisecond * 10)
-			SyncService(serviceName)
-		}(serviceName)
-	}()
-	lastIndex, _ := lastIndexMap.LoadOrStore(serviceName, lastIndexDefault)
-	_client, _ := newClient()
-	sers, metaInfo, err := _client.Health().Service(serviceName, "", true, &api.QueryOptions{
-		WaitIndex: lastIndex.(uint64), // 同步点，这个调用将一直阻塞，直到有新的更新
-	})
-	if err != nil {
-		fmt.Println("error retrieving instances from Consul: ", err)
+// 添加服务信息
+func AddService(serviceName string) {
+	serviceMapLock.Lock()
+	defer serviceMapLock.Unlock()
+	if _, ok := serviceMap[serviceName]; ok {
 		return
 	}
-	lastIndexMap.Store(serviceName, metaInfo.LastIndex)
-	serviceNodes := []*ServiceNode{}
-	var (
-		ser   *api.ServiceEntry
-		check *api.HealthCheck
-	)
-	for _, ser = range sers {
-		for _, check = range ser.Checks {
-			if check.Status == api.HealthPassing && check.Type != "" {
-				node := &ServiceNode{}
-				node.Status = check.Status
-				node.ServiceName = check.ServiceName
-				node.Protocol = check.Type
-				node.Address = ser.Service.Address
-				node.Port = strconv.Itoa(ser.Service.Port)
-				serviceNodes = append(serviceNodes, node)
-			}
-		}
+	serviceMap[serviceName] = &serviceMonitor{
+		name:      serviceName,
+		status:    monitorOn,
+		lastIndex: uint64(0),
 	}
-	services.setServiceNodes(serviceName, serviceNodes)
+	serviceMap[serviceName].syncService()
+}
+
+// 移除服务信息
+func RemoveService(serviceName string) {
+	serviceMapLock.Lock()
+	defer serviceMapLock.Unlock()
+	serviceMap[serviceName].close()
+	delete(serviceMap, serviceName)
 }
 
 func GetNode(serviceName string, protocol string) (node *ServiceNode, err error) {

@@ -29,7 +29,7 @@ func (Service) Start(wg *sync.WaitGroup) {
 	}
 	if len(consumerServiceNames) > 0 {
 		// 获取服务信息
-		getServiceData(consumerServiceNames)
+		AddServices(consumerServiceNames)
 	}
 }
 
