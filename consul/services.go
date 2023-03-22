@@ -32,11 +32,13 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func (sers *Services) isExistService(serviceName string) (ok bool) {
+// 判断服务信息是否存在
+func (sers *Services) HasService(serviceName string) (ok bool) {
 	_, ok = sers.maps.Load(serviceName)
 	return
 }
 
+// 设置服务节点信息
 func (sers *Services) setServiceNodes(serviceName string, serviceNodes []*ServiceNode) {
 	nodeMap := map[string]ServiceNodes{}
 	tcpNodes := ServiceNodes{}
@@ -62,6 +64,7 @@ func (sers *Services) setServiceNodes(serviceName string, serviceNodes []*Servic
 	sers.maps.Store(serviceName, nodeMap)
 }
 
+// 随机取一个节点
 func (sers *Services) getRandomNode(serviceName string, protocol string) (node *ServiceNode, err error) {
 	res, ok := sers.maps.Load(serviceName)
 	if !ok {
