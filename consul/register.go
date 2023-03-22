@@ -91,17 +91,17 @@ func setServiceCheckDefaultValue(check *api.AgentServiceCheck) *api.AgentService
 	if check.Interval == "" {
 		// 健康检查间隔
 		if consulConfig.HealthCheck == nil || consulConfig.HealthCheck.Interval == "" {
-			check.Timeout = "3s"
+			check.Interval = "3s"
 		} else {
-			check.Timeout = consulConfig.HealthCheck.Interval
+			check.Interval = consulConfig.HealthCheck.Interval
 		}
 	}
 	if check.DeregisterCriticalServiceAfter == "" {
 		// check失败后90秒删除本服务，注销时间，相当于过期时间
 		if consulConfig.HealthCheck == nil || consulConfig.HealthCheck.DeregisterCriticalServiceAfter == "" {
-			check.Timeout = "90s"
+			check.DeregisterCriticalServiceAfter = "90s"
 		} else {
-			check.Timeout = consulConfig.HealthCheck.DeregisterCriticalServiceAfter
+			check.DeregisterCriticalServiceAfter = consulConfig.HealthCheck.DeregisterCriticalServiceAfter
 		}
 	}
 	return check
