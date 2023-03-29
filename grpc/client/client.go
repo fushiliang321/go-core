@@ -9,9 +9,10 @@ import (
 
 type ClientGenerateFun[t any] func(isMultiplex ...bool) t
 
-var multiplexConns = map[any]*ClientConn{}
-
-var ctx context.Context
+var (
+	multiplexConns = map[any]*ClientConn{}
+	ctx            context.Context
+)
 
 func init() {
 	ctx = context.Background()

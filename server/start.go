@@ -10,8 +10,7 @@ import (
 	"sync"
 )
 
-type Service struct {
-}
+type Service struct{}
 
 func (Service) Start(wg *sync.WaitGroup) {
 	r := routers.Get()

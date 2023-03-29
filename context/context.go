@@ -14,8 +14,7 @@ func NewInstance() *Context {
 
 // 获取全部协程上下文数据
 func (ctx *Context) GetAll() map[string]any {
-	data := ctx.Local.Get()
-	if data != nil {
+	if data := ctx.Local.Get(); data != nil {
 		if data, ok := data.(map[string]any); ok {
 			return data
 		}
@@ -25,8 +24,7 @@ func (ctx *Context) GetAll() map[string]any {
 
 // 获取协程上下文数据
 func (ctx *Context) Get(key string) any {
-	data := ctx.Local.Get()
-	if data != nil {
+	if data := ctx.Local.Get(); data != nil {
 		if data, ok := data.(map[string]any); ok {
 			if value, ok := data[key]; ok {
 				return value
@@ -39,8 +37,7 @@ func (ctx *Context) Get(key string) any {
 // 设置协程上下文数据
 func (ctx *Context) Set(key string, value any) {
 	_map := map[string]any{}
-	data := ctx.Local.Get()
-	if data != nil {
+	if data := ctx.Local.Get(); data != nil {
 		if data, ok := data.(map[string]any); ok {
 			_map = data
 		}
@@ -52,8 +49,7 @@ func (ctx *Context) Set(key string, value any) {
 // 批量设置协程上下文数据
 func (ctx *Context) SetBatch(values map[string]any) {
 	_map := map[string]any{}
-	data := ctx.Local.Get()
-	if data != nil {
+	if data := ctx.Local.Get(); data != nil {
 		if data, ok := data.(map[string]any); ok {
 			_map = data
 		}
@@ -66,8 +62,7 @@ func (ctx *Context) SetBatch(values map[string]any) {
 
 // 移除协程上下文数据
 func (ctx *Context) Remove(key string) {
-	data := ctx.Local.Get()
-	if data != nil {
+	if data := ctx.Local.Get(); data != nil {
 		if data, ok := data.(map[string]any); ok {
 			delete(data, key)
 			if len(data) > 0 {

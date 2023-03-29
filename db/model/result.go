@@ -41,7 +41,7 @@ func (m *Model[t]) First() (*t, error) {
 	return &res, nil
 }
 
-func (m *Model[t]) Find() (*[]t, error) {
+func (m *Model[t]) Find() ([]t, error) {
 	var res []t
 	tx := m.Db.Find(&res)
 	if tx.Error != nil {
@@ -51,7 +51,7 @@ func (m *Model[t]) Find() (*[]t, error) {
 			return nil, tx.Error
 		}
 	}
-	return &res, nil
+	return res, nil
 }
 
 func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
@@ -62,7 +62,7 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 		limit = 20
 	}
 	lastPage := 0
-	lists := []t{}
+	var lists []t
 	total, _ := m.Count()
 	if total > 0 {
 		totalInt := int(total)
@@ -72,8 +72,12 @@ func (m *Model[t]) Paginate(page int, limit int) *PaginateData[t] {
 		}
 		offset := (page - 1) * limit
 		if res, _ := m.Offset(offset).Limit(limit).Find(); res != nil {
-			lists = *res
+			lists = res
+		} else {
+			lists = []t{}
 		}
+	} else {
+		lists = []t{}
 	}
 	return &PaginateData[t]{
 		Page:     page,

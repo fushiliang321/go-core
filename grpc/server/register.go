@@ -67,7 +67,7 @@ func (s *serverListen) Serve() {
 	serviceInfos := s.server.GetServiceInfo()
 	consulConfig := consul.GetConfig()
 	ip := helper.GetLocalIP(consulConfig.Address)
-	serviceNames := []string{}
+	var serviceNames []string
 	for serviceName := range serviceInfos {
 		b, err := consul.RegisterServer(serviceName, "grpc", ip, s.port, &api.AgentServiceCheck{
 			GRPC: fmt.Sprintf("%v:%v/%v", ip, s.port, HEALTHCHECK_SERVICE+"."+serviceName),
@@ -78,7 +78,9 @@ func (s *serverListen) Serve() {
 			log.Printf("grpc consul register error: %v", err)
 		}
 	}
-	s.RegisterHealthServer(serviceNames)
+	if len(serviceNames) > 0 {
+		s.RegisterHealthServer(serviceNames)
+	}
 	if err := s.server.Serve(s.listener); err != nil {
 		log.Printf("grpc failed to serve: %v", err)
 	}

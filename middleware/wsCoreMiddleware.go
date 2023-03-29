@@ -25,16 +25,17 @@ type (
 	}
 )
 
-var upgraderDefault = websocket.FastHTTPUpgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	Subprotocols:    []string{"BinaryMessage", "TextMessage"},
-	CheckOrigin: func(ctx *fasthttp.RequestCtx) bool {
-		return true
-	},
-}
-
-var config *server.Servers
+var (
+	upgraderDefault = websocket.FastHTTPUpgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		Subprotocols:    []string{"BinaryMessage", "TextMessage"},
+		CheckOrigin: func(ctx *fasthttp.RequestCtx) bool {
+			return true
+		},
+	}
+	config *server.Servers
+)
 
 func init() {
 	config = server.Get()

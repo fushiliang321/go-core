@@ -42,9 +42,11 @@ func ClientAddr(ctx *fasthttp.RequestCtx) string {
 	return "[" + ip + "]:" + string(port)
 }
 
+const internalRequestKey = "internalRequest"
+
 // 获取rpc上下文请求数据
 func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
-	data := context.Get("internalRequest")
+	data := context.Get(internalRequestKey)
 	if data == nil {
 		return
 	}
@@ -68,5 +70,5 @@ func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
 
 // 设置rpc上下文请求数据
 func SetRpcRequestData(rpcRequestData rpc.RpcRequestData) {
-	context.Set("internalRequest", rpcRequestData)
+	context.Set(internalRequestKey, rpcRequestData)
 }

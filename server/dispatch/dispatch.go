@@ -67,10 +67,10 @@ func write(ctx *fasthttp.RequestCtx, data any) {
 		log.Printf("server result err:%s\n", err)
 		return
 	}
-	if len(*bytes) > gzipMinSize {
+	if len(bytes) > gzipMinSize {
 		ctx.Response.Header.Add("Content-Encoding", "gzip")
-		ctx.Write(fasthttp.AppendGzipBytes([]byte{}, *bytes))
+		ctx.Write(fasthttp.AppendGzipBytes([]byte{}, bytes))
 	} else {
-		ctx.Write(*bytes)
+		ctx.Write(bytes)
 	}
 }

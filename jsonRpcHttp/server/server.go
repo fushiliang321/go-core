@@ -15,21 +15,19 @@ func (svr *Server) Handler(b []byte) any {
 	if err != nil {
 		return jsonE(nil, common.JsonRpc, common.ParseError)
 	}
-	var res any
-	if reflect.ValueOf(data).Kind() == reflect.Slice {
+	switch reflect.ValueOf(data).Kind() {
+	case reflect.Slice:
 		var resList []any
 		for _, v := range data.([]any) {
 			r := svr.SingleHandler(v.(map[string]any))
 			resList = append(resList, r)
 		}
-		res = resList
-	} else if reflect.ValueOf(data).Kind() == reflect.Map {
-		r := svr.SingleHandler(data.(map[string]any))
-		res = r
-	} else {
+		return resList
+	case reflect.Map:
+		return svr.SingleHandler(data.(map[string]any))
+	default:
 		return jsonE(nil, common.JsonRpc, common.InvalidRequest)
 	}
-	return res
 }
 
 func (svr *Server) SingleHandler(jsonMap map[string]any) any {

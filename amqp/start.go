@@ -11,8 +11,7 @@ import (
 	"sync"
 )
 
-type Service struct {
-}
+type Service struct{}
 
 func (Service) Start(_ *sync.WaitGroup) {
 	config := amqp2.Get()
@@ -50,7 +49,7 @@ func Publish(producer *types.Producer) {
 	err = channel.Publish(producer.Exchange, producer.RoutingKey, false, false, amqp3.Publishing{
 		ContentType:  "text/plain",
 		DeliveryMode: deliveryMode,
-		Body:         *body,
+		Body:         body,
 		Expiration:   producer.Expiration,
 		Priority:     producer.Priority,
 	})

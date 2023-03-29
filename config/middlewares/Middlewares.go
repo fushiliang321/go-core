@@ -5,14 +5,15 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type Middlewares struct {
-	Http []Middleware
-	WS   []Middleware
-}
-
-type Middleware interface {
-	Process(ctx *fasthttp.RequestCtx, handler types.RequestHandler) any
-}
+type (
+	Middlewares struct {
+		Http []Middleware
+		WS   []Middleware
+	}
+	Middleware interface {
+		Process(ctx *fasthttp.RequestCtx, handler types.RequestHandler) any
+	}
+)
 
 var middlewares = &Middlewares{
 	Http: []Middleware{},

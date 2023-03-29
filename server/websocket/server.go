@@ -11,21 +11,22 @@ import (
 	"time"
 )
 
-type ConnWriteChanParams struct {
-	messageType int
-	data        []byte
-	deadline    time.Time
-}
-
-type WsServer struct {
-	Ctx                   *fasthttp.RequestCtx
-	Conn                  *websocket.Conn
-	ConnWriteChan         chan *ConnWriteChanParams
-	Fd                    uint64
-	MessageType           int
-	LastResponseTimestamp int64
-	Status                byte
-}
+type (
+	ConnWriteChanParams struct {
+		messageType int
+		data        []byte
+		deadline    time.Time
+	}
+	WsServer struct {
+		Ctx                   *fasthttp.RequestCtx
+		Conn                  *websocket.Conn
+		ConnWriteChan         chan *ConnWriteChanParams
+		Fd                    uint64
+		MessageType           int
+		LastResponseTimestamp int64
+		Status                byte
+	}
+)
 
 const (
 	WsServerStatusClose     = 0 //连接关闭
@@ -106,7 +107,7 @@ func (s *WsServer) Push(data any) {
 	}
 	s.ConnWriteChan <- &ConnWriteChanParams{
 		messageType: s.MessageType,
-		data:        *bytes,
+		data:        bytes,
 	}
 }
 

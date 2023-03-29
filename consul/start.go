@@ -10,7 +10,7 @@ import (
 
 var consulConfig *consul.Consul
 
-func (Service) Start(wg *sync.WaitGroup) {
+func (Service) Start(_ *sync.WaitGroup) {
 	consulConfig = consul.Get()
 	rpcConfig := jsonRpcHttp.Get()
 	grpcConfig := grpc.Get()

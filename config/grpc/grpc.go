@@ -1,16 +1,17 @@
 package grpc
 
-type Service struct {
-	RegisterFun any
-	Handle      any
-}
-
-type Grpc struct {
-	Host      string
-	Port      int
-	Services  []Service
-	Consumers []string
-}
+type (
+	Service struct {
+		RegisterFun any
+		Handle      any
+	}
+	Grpc struct {
+		Host      string
+		Port      int
+		Services  []Service
+		Consumers []string
+	}
+)
 
 var data = &Grpc{
 	Services:  []Service{},

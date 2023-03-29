@@ -17,18 +17,17 @@ type Server interface {
 }
 
 var (
-	once sync.Once
+	once    sync.Once
+	servers = []Server{
+		amqp.Service{},
+		consul.Service{},
+		jsonRpcHttp.Service{},
+		grpc.Service{},
+		task.Service{},
+		rateLimit.Service{},
+		server.Service{},
+	}
 )
-
-var servers = []Server{
-	amqp.Service{},
-	consul.Service{},
-	jsonRpcHttp.Service{},
-	grpc.Service{},
-	task.Service{},
-	rateLimit.Service{},
-	server.Service{},
-}
 
 func Register(s Server) {
 	servers = append(servers, s)

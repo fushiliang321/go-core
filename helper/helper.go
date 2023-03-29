@@ -48,7 +48,7 @@ func GetStructFields(v any) (fields []string) {
 }
 
 // any转bytes
-func AnyToBytes(data any) (*[]byte, error) {
+func AnyToBytes(data any) ([]byte, error) {
 	var bts []byte
 	var err error
 	switch data.(type) {
@@ -57,9 +57,9 @@ func AnyToBytes(data any) (*[]byte, error) {
 	case *string:
 		bts = strconv.S2B(*(data.(*string)))
 	case []byte:
-		bts = data.([]byte)
+		return data.([]byte), nil
 	case *[]byte:
-		return data.(*[]byte), nil
+		bts = *data.(*[]byte)
 	case byte:
 		bts = []byte{data.(byte)}
 	case *byte:
@@ -67,5 +67,5 @@ func AnyToBytes(data any) (*[]byte, error) {
 	default:
 		bts, err = json.Marshal(data)
 	}
-	return &bts, err
+	return bts, err
 }

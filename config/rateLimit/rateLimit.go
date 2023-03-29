@@ -7,7 +7,7 @@ type RateLimit struct {
 	IdleTime int64 //闲置时长（s）
 }
 
-var config *RateLimit
+var config = &RateLimit{}
 
 func Set(c *RateLimit) {
 	config = c

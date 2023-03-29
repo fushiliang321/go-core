@@ -6,14 +6,15 @@ import (
 	"strings"
 )
 
-type clientServiceNameExtract struct {
-	connType
-}
-
-type serviceName struct {
-	error
-	name string
-}
+type (
+	clientServiceNameExtract struct {
+		connType
+	}
+	serviceName struct {
+		error
+		name string
+	}
+)
 
 var consumers = []string{}
 

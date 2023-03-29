@@ -4,13 +4,14 @@ import (
 	"github.com/fushiliang321/go-core/exception/types"
 )
 
-type Exceptions struct {
-	Handlers []ExceptionHandler
-}
-
-type ExceptionHandler interface {
-	Handle(*types.Runtime)
-}
+type (
+	Exceptions struct {
+		Handlers []ExceptionHandler
+	}
+	ExceptionHandler interface {
+		Handle(*types.Runtime)
+	}
+)
 
 var exceptions = &Exceptions{
 	Handlers: []ExceptionHandler{},

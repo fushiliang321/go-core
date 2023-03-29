@@ -9,9 +9,7 @@ import (
 	"strings"
 )
 
-var (
-	client *api.Client
-)
+var client *api.Client
 
 func newConsulClient() (*api.Client, error) {
 	var err error

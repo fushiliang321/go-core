@@ -29,7 +29,7 @@ func GetEnvDefault(key, defVal string) string {
 func GetMacAddrs() (macAddrs []string) {
 	netInterfaces, err := net.Interfaces()
 	if err != nil {
-		return macAddrs
+		return
 	}
 	for _, netInterface := range netInterfaces {
 		macAddr := netInterface.HardwareAddr.String()
@@ -38,14 +38,14 @@ func GetMacAddrs() (macAddrs []string) {
 		}
 		macAddrs = append(macAddrs, macAddr)
 	}
-	return macAddrs
+	return
 }
 
 // 获取本机所有ip地址
 func GetLocalIPs() (ips []string) {
 	interfaceAddr, err := net.InterfaceAddrs()
 	if err != nil {
-		return ips
+		return
 	}
 	for _, address := range interfaceAddr {
 		ipNet, isValidIpNet := address.(*net.IPNet)
@@ -55,7 +55,7 @@ func GetLocalIPs() (ips []string) {
 			}
 		}
 	}
-	return ips
+	return
 }
 
 // 获取本机ip地址，默认获取对外的ip地址
@@ -69,17 +69,17 @@ func GetLocalIP(address ...string) string {
 		if ip != nil {
 			switch IpType(ip.String()) {
 			case 4:
-				addr = (addr + ":80")
+				addr = addr + ":80"
 			case 6:
-				addr = ("[" + addr + "]:80")
+				addr = "[" + addr + "]:80"
 			}
 		}
 		conn, err := net.Dial("udp", addr)
 		if err != nil {
 			continue
 		}
-		defer conn.Close()
 		localAddr := conn.LocalAddr().(*net.UDPAddr)
+		conn.Close()
 		return localAddr.IP.String()
 	}
 	log.Println("GetLocalIP error：", err)
