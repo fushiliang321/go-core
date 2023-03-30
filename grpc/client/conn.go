@@ -63,8 +63,8 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 				return
 			}
 			//超出复用次数就关闭连接
-			cc.cc.Close()
 			cc.cc = nil
+			con.Close()
 		}()
 	} else {
 		//不复用连接的情况下 每次调用都会重新连接
