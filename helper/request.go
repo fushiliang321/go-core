@@ -3,24 +3,68 @@ package helper
 import (
 	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
 	"github.com/fushiliang321/go-core/rpc"
+	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
 	"net"
 )
 
+var ipHeaderKeys = []string{ //请求头中可以获取到客户端ip的字段
+	"client-ip",
+	"real_client_ip",
+	"x-forwarded-for",
+	"x-real-ip",
+	"x-true-ip",
+	"wl-proxy-client-ip",
+	"x-client-ip",
+}
+
 // 获取客户端ip
 func ClientIP(ctx *fasthttp.RequestCtx) (string, uint8) {
-	cip := ctx.Request.Header.Peek("client-ip")
-	var ip net.IP
-	if cip != nil {
-		ip = net.ParseIP(string(cip))
-	} else {
+	var (
+		ip                net.IP
+		cip               []byte
+		isPublicNetworkIp = false //是否为公网ip
+	)
+
+	for _, key := range ipHeaderKeys {
+		cip = ctx.Request.Header.Peek(key)
+		if cip != nil {
+			ip = net.ParseIP(strconv.B2S(cip))
+			if ip != nil && !IsIntranetIp(ip) {
+				isPublicNetworkIp = true
+				break
+			}
+		}
+	}
+
+	if !isPublicNetworkIp {
 		ip = ctx.RemoteIP()
 	}
+
 	if ip == nil {
 		return "", 0
 	}
 	s := ip.String()
 	return s, IpType(s)
+}
+
+// 判断是否为内网ip
+func IsIntranetIp(ip net.IP) (b bool) {
+	ip4 := ip.To4()
+	if ip4 == nil {
+		return
+	}
+	switch ip4[0] {
+	case 10:
+		b = true
+	case 172:
+		b = ip4[1] >= 16 && ip4[1] <= 31
+	case 169:
+		b = ip4[1] == 254
+	case 192:
+		b = ip4[1] == 168
+	}
+	return
 }
 
 // 获取客户端地址（ip+port）
@@ -31,15 +75,18 @@ func ClientAddr(ctx *fasthttp.RequestCtx) string {
 	}
 	port := ctx.Request.Header.Peek("client-port")
 	if port == nil {
+		port = ctx.Request.Header.Peek("real_client_port")
+	}
+	if port == nil {
 		if ip == ctx.RemoteIP().String() {
 			return ctx.RemoteAddr().String()
 		}
 		return ip
 	}
 	if v == 4 {
-		return ip + ":" + string(port)
+		return ip + ":" + strconv.B2S(port)
 	}
-	return "[" + ip + "]:" + string(port)
+	return "[" + ip + "]:" + strconv.B2S(port)
 }
 
 const internalRequestKey = "internalRequest"
