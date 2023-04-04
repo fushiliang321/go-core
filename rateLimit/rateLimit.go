@@ -1,20 +1,21 @@
 package rateLimit
 
 import (
-	"errors"
 	"github.com/fushiliang321/go-core/config/rateLimit"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
-type Service struct{}
-
-type tokenBucket struct {
-	global int //全局令牌桶
-	//paths       map[string]int //地址令牌桶
-	lastUseTime int64 //最后使用的时间
-	sync.Mutex
-}
+type (
+	Service     struct{}
+	tokenBucket struct {
+		global atomic.Int32
+		//paths       map[string]int //地址令牌桶
+		lastUseTime int64 //最后使用的时间
+		sync.Mutex
+	}
+)
 
 var (
 	tokenBucketMap sync.Map
@@ -45,42 +46,39 @@ func (Service) Start(_ *sync.WaitGroup) {
 				bucket.charge()
 				return true
 			})
+			bucket = nil
 		}
 	}()
 }
 
-func Process(key string, path string) error {
+func Process(key string, path string) bool {
 	var bucket *tokenBucket
-	v, ok := tokenBucketMap.Load(key)
-	if !ok {
+	if v, ok := tokenBucketMap.Load(key); ok {
+		bucket = v.(*tokenBucket)
+	} else {
 		bucket = bucketInit()
 		tokenBucketMap.Store(key, bucket)
-	} else {
-		bucket = v.(*tokenBucket)
 	}
 	bucket.Lock()
 	defer bucket.Unlock()
-	if bucket.global < 1 {
-		return errors.New("请求频率超出")
+	if bucket.global.Load() < 1 {
+		return false
 	}
-	bucket.global = bucket.global - configData.Consume
+	bucket.global.Add(-configData.Consume)
 	bucket.lastUseTime = time.Now().Unix()
-	return nil
+	return true
 }
 
 // 初始化令牌桶
 func bucketInit() *tokenBucket {
 	bucket := &tokenBucket{}
-	bucket.global = configData.Capacity
+	bucket.global.Store(configData.Capacity)
 	return bucket
 }
 
 // 令牌桶充能
 func (bucket *tokenBucket) charge() {
-	bucket.Lock()
-	defer bucket.Unlock()
-	bucket.global = bucket.global + configData.Create
-	if bucket.global > configData.Capacity {
-		bucket.global = configData.Capacity
+	if bucket.global.Add(configData.Create) > configData.Capacity {
+		bucket.global.Store(configData.Capacity)
 	}
 }
