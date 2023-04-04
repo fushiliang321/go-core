@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
 	"time"
 )
@@ -51,9 +52,11 @@ func heartbeatCheck(interval int64, idleTime int64) {
 		idleTime = interval * 2
 	}
 	var (
-		nowTime int64
-		ok      bool
-		ser     *WsServer
+		nowTime        int64
+		ok             bool
+		ser            *WsServer
+		pingData       = []byte{1}
+		disconnectData = strconv.S2B("timeout")
 	)
 	for {
 		time.Sleep(sleep)
@@ -65,9 +68,9 @@ func heartbeatCheck(interval int64, idleTime int64) {
 			if ser, ok = value.(*WsServer); ok && ser.Status == WsServerStatusOpen {
 				if nowTime-ser.LastResponseTimestamp > idleTime {
 					//超时断开连接
-					ser.Disconnect([]byte("timeout"))
+					ser.Disconnect(disconnectData)
 				} else {
-					ser.Ping([]byte{1}, time.Time{})
+					ser.Ping(pingData, time.Time{})
 				}
 			} else {
 				//类型或者连接状态有问题的就删掉

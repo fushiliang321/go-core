@@ -13,19 +13,27 @@ import (
 type Service struct{}
 
 func (Service) Start(wg *sync.WaitGroup) {
-	r := routers.Get()
-	config := server.Get()
+	var (
+		r      = routers.Get()
+		config = server.Get()
 
-	serverMap := map[string]map[byte]server.Server{}
+		serverMap = map[string]map[byte]server.Server{}
 
-	startWs := false
-	for _, s := range config.Servers {
-		addr := s.Host + ":" + s.Port
-		if _, ok := serverMap[addr]; !ok {
+		startWs = false
+
+		i  int
+		ok bool
+	)
+	for i = range config.Servers {
+		var (
+			ser  = config.Servers[i]
+			addr = ser.Host + ":" + ser.Port
+		)
+		if _, ok = serverMap[addr]; !ok {
 			serverMap[addr] = make(map[byte]server.Server, 2)
 		}
-		serverMap[addr][s.Type] = s
-		if s.Type == types.SERVER_WEBSOCKET {
+		serverMap[addr][ser.Type] = ser
+		if ser.Type == types.SERVER_WEBSOCKET {
 			startWs = true
 		}
 	}

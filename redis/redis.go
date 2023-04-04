@@ -14,13 +14,15 @@ var (
 )
 
 func NewClient() *redis.Client {
-	config := redisConfig.Get()
-	c := redis.NewClient(&redis.Options{
-		Addr:     config.Host + ":" + strconv.Itoa(config.Port),
-		Password: config.Password,
-		DB:       config.Db,
-	})
-	_, err := c.Ping(_ctx).Result()
+	var (
+		config = redisConfig.Get()
+		c      = redis.NewClient(&redis.Options{
+			Addr:     config.Host + ":" + strconv.Itoa(config.Port),
+			Password: config.Password,
+			DB:       config.Db,
+		})
+		_, err = c.Ping(_ctx).Result()
+	)
 	if err != nil {
 		fmt.Println("connection redis error：", err.Error())
 		return nil

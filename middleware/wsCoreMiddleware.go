@@ -35,6 +35,8 @@ var (
 		},
 	}
 	config *server.Servers
+
+	pongData = []byte{1}
 )
 
 func init() {
@@ -104,7 +106,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		conn.SetPingHandler(func(appData string) error {
 			//响应ping帧
 			ser.LastResponseTimestamp = time.Now().Unix()
-			ser.Pong([]byte{1}, time.Time{})
+			ser.Pong(pongData, time.Time{})
 			return nil
 		})
 

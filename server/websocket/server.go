@@ -72,10 +72,10 @@ func (s *WsServer) init() {
 			}
 			func() {
 				defer func() {
-					if err := recover(); err != nil {
+					if rec := recover(); rec != nil {
 						log.Println("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, writeData.data, writeData.deadline, s.Conn.NetConn())
 						s.Conn.Close()
-						exception.Listener("["+fmt.Sprint(s.Fd)+"]ws write message exception", err)
+						exception.Listener("["+fmt.Sprint(s.Fd)+"]ws write message exception", rec)
 					}
 				}()
 				switch writeData.messageType {

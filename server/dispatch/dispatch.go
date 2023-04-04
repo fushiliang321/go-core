@@ -9,6 +9,7 @@ import (
 	"github.com/fushiliang321/go-core/middleware"
 	types2 "github.com/fushiliang321/go-core/router/types"
 	"github.com/fushiliang321/go-core/server/types"
+	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
 	"log"
 	"strings"
@@ -40,7 +41,7 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 		_, wsOk := ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
 		handlers := requestHandler{}
 		switch {
-		case wsOk && "websocket" == strings.ToLower(string(ctx.Request.Header.Peek("Upgrade"))):
+		case wsOk && "websocket" == strings.ToLower(strconv.B2S(ctx.Request.Header.Peek("Upgrade"))):
 			//优先判断websocket请求，避免同时开启http和websocket时无法升级到websocket
 			handlers.len = middlewaresWsLen
 			handlers.middlewares = make([]config.Middleware, handlers.len)

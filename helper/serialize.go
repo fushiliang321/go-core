@@ -3,11 +3,12 @@ package helper
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/savsgio/gotils/strconv"
 )
 
 // json字符串解码
 func JsonDecode(str string, v any) error {
-	d := json.NewDecoder(bytes.NewReader([]byte(str)))
+	d := json.NewDecoder(bytes.NewReader(strconv.S2B(str)))
 	d.UseNumber()
 	return d.Decode(&v)
 }
@@ -18,5 +19,5 @@ func JsonEncode(v any) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(marshal), nil
+	return strconv.B2S(marshal), nil
 }

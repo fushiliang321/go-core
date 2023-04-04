@@ -1,6 +1,9 @@
 package helper
 
-import "strings"
+import (
+	"github.com/savsgio/gotils/strconv"
+	"strings"
+)
 
 // 转为蛇形字符串
 func SnakeString(s string) string {
@@ -17,5 +20,5 @@ func SnakeString(s string) string {
 		}
 		data = append(data, d)
 	}
-	return strings.ToLower(string(data[:]))
+	return strings.ToLower(strconv.B2S(data[:]))
 }

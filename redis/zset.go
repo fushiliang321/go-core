@@ -2,8 +2,10 @@ package redis
 
 import "github.com/go-redis/redis/v9"
 
-type Z = redis.Z
-type ZRangeBy = redis.ZRangeBy
+type (
+	Z        = redis.Z
+	ZRangeBy = redis.ZRangeBy
+)
 
 // 添加元素
 func ZAdd(key string, members ...Z) (int64, error) {
@@ -17,14 +19,14 @@ func ZIncrBy(key string, increment float64, member string) (float64, error) {
 
 // 获取根据score排序后的数据段，升序
 func ZRange(key string, startStop ...int64) ([]string, error) {
-	var (
-		start int64 = 0
-		stop  int64 = -1
-	)
+	var start, stop int64
 	switch len(startStop) {
 	case 0:
+		start = 0
+		stop = -1
 	case 1:
 		start = startStop[0]
+		stop = -1
 	default:
 		start = startStop[0]
 		stop = startStop[1]
@@ -34,14 +36,14 @@ func ZRange(key string, startStop ...int64) ([]string, error) {
 
 // 获取根据score排序后的数据段，降序
 func ZRevRange(key string, startStop ...int64) ([]string, error) {
-	var (
-		start int64 = 0
-		stop  int64 = -1
-	)
+	var start, stop int64
 	switch len(startStop) {
 	case 0:
+		start = 0
+		stop = -1
 	case 1:
 		start = startStop[0]
+		stop = -1
 	default:
 		start = startStop[0]
 		stop = startStop[1]

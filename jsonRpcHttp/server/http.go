@@ -35,18 +35,18 @@ func NewHttpServer(ip string, port string) *Http {
 }
 
 func (p *Http) Start() {
-	mux := http.NewServeMux()
+	var (
+		mux = http.NewServeMux()
+		url = fmt.Sprintf("%s:%s", p.Ip, p.Port)
+	)
 	mux.HandleFunc("/", p.handleFunc)
-	var url = fmt.Sprintf("%s:%s", p.Ip, p.Port)
-	err := http.ListenAndServe(url, mux)
-	if err != nil {
+	if err := http.ListenAndServe(url, mux); err != nil {
 		fmt.Println("json rpc http server start error", err)
 	}
 }
 
 func (p *Http) Register(s interface{}) {
-	err := p.Server.Register(s)
-	if err != nil {
+	if err := p.Server.Register(s); err != nil {
 		fmt.Println("json rpc http server register error", err)
 	}
 }
@@ -69,9 +69,11 @@ func (p *Http) handleFunc(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	res := p.Server.Handler(data)
 
-	var internalErr *common.InternalErr
+	var (
+		res         = p.Server.Handler(data)
+		internalErr *common.InternalErr
+	)
 
 	switch res.(type) {
 	case common.ErrorResponse:
@@ -91,7 +93,6 @@ func (p *Http) handleFunc(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(errData.Code)
 		}
 	}
-
 	marshal, _ := json.Marshal(res)
 	w.Write(marshal)
 }

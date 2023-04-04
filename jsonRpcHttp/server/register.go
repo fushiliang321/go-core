@@ -24,18 +24,19 @@ type (
 var serviceRegistrations map[string]*registerInfo //全局的服务注册信息
 
 func RegisterServer(name string, s any) {
-	_registerInfo := &registerInfo{
-		Name:     name,
-		Protocol: "jsonrpc-http",
-		address:  ip,
-		port:     port,
-	}
-	body := checkBody{
-		Jsonrpc: "2.0",
-		Method:  "Health.Check",
-		Params:  _registerInfo,
-	}
-	bodyStr, _ := helper.JsonEncode(body)
+	var (
+		_registerInfo = &registerInfo{
+			Name:     name,
+			Protocol: "jsonrpc-http",
+			address:  ip,
+			port:     port,
+		}
+		bodyStr, _ = helper.JsonEncode(checkBody{
+			Jsonrpc: "2.0",
+			Method:  "Health.Check",
+			Params:  _registerInfo,
+		})
+	)
 	b, _ := consul.RegisterServer(_registerInfo.Name, _registerInfo.Protocol, _registerInfo.address, _registerInfo.port, &api.AgentServiceCheck{
 		HTTP:   fmt.Sprintf("http://%s:%d/", _registerInfo.address, _registerInfo.port),
 		Method: "POST",

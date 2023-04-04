@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/savsgio/gotils/strconv"
 	"reflect"
 	"time"
 )
 
 // 设置指定 key 的值
 func Set(key string, val any, expiration ...int64) error {
-	var exp time.Duration
+	var (
+		exp    time.Duration
+		valStr string
+	)
 	if len(expiration) > 0 {
 		exp = time.Duration(expiration[0]) * time.Second
 	}
-	var valStr string
 	switch val.(type) {
 	case string:
 		valStr = val.(string)
@@ -25,16 +28,16 @@ func Set(key string, val any, expiration ...int64) error {
 	case *byte:
 		valStr = string(*(val.(*byte)))
 	case []byte:
-		valStr = string(val.([]byte))
+		valStr = strconv.B2S(val.([]byte))
 	case *[]byte:
-		valStr = string(*(val.(*[]byte)))
+		valStr = strconv.B2S(*(val.(*[]byte)))
 	default:
 		valBytes, err := json.Marshal(val)
 		if err != nil {
 			fmt.Println("redis set serialization error:", err.Error())
 			return err
 		}
-		valStr = string(valBytes)
+		valStr = strconv.B2S(valBytes)
 	}
 	err := client().Set(_ctx, key, valStr, exp).Err()
 	if err != nil {
@@ -74,7 +77,7 @@ func Get[t any](key string) (*t, error) {
 		}
 		return &res, nil
 	}
-	err = json.Unmarshal([]byte(v), &res)
+	err = json.Unmarshal(strconv.S2B(v), &res)
 	if err != nil {
 		fmt.Println("redis get deserialization error：", err.Error())
 		return nil, err

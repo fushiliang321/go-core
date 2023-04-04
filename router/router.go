@@ -7,13 +7,14 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type Router struct {
-	router *router.Router
-}
-
-type Group struct {
-	group *router.Group
-}
+type (
+	Router struct {
+		router *router.Router
+	}
+	Group struct {
+		group *router.Group
+	}
+)
 
 func New() *Router {
 	return &Router{

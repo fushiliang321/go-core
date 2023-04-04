@@ -21,7 +21,7 @@ func New(server string) *Client {
 	}
 }
 
-func (c *Client) Call(method string, params any, res any) (err error) {
+func (c *Client) Call(method string, params any, res any) error {
 	defer func() {
 		exception.Listener("rpc call", recover())
 	}()
@@ -32,7 +32,7 @@ func (c *Client) Call(method string, params any, res any) (err error) {
 			log.Println("rpc rpcClient error", err)
 		}
 	}
-	return
+	return err
 }
 
 func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
@@ -44,6 +44,6 @@ func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
 	return jsonrpc.NewClient(node.Protocol, node.Address, node.Port)
 }
 
-func Call(server string, method string, params any, res any) (err error) {
+func Call(server string, method string, params any, res any) error {
 	return New(server).Call(method, params, res)
 }
