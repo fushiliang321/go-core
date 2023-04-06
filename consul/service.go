@@ -52,24 +52,27 @@ func (s *serviceMonitor) syncService() {
 		serviceNodes []*ServiceNode
 		ser          *api.ServiceEntry
 		check        *api.HealthCheck
+		port         string
 	)
 	for _, ser = range sers {
+		port = strconv.Itoa(ser.Service.Port)
 		for _, check = range ser.Checks {
 			if check.Status == api.HealthPassing && check.Type != "" {
-				node := &ServiceNode{}
-				node.Status = check.Status
-				node.ServiceName = check.ServiceName
-				node.Protocol = check.Type
-				node.Address = ser.Service.Address
-				node.Port = strconv.Itoa(ser.Service.Port)
-				serviceNodes = append(serviceNodes, node)
+				serviceNodes = append(serviceNodes, &ServiceNode{
+					CheckStatus: api.HealthPassing,
+					ServiceName: check.ServiceName,
+					Protocol:    check.Type,
+					Address:     ser.Service.Address,
+					Port:        port,
+					IsRemove:    false,
+				})
 			}
 		}
 	}
 	if serviceNodes == nil {
 		serviceNodes = []*ServiceNode{}
 	}
-	services.setServiceNodes(s.name, serviceNodes)
+	globalServices.setServiceNodes(s.name, serviceNodes)
 }
 
 func (s *serviceMonitor) close() {

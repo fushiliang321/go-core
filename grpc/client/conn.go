@@ -12,67 +12,89 @@ import (
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"log"
 	"sync"
 )
 
 type ClientConn struct {
-	serviceName      string
-	cc               *grpc.ClientConn
-	ccInUse          bool      //连接是否被使用
-	multiplex        bool      //是否复用连接
-	multiplexNum     uint      //连接已复用次数
-	currentLimitChan chan byte //限流通道
+	serviceName   string
+	serviceNode   *consul.ServiceNode
+	cc            *grpc.ClientConn
+	ccInUse       bool //连接是否被使用
+	multiplex     bool //是否复用连接
+	multiplexNum  uint //连接已复用次数
+	isCloseClient bool //客户端是否关闭
 	sync.RWMutex
 }
 
 const maxMultiplexNum = 1000 //连接最大复用次数
 
-func dial(serviceName string) (*grpc.ClientConn, error) {
+func dial(serviceName string) (*grpc.ClientConn, *consul.ServiceNode, error) {
 	defer func() {
 		exception.Listener("grpc dial exception", recover())
 	}()
 	node, err := consul.GetNode(serviceName, consul.GrpcProtocol)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return grpc.Dial(node.Address+":"+node.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(node.Address+":"+node.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	return conn, node, err
 }
 
 func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply interface{}, opts ...grpc.CallOption) (err error) {
 	var con *grpc.ClientConn
-
 	if cc.multiplex {
 		//连接复用
-		cc.currentLimitChan <- <-cc.currentLimitChan
 		cc.RLock()
 		defer cc.RUnlock()
+		if cc.isCloseClient {
+			return errors.New("The client is closed ")
+		}
 
+		if cc.serviceNode != nil && cc.serviceNode.IsRemove {
+			cc.Close()
+		}
 		if cc.cc == nil {
-			cc.cc, err = dial(cc.serviceName)
+			cc.RUnlock()
+			cc.Lock()
+			if cc.cc == nil {
+				err = func() error {
+					defer func() {
+						recover()
+					}()
+					cc.cc, cc.serviceNode, err = dial(cc.serviceName)
+					if err != nil {
+						return err
+					}
+					cc.multiplexNum = 0
+					return nil
+				}()
+			}
+			cc.Unlock()
+			cc.RLock()
 			if err != nil {
 				return err
 			}
-			cc.multiplexNum = 0
 		}
-
 		con = cc.cc
 
 		defer func() {
 			cc.multiplexNum++
-			if cc.multiplexNum < maxMultiplexNum {
+			if cc.multiplexNum < maxMultiplexNum || (cc.serviceNode != nil && cc.serviceNode.IsRemove) {
 				return
 			}
-			//超出复用次数就关闭连接
+			//超出复用次数或服务节点信息被移除就关闭连接
 			cc.cc = nil
+			cc.serviceNode = nil
 			con.Close()
 		}()
 	} else {
 		//不复用连接的情况下 每次调用都会重新连接
-		cc.cc, err = dial(cc.serviceName)
+		con, _, err = dial(cc.serviceName)
 		if err != nil {
 			return err
 		}
-		con = cc.cc
+		cc.cc = con
 		defer func() {
 			cc.cc = nil
 			con.Close()
@@ -83,8 +105,8 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 	}
 	contextData := context.GetAll()
 	if contextData != nil && len(contextData) > 0 {
-		str, err := helper.JsonEncode(contextData)
-		if err == nil {
+		var str string
+		if str, err = helper.JsonEncode(contextData); err == nil {
 			ctx = metadata.AppendToOutgoingContext(ctx, "contextData", str)
 		}
 	}
@@ -125,6 +147,13 @@ func (cc *ClientConn) Connect() {
 	cc.cc.Connect()
 }
 func (cc *ClientConn) Close() error {
+	defer func() {
+		cc.serviceNode = nil
+		cc.cc = nil
+		if err := recover(); err != nil {
+			log.Println("conn close error:", err)
+		}
+	}()
 	if cc.cc == nil {
 		return nil
 	}
@@ -132,7 +161,6 @@ func (cc *ClientConn) Close() error {
 	if err != nil {
 		return err
 	}
-	cc.cc = nil
 	return nil
 }
 func (cc *ClientConn) ResetConnectBackoff() {
@@ -152,15 +180,9 @@ func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 	defer func() {
 		exception.Listener("grpc conn exception", recover())
 	}()
-	var currentLimitChan chan byte
-	if multiplex {
-		currentLimitChan = make(chan byte, 1)
-		currentLimitChan <- 0
-	}
 	return &ClientConn{
-		serviceName:      serviceName,
-		cc:               nil,
-		multiplex:        multiplex,
-		currentLimitChan: currentLimitChan,
+		serviceName: serviceName,
+		cc:          nil,
+		multiplex:   multiplex,
 	}, nil
 }

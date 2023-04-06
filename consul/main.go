@@ -9,11 +9,11 @@ import (
 type Service struct{}
 
 var (
-	apiConfig *api.Config
-	services  = Services{}
+	apiConfig      *api.Config
+	globalServices = services{}
 
-	serviceMap     = map[string]*serviceMonitor{}
-	serviceMapLock sync.Mutex
+	serviceMonitorMap     = map[string]*serviceMonitor{}
+	serviceMonitorMapLock sync.Mutex
 )
 
 func newClient() (client *api.Client, err error) {
@@ -32,27 +32,27 @@ func AddServices(consumerServiceNames []string) {
 
 // 添加服务信息
 func AddService(serviceName string) {
-	serviceMapLock.Lock()
-	defer serviceMapLock.Unlock()
-	if _, ok := serviceMap[serviceName]; ok {
+	serviceMonitorMapLock.Lock()
+	defer serviceMonitorMapLock.Unlock()
+	if _, ok := serviceMonitorMap[serviceName]; ok {
 		return
 	}
-	serviceMap[serviceName] = &serviceMonitor{
+	serviceMonitorMap[serviceName] = &serviceMonitor{
 		name:      serviceName,
 		status:    monitorOn,
 		lastIndex: uint64(0),
 	}
-	serviceMap[serviceName].syncService()
+	serviceMonitorMap[serviceName].syncService()
 }
 
 // 移除服务信息
 func RemoveService(serviceName string) {
-	serviceMapLock.Lock()
-	defer serviceMapLock.Unlock()
-	serviceMap[serviceName].close()
-	delete(serviceMap, serviceName)
+	serviceMonitorMapLock.Lock()
+	defer serviceMonitorMapLock.Unlock()
+	serviceMonitorMap[serviceName].close()
+	delete(serviceMonitorMap, serviceName)
 }
 
 func GetNode(serviceName string, protocol string) (node *ServiceNode, err error) {
-	return services.getRandomNode(serviceName, protocol)
+	return globalServices.getRandomNode(serviceName, protocol)
 }

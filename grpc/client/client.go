@@ -65,6 +65,7 @@ func ClientAuto[t any](fun func(cc grpc.ClientConnInterface) t) ClientGenerateFu
 func Close(client any) {
 	if conn, ok := multiplexConns[client]; ok {
 		defer delete(multiplexConns, client)
+		conn.isCloseClient = true
 		conn.Close()
 	}
 }
@@ -73,10 +74,9 @@ func Close(client any) {
 func CloseAwait(client any) {
 	if conn, ok := multiplexConns[client]; ok {
 		defer delete(multiplexConns, client)
-		v := <-conn.currentLimitChan
 		conn.Lock()
 		defer conn.Unlock()
-		conn.currentLimitChan <- v
+		conn.isCloseClient = true
 		conn.Close()
 	}
 }
