@@ -2,6 +2,7 @@ package rateLimit
 
 import (
 	"github.com/fushiliang321/go-core/config/rateLimit"
+	"github.com/fushiliang321/go-core/event"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -22,11 +23,12 @@ var (
 	configData     *rateLimit.RateLimit
 )
 
-func (Service) Start(_ *sync.WaitGroup) {
+func (*Service) Start(_ *sync.WaitGroup) {
 	configData = rateLimit.Get()
 	if configData == nil {
 		return
 	}
+	event.Dispatch(event.NewRegistered(event.BeforeRateLimitServerStart, nil))
 	go func() {
 		var (
 			t      int64
@@ -49,6 +51,7 @@ func (Service) Start(_ *sync.WaitGroup) {
 			bucket = nil
 		}
 	}()
+	event.Dispatch(event.NewRegistered(event.AfterRateLimitServerStart, nil))
 }
 
 func Process(key string, path string) bool {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
+	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/hashicorp/consul/api"
@@ -40,8 +41,7 @@ func listen(host string, port int) *serverListen {
 			contextDataStr := md.Get("contextData")
 			if contextDataStr != nil && len(contextDataStr) > 0 && len(contextDataStr[0]) > 0 {
 				var contextData map[string]any
-				err := helper.JsonDecode(contextDataStr[0], &contextData)
-				if err == nil {
+				if helper.JsonDecode(contextDataStr[0], &contextData) == nil {
 					context.SetBatch(contextData)
 				}
 			}
@@ -74,6 +74,8 @@ func (s *serverListen) Serve() {
 		})
 		if b {
 			serviceNames = append(serviceNames, serviceName)
+			s.server.GetServiceInfo()
+			event.Dispatch(event.NewRegistered(event.GrpcServerRegister, serviceName))
 		} else {
 			log.Printf("grpc consul register error: %v", err)
 		}

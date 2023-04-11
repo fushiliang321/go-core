@@ -2,11 +2,10 @@ package consul
 
 import (
 	"fmt"
+	"github.com/fushiliang321/go-core/event"
 	"github.com/hashicorp/consul/api"
 	"sync"
 )
-
-type Service struct{}
 
 var (
 	apiConfig      *api.Config
@@ -37,6 +36,7 @@ func AddService(serviceName string) {
 	if _, ok := serviceMonitorMap[serviceName]; ok {
 		return
 	}
+	event.Dispatch(event.NewRegistered(event.ConsulConsumerServerStart, serviceName))
 	serviceMonitorMap[serviceName] = &serviceMonitor{
 		name:      serviceName,
 		status:    monitorOn,

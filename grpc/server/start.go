@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/fushiliang321/go-core/config/grpc"
+	"github.com/fushiliang321/go-core/event"
 	"sync"
 )
 
@@ -9,18 +10,21 @@ type Service struct{}
 
 var config *grpc.Grpc
 
-func (Service) Start(wg *sync.WaitGroup) {
+func (*Service) Start(wg *sync.WaitGroup) {
 	config = grpc.Get()
-	if config.Services != nil && len(config.Services) > 0 {
-		server := listen(config.Host, config.Port)
-		for _, service := range config.Services {
-			server.RegisterServer(service.Handle, service.RegisterFun)
-		}
-		wg.Add(1)
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
-			// 启动服务监听
-			server.Serve()
-		}(wg)
+	if config.Services == nil || len(config.Services) == 0 {
+		return
 	}
+	event.Dispatch(event.NewRegistered(event.BeforeGrpcServerStart, nil))
+	server := listen(config.Host, config.Port)
+	for _, service := range config.Services {
+		server.RegisterServer(service.Handle, service.RegisterFun)
+	}
+	wg.Add(1)
+	go func(wg *sync.WaitGroup) {
+		defer wg.Done()
+		// 启动服务监听
+		server.Serve()
+	}(wg)
+	event.Dispatch(event.NewRegistered(event.AfterGrpcServerStart, nil))
 }

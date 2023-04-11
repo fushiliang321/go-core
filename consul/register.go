@@ -2,6 +2,7 @@ package consul
 
 import (
 	"fmt"
+	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/hashicorp/consul/api"
 	"log"
@@ -73,6 +74,7 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 		log.Println("register server error : ", err)
 		return
 	}
+	event.Dispatch(event.NewRegistered(event.ConsulServiceRegister, *registration))
 	return true, nil
 }
 

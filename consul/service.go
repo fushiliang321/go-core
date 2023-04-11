@@ -2,6 +2,7 @@ package consul
 
 import (
 	"fmt"
+	"github.com/fushiliang321/go-core/event"
 	"github.com/hashicorp/consul/api"
 	"strconv"
 	"time"
@@ -73,6 +74,7 @@ func (s *serviceMonitor) syncService() {
 		serviceNodes = []*ServiceNode{}
 	}
 	globalServices.setServiceNodes(s.name, serviceNodes)
+	event.Dispatch(event.NewRegistered(event.ConsulConsumerServiceInfoChange, s.name))
 }
 
 func (s *serviceMonitor) close() {

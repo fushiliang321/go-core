@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/fushiliang321/go-core/consul"
+	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/hashicorp/consul/api"
 )
@@ -44,6 +45,7 @@ func RegisterServer(name string, s any) {
 	})
 	if b {
 		server.Register(s)
+		event.Dispatch(event.NewRegistered(event.JsonRpcServerRegister, *_registerInfo))
 		serviceRegistrations[_registerInfo.Name] = _registerInfo
 	}
 }

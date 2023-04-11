@@ -5,6 +5,7 @@ import (
 	"github.com/fushiliang321/go-core/amqp/consumer"
 	"github.com/fushiliang321/go-core/amqp/types"
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
+	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper"
 	amqp3 "github.com/streadway/amqp"
 	"log"
@@ -13,16 +14,19 @@ import (
 
 type Service struct{}
 
-func (Service) Start(_ *sync.WaitGroup) {
+func (*Service) Start(_ *sync.WaitGroup) {
 	config := amqp2.Get()
 	if len(config.Consumers) > 0 {
+		event.Dispatch(event.NewRegistered(event.BeforeAmqpConsumerServerStart, nil))
 		//有消费者
 		for _, _consumer := range config.Consumers {
 			con := consumer.Consumer{
 				Consumer: _consumer,
 			}
 			con.Start()
+			event.Dispatch(event.NewRegistered(event.AmqpConsumerServerStart, _consumer))
 		}
+		event.Dispatch(event.NewRegistered(event.AfterAmqpConsumerServerStart, nil))
 	}
 }
 
