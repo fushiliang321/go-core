@@ -7,6 +7,7 @@ import (
 	"github.com/fushiliang321/go-core/exception"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"time"
 )
 
 var _db *gorm.DB
@@ -26,9 +27,31 @@ func db() *gorm.DB {
 		exception.Listener("open db", err)
 		return _db
 	}
+	if config.Pool == nil {
+		return _db
+	}
+	pool := config.Pool
 	mysqlDb, _ := _db.DB()
-	mysqlDb.SetMaxOpenConns(10)
-	mysqlDb.SetMaxIdleConns(1)
+	if pool.MaxOpenConns > 0 {
+		mysqlDb.SetMaxOpenConns(pool.MaxOpenConns)
+	}
+	if pool.MaxIdleConns > 0 {
+		mysqlDb.SetMaxIdleConns(pool.MaxIdleConns)
+	}
+	if pool.MaxIdleTime > 0 {
+		mysqlDb.SetConnMaxIdleTime(pool.MaxIdleTime)
+	}
+	if pool.MaxIdleTime > 0 {
+		mysqlDb.SetConnMaxLifetime(pool.MaxIdleTime)
+	}
+	if pool.Heartbeat > 0 {
+		go func() {
+			for {
+				time.Sleep(pool.Heartbeat)
+				mysqlDb.Ping()
+			}
+		}()
+	}
 	return _db
 }
 
