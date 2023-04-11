@@ -7,19 +7,20 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type (
-	Router struct {
-		router *router.Router
-	}
-	Group struct {
-		group *router.Group
-	}
-)
+type Router struct {
+	router   *router.Router
+	dispatch func(handler types.RequestHandler) fasthttp.RequestHandler
+}
 
 func New() *Router {
 	return &Router{
-		router: router.New(),
+		router:   router.New(),
+		dispatch: dispatch.HttpDispatch,
 	}
+}
+
+func (r *Router) Dispatch(dispatch func(handler types.RequestHandler) fasthttp.RequestHandler) {
+	r.dispatch = dispatch
 }
 
 func (r *Router) Group(path string) *Group {
@@ -38,54 +39,54 @@ func (r *Router) List() map[string][]string {
 
 // GET is a shortcut for router.Handle(fasthttp.MethodGet, path, handler)
 func (r *Router) GET(path string, handler types.RequestHandler) {
-	r.router.GET(path, dispatch.Dispatch(handler))
+	r.router.GET(path, r.dispatch(handler))
 }
 
 // HEAD is a shortcut for router.Handle(fasthttp.MethodHead, path, handler)
 func (r *Router) HEAD(path string, handler types.RequestHandler) {
-	r.router.HEAD(path, dispatch.Dispatch(handler))
+	r.router.HEAD(path, r.dispatch(handler))
 }
 
 // POST is a shortcut for router.Handle(fasthttp.MethodPost, path, handler)
 func (r *Router) POST(path string, handler types.RequestHandler) {
-	r.router.POST(path, dispatch.Dispatch(handler))
+	r.router.POST(path, r.dispatch(handler))
 }
 
 // PUT is a shortcut for router.Handle(fasthttp.MethodPut, path, handler)
 func (r *Router) PUT(path string, handler types.RequestHandler) {
-	r.router.PUT(path, dispatch.Dispatch(handler))
+	r.router.PUT(path, r.dispatch(handler))
 }
 
 // PATCH is a shortcut for router.Handle(fasthttp.MethodPatch, path, handler)
 func (r *Router) PATCH(path string, handler types.RequestHandler) {
-	r.router.PATCH(path, dispatch.Dispatch(handler))
+	r.router.PATCH(path, r.dispatch(handler))
 }
 
 // DELETE is a shortcut for router.Handle(fasthttp.MethodDelete, path, handler)
 func (r *Router) DELETE(path string, handler types.RequestHandler) {
-	r.router.DELETE(path, dispatch.Dispatch(handler))
+	r.router.DELETE(path, r.dispatch(handler))
 }
 
 // CONNECT is a shortcut for router.Handle(fasthttp.MethodConnect, path, handler)
 func (r *Router) CONNECT(path string, handler types.RequestHandler) {
-	r.router.CONNECT(path, dispatch.Dispatch(handler))
+	r.router.CONNECT(path, r.dispatch(handler))
 }
 
 // OPTIONS is a shortcut for router.Handle(fasthttp.MethodOptions, path, handler)
 func (r *Router) OPTIONS(path string, handler types.RequestHandler) {
-	r.router.OPTIONS(path, dispatch.Dispatch(handler))
+	r.router.OPTIONS(path, r.dispatch(handler))
 }
 
 // TRACE is a shortcut for router.Handle(fasthttp.MethodTrace, path, handler)
 func (r *Router) TRACE(path string, handler types.RequestHandler) {
-	r.router.TRACE(path, dispatch.Dispatch(handler))
+	r.router.TRACE(path, r.dispatch(handler))
 }
 
 // ANY is a shortcut for router.Handle(router.MethodWild, path, handler)
 //
 // WARNING: Use only for routes where the request method is not important
 func (r *Router) ANY(path string, handler types.RequestHandler) {
-	r.router.ANY(path, dispatch.Dispatch(handler))
+	r.router.ANY(path, r.dispatch(handler))
 }
 
 // ServeFiles serves files from the given file system root.
@@ -124,7 +125,7 @@ func (r *Router) ServeFilesCustom(path string, fs *fasthttp.FS) {
 // frequently used, non-standardized or custom methods (e.g. for internal
 // communication with a proxy).
 func (r *Router) Handle(method, path string, handler types.RequestHandler) {
-	r.router.Handle(method, path, dispatch.Dispatch(handler))
+	r.router.Handle(method, path, r.dispatch(handler))
 }
 
 // Lookup allows the manual lookup of a method + path combo.
