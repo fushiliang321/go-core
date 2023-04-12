@@ -48,6 +48,7 @@ func init() {
 func Register(s Server) {
 	servers = append(servers, s)
 }
+
 func Registers(sers []Server) {
 	servers = append(servers, sers...)
 }
@@ -74,14 +75,19 @@ func AwaitStartFinish() {
 		//已经完成启动
 		return
 	}
+	defer func() {
+		recover()
+	}()
 	awaitStartFinishOnce.Do(func() {
 		event.Listener(event.Listen{
 			EventNames: []string{event.AfterServerStart},
 			Process: func(registered event.Registered) {
 				//启动完成后把等待通道关闭
-				for range _serverStartMonitor.awaitChan {
-				}
+				_serverStartMonitor.isFinish.Store(true)
 				close(_serverStartMonitor.awaitChan)
+				for len(_serverStartMonitor.awaitChan) > 0 {
+					<-_serverStartMonitor.awaitChan
+				}
 			},
 		})
 	})
