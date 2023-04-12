@@ -42,7 +42,7 @@ func (consumer *Consumer) monitor() {
 	}
 	defer func() {
 		if err := recover(); err != nil {
-			exception.Listener("amqp monitor", err)
+			exception.Listener(consumer.Exchange+" amqp monitor", err)
 			// 监听异常 要重试
 			go consumer.retryMonitor()
 		}
@@ -56,7 +56,7 @@ func (consumer *Consumer) monitor() {
 	var err error
 	consumer.channel, err = amqp.Consumer.Channel()
 	if err != nil {
-		log.Println("consumer channel error", err)
+		log.Println(consumer.Exchange, "consumer channel error", err)
 		// 监听失败 要重试
 		go consumer.retryMonitor()
 		return
@@ -72,7 +72,7 @@ func (consumer *Consumer) monitor() {
 		}
 	}()
 	if err != nil {
-		log.Println("consumer channel error", err)
+		log.Println(consumer.Exchange, "consumer channel error", err)
 		return
 	}
 	err = channelInit(consumer.channel, consumer.Exchange, consumer.RoutingKey, consumer.Queue, consumer.Type, consumer.Durable, consumer.AutoDeletedExchange, consumer.AutoDeletedQueue)
@@ -81,7 +81,7 @@ func (consumer *Consumer) monitor() {
 	}
 	msgs, err := consumer.channel.Consume(consumer.Queue, "", false, false, false, true, amqp3.Table{})
 	if err != nil {
-		log.Println("consumer consume error", err)
+		log.Println(consumer.Exchange, "consumer consume error", err)
 		return
 	}
 	closeChannel = false
@@ -101,7 +101,7 @@ func (consumer *Consumer) monitor() {
 		for d := range msgs {
 			fun(&d)
 		}
-		log.Println("channel close")
+		log.Println(consumer.Exchange, "channel close")
 		// 断开后 要重新监听
 		go consumer.retryMonitor()
 	}()
