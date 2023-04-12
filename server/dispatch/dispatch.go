@@ -20,15 +20,11 @@ const gzipMinSize = 10000 //触发gzip压缩的最小长度
 // 包装整合路由调度的中间件
 func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 	coreMiddlewares := middleware.GetCoreMiddlewares(handler)
-	middlewares := &config.Middlewares{
-		Http: []config.Middleware{},
-		WS:   []config.Middleware{},
-	}
-	*middlewares = *config.Get()
-	middlewares.Http = append(middlewares.Http, coreMiddlewares.Http...)
-	middlewares.WS = append(middlewares.WS, coreMiddlewares.WS...)
-	middlewaresHttpLen := len(middlewares.Http)
-	middlewaresWsLen := len(middlewares.WS)
+	middlewares := config.Get()
+	middlewaresHttp := append(middlewares.Http, coreMiddlewares.Http...)
+	middlewaresWS := append(middlewares.WS, coreMiddlewares.WS...)
+	middlewaresHttpLen := len(middlewaresHttp)
+	middlewaresWsLen := len(middlewaresWS)
 
 	return func(ctx *fasthttp.RequestCtx) {
 		defer func() {
@@ -39,17 +35,21 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 		}()
 		_, httpOk := ctx.UserValue(types.SERVER_HTTP_KEY).(*server.Server)
 		_, wsOk := ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
-		handlers := requestHandler{}
+		var handlers requestHandler
 		switch {
-		case wsOk && "websocket" == strings.ToLower(strconv.B2S(ctx.Request.Header.Peek("Upgrade"))):
+		case wsOk && "websocket" == strings.ToLower(strconv.B2S(ctx.Request.Header.Peek("upgrade"))):
 			//优先判断websocket请求，避免同时开启http和websocket时无法升级到websocket
-			handlers.len = middlewaresWsLen
-			handlers.middlewares = make([]config.Middleware, handlers.len)
-			copy(handlers.middlewares, middlewares.WS)
+			handlers = requestHandler{
+				len:         middlewaresWsLen,
+				middlewares: make([]config.Middleware, middlewaresWsLen),
+			}
+			copy(handlers.middlewares, middlewaresWS)
 		case httpOk:
-			handlers.len = middlewaresHttpLen
-			handlers.middlewares = make([]config.Middleware, handlers.len)
-			copy(handlers.middlewares, middlewares.Http)
+			handlers = requestHandler{
+				len:         middlewaresHttpLen,
+				middlewares: make([]config.Middleware, middlewaresHttpLen),
+			}
+			copy(handlers.middlewares, middlewaresHttp)
 			ctx.RemoveUserValue(types.SERVER_WEBSOCKET_KEY)
 		default:
 			//未知的协议，就直接返回空数据
@@ -57,8 +57,7 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 			return
 		}
 		ctx.RemoveUserValue(types.SERVER_HTTP_KEY)
-		res := handlers.Process(ctx)
-		write(ctx, res)
+		write(ctx, handlers.Process(ctx))
 	}
 }
 

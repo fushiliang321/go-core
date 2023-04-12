@@ -15,7 +15,7 @@ type Router struct {
 func New() *Router {
 	return &Router{
 		router:   router.New(),
-		dispatch: dispatch.HttpDispatch,
+		dispatch: dispatch.Dispatch,
 	}
 }
 
