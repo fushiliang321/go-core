@@ -96,6 +96,6 @@ func AwaitStartFinish(funs ...func()) {
 		_serverStartMonitor.awaitChan <- 1
 	}()
 	for _, fun := range funs {
-		fun()
+		go fun()
 	}
 }
