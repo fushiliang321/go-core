@@ -11,12 +11,8 @@ type ClientGenerateFun[t any] func(isMultiplex ...bool) t
 
 var (
 	multiplexConns = map[any]*ClientConn{}
-	ctx            context.Context
+	ctx            = context.Background()
 )
-
-func init() {
-	ctx = context.Background()
-}
 
 func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
 	return func(isMultiplex ...bool) t {
