@@ -21,11 +21,12 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		c := cron.New()
 		for i := range config.Crontabs {
 			crontab := config.Crontabs[i]
+			callback := crontab.Callback
 			BeforeTaskExecuteRegistered := event.NewRegistered(event.BeforeTaskExecute, crontab)
 			AfterTaskExecuteRegistered := event.NewRegistered(event.AfterTaskExecute, crontab)
 			err := c.AddFunc(crontab.Rule, func() {
 				event.Dispatch(BeforeTaskExecuteRegistered)
-				crontab.Callback()
+				callback()
 				event.Dispatch(AfterTaskExecuteRegistered)
 			})
 			if err != nil {
