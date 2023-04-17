@@ -23,7 +23,7 @@ type PaginateData[t any] struct {
 var operatorMap = map[string]byte{"=": 0, "<": 0, "<=": 0, ">": 0, ">=": 0, "<>": 0, "<=>": 0, "!=": 0, "like": 0, "not like": 0, "in": 0, "not in": 0, "between": 0, "not between": 0}
 
 func filter(str string) string {
-	reg, err := regexp.Compile(`[^a-zA-Z0-9_.\-\[\]>]+`)
+	reg, err := regexp.Compile(`[^a-zA-Z0-9_*.\-\[\]>]+`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -92,18 +92,14 @@ func (m *Model[t]) _where(where map[string]any) *Model[t] {
 
 // json字段名称转换 ->格式转为 ->'$.'
 func jsonFieldNameTransition(filedName *string) {
-	if !strings.Contains(*filedName, "->") {
+	i := strings.Index(*filedName, "->")
+	if i > 0 {
 		return
 	}
-	filedNameSplit := strings.Split(*filedName, "->")
 	builder := strings.Builder{}
-	builder.WriteString(filedNameSplit[0])
-	builder.WriteString("->'$")
-
-	for i := 1; i < len(filedNameSplit); i++ {
-		builder.WriteString(".")
-		builder.WriteString(filedNameSplit[i])
-	}
+	builder.WriteString((*filedName)[:i+2])
+	builder.WriteString("'$")
+	builder.WriteString(strings.Replace((*filedName)[i:], "->", ".", -1))
 	builder.WriteString("'")
 	*filedName = builder.String()
 }
