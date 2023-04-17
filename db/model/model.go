@@ -23,7 +23,7 @@ type PaginateData[t any] struct {
 var operatorMap = map[string]byte{"=": 0, "<": 0, "<=": 0, ">": 0, ">=": 0, "<>": 0, "<=>": 0, "!=": 0, "like": 0, "not like": 0, "in": 0, "not in": 0, "between": 0, "not between": 0}
 
 func filter(str string) string {
-	reg, err := regexp.Compile("[^a-zA-Z0-9_$>./[/]\"-]+")
+	reg, err := regexp.Compile(`[^a-zA-Z0-9_.\-\[\]>]+`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,24 +44,25 @@ func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
 		return m
 	}
 	if args == nil {
-		if w, ok := where.(map[string]any); ok {
-			return m._where(&w)
-		} else if w, ok := where.(*map[string]any); ok {
-			return m._where(w)
+		switch where.(type) {
+		case map[string]any:
+			return m._where(where.(map[string]any))
+		case *map[string]any:
+			return m._where(*where.(*map[string]any))
 		}
 	}
 	m.Db = m.Db.Where(where, args...)
 	return m
 }
 
-func (m *Model[t]) _where(where *map[string]any) *Model[t] {
+func (m *Model[t]) _where(where map[string]any) *Model[t] {
 	var (
 		operator string
 		k        string
 		v        any
 	)
 
-	for k, v = range *where {
+	for k, v = range where {
 		var value any
 		operator = "="
 		switch v.(type) {
@@ -77,6 +78,7 @@ func (m *Model[t]) _where(where *map[string]any) *Model[t] {
 			value = v
 		}
 		k = filter(k)
+		jsonFieldNameTransition(&k)
 		switch operator {
 		case "not between", "between":
 			betweenValues := value.([]any)
@@ -86,6 +88,24 @@ func (m *Model[t]) _where(where *map[string]any) *Model[t] {
 		}
 	}
 	return m
+}
+
+// json字段名称转换 ->格式转为 ->'$.'
+func jsonFieldNameTransition(filedName *string) {
+	if !strings.Contains(*filedName, "->") {
+		return
+	}
+	filedNameSplit := strings.Split(*filedName, "->")
+	builder := strings.Builder{}
+	builder.WriteString(filedNameSplit[0])
+	builder.WriteString("->'$")
+
+	for i := 1; i < len(filedNameSplit); i++ {
+		builder.WriteString(".")
+		builder.WriteString(filedNameSplit[i])
+	}
+	builder.WriteString("'")
+	*filedName = builder.String()
 }
 
 func getOperator(str string) (operator string) {
