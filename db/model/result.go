@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"errors"
 	"gorm.io/gorm"
 )
 
@@ -32,7 +33,7 @@ func (m *Model[t]) First() (*t, error) {
 	var res t
 	tx := m.Db.First(&res)
 	if tx.Error != nil {
-		if tx.Error == gorm.ErrRecordNotFound {
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		} else {
 			return nil, tx.Error
@@ -45,7 +46,7 @@ func (m *Model[t]) Find() ([]t, error) {
 	var res []t
 	tx := m.Db.Find(&res)
 	if tx.Error != nil {
-		if tx.Error == gorm.ErrRecordNotFound {
+		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
 		} else {
 			return nil, tx.Error
