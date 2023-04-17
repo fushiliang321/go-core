@@ -93,7 +93,7 @@ func (m *Model[t]) _where(where map[string]any) *Model[t] {
 // json字段名称转换 ->格式转为 ->'$.'
 func jsonFieldNameTransition(filedName *string) {
 	i := strings.Index(*filedName, "->")
-	if i > 0 {
+	if i < 1 {
 		return
 	}
 	builder := strings.Builder{}
