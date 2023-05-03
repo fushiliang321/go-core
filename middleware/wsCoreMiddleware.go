@@ -119,8 +119,8 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		}
 		var err error
 		if onMessage, ok := ws.Callbacks[event.ON_MESSAGE].(event.OnMessage); ok {
+			var p []byte
 			for {
-				var p []byte
 				_, p, err = conn.ReadMessage()
 				if err != nil {
 					_wsError := errAnalysis(err)
@@ -129,6 +129,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 				}
 				ser.LastResponseTimestamp = time.Now().Unix()
 				callOnMessage(onMessage, ser, p)
+				p = nil
 			}
 		} else {
 			for {
