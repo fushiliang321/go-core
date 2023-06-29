@@ -1,5 +1,7 @@
 package server
 
+import "github.com/valyala/fasthttp"
+
 type (
 	Callbacks = map[string]any
 	Settings  struct {
@@ -13,6 +15,7 @@ type (
 		Host      string
 		Port      string
 		Callbacks Callbacks
+		Server    *fasthttp.Server
 	}
 	Servers struct {
 		Servers  []Server

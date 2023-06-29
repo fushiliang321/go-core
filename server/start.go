@@ -15,8 +15,7 @@ type Service struct{}
 
 func (*Service) Start(wg *sync.WaitGroup) {
 	var (
-		routerConfig = routers.Get()
-		config       = server.Get()
+		config = server.Get()
 
 		serverMap = map[string]map[byte]server.Server{}
 
@@ -46,55 +45,74 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		websocket.Start()
 	}
 
-	for addr, s := range serverMap {
-		wg.Add(1)
-		go func(addr string, sers map[byte]server.Server) {
-			defer wg.Done()
-
-			var (
-				httpServer = &server.Server{}
-				wsServer   = &server.Server{}
-				err        error
-			)
-			for _, ser := range sers {
-				switch ser.Type {
-				case types.SERVER_WEBSOCKET:
-					*wsServer = ser
-				case types.SERVER_HTTP:
-					*httpServer = ser
-				}
-			}
-
-			if httpServer != nil {
-				if wsServer == nil {
-					//http服务器
-					event.Dispatch(event.NewRegistered(event.HttpServerListen, addr))
-					err = fasthttp.ListenAndServe(addr, func(ctx *fasthttp.RequestCtx) {
-						ctx.SetUserValue(types.SERVER_HTTP_KEY, httpServer)
-						routerConfig.Handler(ctx)
-					})
+	for addr, sers := range serverMap {
+		var (
+			httpServer *server.Server
+			wsServer   *server.Server
+		)
+		for _, ser := range sers {
+			switch ser.Type {
+			case types.SERVER_WEBSOCKET:
+				if ser.Server == nil {
+					wsServer = &ser
 				} else {
-					//http+ws服务器
-					event.Dispatch(event.NewRegistered(event.HttpServerListen, addr))
-					event.Dispatch(event.NewRegistered(event.WebsocketServerListen, addr))
-					err = fasthttp.ListenAndServe(addr, func(ctx *fasthttp.RequestCtx) {
-						ctx.SetUserValue(types.SERVER_HTTP_KEY, httpServer)
-						ctx.SetUserValue(types.SERVER_WEBSOCKET_KEY, wsServer)
-						routerConfig.Handler(ctx)
-					})
+					listenAndServe(wg, ser.Server, nil, &ser, addr)
 				}
-			} else if wsServer != nil {
-				//ws服务器
-				event.Dispatch(event.NewRegistered(event.WebsocketServerListen, addr))
-				err = fasthttp.ListenAndServe(addr, func(ctx *fasthttp.RequestCtx) {
-					ctx.SetUserValue(types.SERVER_WEBSOCKET_KEY, wsServer)
-					routerConfig.Handler(ctx)
-				})
+			case types.SERVER_HTTP:
+				if ser.Server == nil {
+					httpServer = &ser
+				} else {
+					listenAndServe(wg, ser.Server, &ser, nil, addr)
+				}
 			}
-
-			if err != nil {
-				fmt.Println("start fasthttp fail", err.Error())
-			}
-		}(addr, s)
+		}
+		if httpServer != nil || wsServer != nil {
+			listenAndServe(wg, &fasthttp.Server{}, httpServer, wsServer, addr)
+		}
 	}
+}
+
+func listenAndServe(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer, wsServer *server.Server, addr string) {
+	serve.Handler = generateHandler(httpServer, wsServer, addr)
+	if serve.Handler == nil {
+		return
+	}
+	wg.Add(1)
+	go func(addr string) {
+		if err := serve.ListenAndServe(addr); err != nil {
+			fmt.Println("start fasthttp fail", err.Error())
+		}
+		wg.Done()
+	}(addr)
+}
+
+func generateHandler(httpServer, wsServer *server.Server, addr string) func(ctx *fasthttp.RequestCtx) {
+	routerConfig := routers.Get()
+	if httpServer != nil {
+		if wsServer == nil {
+			//http服务器
+			event.Dispatch(event.NewRegistered(event.HttpServerListen, addr))
+			return func(ctx *fasthttp.RequestCtx) {
+				ctx.SetUserValue(types.SERVER_HTTP_KEY, httpServer)
+				routerConfig.Handler(ctx)
+			}
+		} else {
+			//http+ws服务器
+			event.Dispatch(event.NewRegistered(event.HttpServerListen, addr))
+			event.Dispatch(event.NewRegistered(event.WebsocketServerListen, addr))
+			return func(ctx *fasthttp.RequestCtx) {
+				ctx.SetUserValue(types.SERVER_HTTP_KEY, httpServer)
+				ctx.SetUserValue(types.SERVER_WEBSOCKET_KEY, wsServer)
+				routerConfig.Handler(ctx)
+			}
+		}
+	} else if wsServer != nil {
+		//ws服务器
+		event.Dispatch(event.NewRegistered(event.WebsocketServerListen, addr))
+		return func(ctx *fasthttp.RequestCtx) {
+			ctx.SetUserValue(types.SERVER_WEBSOCKET_KEY, wsServer)
+			routerConfig.Handler(ctx)
+		}
+	}
+	return nil
 }
