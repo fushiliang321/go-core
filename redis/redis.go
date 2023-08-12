@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/fushiliang321/go-core"
 	redisConfig "github.com/fushiliang321/go-core/config/redis"
-	"github.com/go-redis/redis/v9"
+	"github.com/redis/go-redis/v9"
 	"strconv"
 	"sync"
 )

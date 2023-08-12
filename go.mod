@@ -6,9 +6,9 @@ require (
 	github.com/fasthttp/router v1.4.20
 	github.com/fasthttp/websocket v1.5.4
 	github.com/fushiliang321/jsonrpc v1.2.1
-	github.com/go-redis/redis/v9 v9.0.0-rc.1
 	github.com/hashicorp/consul/api v1.24.0
 	github.com/rabbitmq/amqp091-go v1.8.1
+	github.com/redis/go-redis/v9 v9.0.5
 	github.com/robfig/cron v1.2.0
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee
 	github.com/timandy/routine v1.1.1
@@ -40,7 +40,6 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/redis/go-redis/v9 v9.0.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb // indirect
 	golang.org/x/net v0.14.0 // indirect
