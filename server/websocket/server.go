@@ -6,7 +6,7 @@ import (
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
-	"github.com/valyala/fasthttp"
+	"github.com/fushiliang321/go-core/router/types"
 	"log"
 	"time"
 )
@@ -18,7 +18,7 @@ type (
 		deadline    time.Time
 	}
 	WsServer struct {
-		Ctx                   *fasthttp.RequestCtx
+		Ctx                   *types.RequestCtx
 		Conn                  *websocket.Conn
 		ConnWriteChan         chan *ConnWriteChanParams
 		Fd                    uint64

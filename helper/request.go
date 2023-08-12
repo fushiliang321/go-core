@@ -2,9 +2,9 @@ package helper
 
 import (
 	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
+	"github.com/fushiliang321/go-core/router/types"
 	"github.com/fushiliang321/go-core/rpc"
 	"github.com/savsgio/gotils/strconv"
-	"github.com/valyala/fasthttp"
 	"net"
 )
 
@@ -19,7 +19,7 @@ var ipHeaderKeys = []string{ //请求头中可以获取到客户端ip的字段
 }
 
 // 获取客户端ip
-func ClientIP(ctx *fasthttp.RequestCtx) (string, uint8) {
+func ClientIP(ctx *types.RequestCtx) (string, uint8) {
 	var (
 		ip                net.IP
 		cip               []byte
@@ -68,7 +68,7 @@ func IsIntranetIp(ip net.IP) (b bool) {
 }
 
 // 获取客户端地址（ip+port）
-func ClientAddr(ctx *fasthttp.RequestCtx) string {
+func ClientAddr(ctx *types.RequestCtx) string {
 	ip, v := ClientIP(ctx)
 	if ip == "" {
 		return ""

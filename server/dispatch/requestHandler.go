@@ -5,7 +5,7 @@ import (
 	"github.com/fushiliang321/go-core/config/middlewares"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
-	"github.com/valyala/fasthttp"
+	"github.com/fushiliang321/go-core/router/types"
 )
 
 type requestHandler struct {
@@ -15,7 +15,7 @@ type requestHandler struct {
 }
 
 // 依次执行每个路由中间件
-func (h *requestHandler) Process(ctx *fasthttp.RequestCtx) (res any) {
+func (h *requestHandler) Process(ctx *types.RequestCtx) (res any) {
 	if h.offset >= h.len {
 		return
 	}

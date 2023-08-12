@@ -5,14 +5,13 @@ import (
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/router/types"
-	"github.com/valyala/fasthttp"
 )
 
 type HttpCoreMiddleware struct {
 	Handler types.RequestHandler
 }
 
-func (m *HttpCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler types.RequestHandler) (res any) {
+func (m *HttpCoreMiddleware) Process(ctx *types.RequestCtx, handler types.RequestHandler) (res any) {
 	defer func() {
 		if err := recover(); err != nil {
 			ctx.Response.SetStatusCode(500)

@@ -1,12 +1,12 @@
 package websocket
 
 import (
+	"github.com/fushiliang321/go-core/router/types"
 	"github.com/savsgio/gotils/strconv"
-	"github.com/valyala/fasthttp"
 	"time"
 )
 
-func SetServer(ctx *fasthttp.RequestCtx) (ser *WsServer) {
+func SetServer(ctx *types.RequestCtx) (ser *WsServer) {
 	ser = &WsServer{
 		Ctx:                   ctx,
 		Fd:                    ctx.ID(),

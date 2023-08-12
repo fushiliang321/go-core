@@ -43,7 +43,7 @@ func init() {
 	config = server.Get()
 }
 
-func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler types2.RequestHandler) (_ any) {
+func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2.RequestHandler) (_ any) {
 	defer func() {
 		exception.Listener("ws process", recover())
 	}()
@@ -63,7 +63,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *fasthttp.RequestCtx, handler type
 		//非200的状态需直接返回，不能升级到websocket
 		return
 	}
-	err := upgrader.Upgrade(ctx, func(conn *websocket.Conn) {
+	err := upgrader.Upgrade(ctx.RequestCtx, func(conn *websocket.Conn) {
 		ser.Conn = conn
 
 		do := sync.Once{}

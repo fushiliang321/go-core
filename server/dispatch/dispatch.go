@@ -17,7 +17,7 @@ import (
 
 const gzipMinSize = 10000 //触发gzip压缩的最小长度
 
-// 包装整合路由调度的中间件
+// Dispatch 包装整合路由调度的中间件
 func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 	coreMiddlewares := middleware.GetCoreMiddlewares(handler)
 	middlewares := config.Get()
@@ -33,9 +33,13 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 				exception.Listener("server exception", err)
 			}
 		}()
-		_, httpOk := ctx.UserValue(types.SERVER_HTTP_KEY).(*server.Server)
-		_, wsOk := ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
-		var handlers requestHandler
+
+		var (
+			handlers  requestHandler
+			_ctx      = &types2.RequestCtx{}
+			_, httpOk = ctx.UserValue(types.SERVER_HTTP_KEY).(*server.Server)
+			_, wsOk   = ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
+		)
 		switch {
 		case wsOk && "websocket" == strings.ToLower(strconv.B2S(ctx.Request.Header.Peek("upgrade"))):
 			//优先判断websocket请求，避免同时开启http和websocket时无法升级到websocket
@@ -57,7 +61,9 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 			return
 		}
 		ctx.RemoveUserValue(types.SERVER_HTTP_KEY)
-		write(ctx, handlers.Process(ctx))
+
+		_ctx.RequestCtx = ctx
+		write(ctx, handlers.Process(_ctx))
 	}
 }
 

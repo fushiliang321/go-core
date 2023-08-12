@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"github.com/fushiliang321/go-core/router/types"
-	"github.com/valyala/fasthttp"
 )
 
 type (
@@ -11,7 +10,7 @@ type (
 		WS   []Middleware
 	}
 	Middleware interface {
-		Process(ctx *fasthttp.RequestCtx, handler types.RequestHandler) any
+		Process(ctx *types.RequestCtx, handler types.RequestHandler) any
 	}
 )
 
