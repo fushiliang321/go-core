@@ -7,7 +7,7 @@ import (
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper"
-	amqp3 "github.com/streadway/amqp"
+	amqp3 "github.com/rabbitmq/amqp091-go"
 	"log"
 	"sync"
 )

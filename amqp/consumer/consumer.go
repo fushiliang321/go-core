@@ -4,7 +4,7 @@ import (
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/types"
 	"github.com/fushiliang321/go-core/exception"
-	amqp3 "github.com/streadway/amqp"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"sync"
 	"time"
@@ -15,7 +15,7 @@ type status = int8
 type Consumer struct {
 	*types.Consumer
 	status  status
-	channel *amqp3.Channel
+	channel *amqp.Channel
 	sync.Mutex
 }
 
@@ -47,14 +47,14 @@ func (consumer *Consumer) monitor() {
 			go consumer.retryMonitor()
 		}
 	}()
-	amqp := connection.GetAmqp()
-	if amqp == nil {
+	_amqp := connection.GetAmqp()
+	if _amqp == nil {
 		// 监听失败 要重试
 		go consumer.retryMonitor()
 		return
 	}
 	var err error
-	consumer.channel, err = amqp.Consumer.Channel()
+	consumer.channel, err = _amqp.Consumer.Channel()
 	if err != nil {
 		log.Println(consumer.Exchange, "consumer channel error", err)
 		// 监听失败 要重试
@@ -79,14 +79,14 @@ func (consumer *Consumer) monitor() {
 	if err != nil {
 		return
 	}
-	msgs, err := consumer.channel.Consume(consumer.Queue, "", false, false, false, true, amqp3.Table{})
+	msgs, err := consumer.channel.Consume(consumer.Queue, "", false, false, false, true, amqp.Table{})
 	if err != nil {
 		log.Println(consumer.Exchange, "consumer consume error", err)
 		return
 	}
 	closeChannel = false
 	go func() {
-		fun := func(d *amqp3.Delivery) {
+		fun := func(d *amqp.Delivery) {
 			switch consumer.Handler(d.Body) {
 			case ACK:
 				d.Ack(false)
@@ -127,7 +127,7 @@ func (consumer *Consumer) Close() {
 	}
 }
 
-func channelInit(channel *amqp3.Channel, Exchange string, RoutingKey string, Queue string, kind string, durable bool, AutoDeletedExchange bool, AutoDeletedQueue bool) (err error) {
+func channelInit(channel *amqp.Channel, Exchange string, RoutingKey string, Queue string, kind string, durable bool, AutoDeletedExchange bool, AutoDeletedQueue bool) (err error) {
 	if kind == "" {
 		kind = types.ExchangeTypeDirect
 	}
