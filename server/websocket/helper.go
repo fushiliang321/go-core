@@ -9,7 +9,7 @@ import (
 func SetServer(ctx *types.RequestCtx) (ser *WsServer) {
 	ser = &WsServer{
 		Ctx:                   ctx,
-		Fd:                    ctx.ID(),
+		Fd:                    ctx.Raw().ID(),
 		Status:                WsServerStatusOpen,
 		LastResponseTimestamp: time.Now().Unix(),
 	}
@@ -22,7 +22,7 @@ func SetServer(ctx *types.RequestCtx) (ser *WsServer) {
 }
 
 func RemoveServer(ser *WsServer) {
-	sender.remove(ser.Ctx.ID())
+	sender.remove(ser.Ctx.Raw().ID())
 	return
 }
 

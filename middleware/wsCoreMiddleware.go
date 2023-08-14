@@ -47,7 +47,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 	defer func() {
 		exception.Listener("ws process", recover())
 	}()
-	ws, ok := ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
+	ws, ok := ctx.Raw().UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
 	if !ok {
 		ctx.Response.SetStatusCode(500)
 		return helper.Error(500, fmt.Sprintln("upgrader exception:"), nil)
@@ -56,14 +56,14 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 	upgrader := upgraderDefault
 	onHandshake, ok := ws.Callbacks[event.ON_HAND_SHAKE].(event.OnHandshake)
 	if ok {
-		log.Println(ctx.ID(), "onHandshake")
+		log.Println(ctx.Raw().ID(), "onHandshake")
 		onHandshake(ser, &upgrader)
 	}
 	if ctx.Response.StatusCode() != 200 {
 		//非200的状态需直接返回，不能升级到websocket
 		return
 	}
-	err := upgrader.Upgrade(ctx.RequestCtx, func(conn *websocket.Conn) {
+	err := upgrader.Upgrade(ctx.Raw(), func(conn *websocket.Conn) {
 		ser.Conn = conn
 
 		do := sync.Once{}
@@ -76,7 +76,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 				conn.Close()
 				ser.OnClose()
 				if onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose); ok {
-					log.Println(ctx.ID(), "onClose")
+					log.Println(ctx.Raw().ID(), "onClose")
 					onClose(ser, code, text)
 				}
 			})
@@ -97,7 +97,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 		}
 
 		if onOpen, ok := ws.Callbacks[event.ON_OPEN].(event.OnOpen); ok {
-			log.Println(ctx.ID(), "onOpen")
+			log.Println(ctx.Raw().ID(), "onOpen")
 			onOpen(ser)
 		}
 

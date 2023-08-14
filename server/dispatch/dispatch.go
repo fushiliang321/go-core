@@ -11,7 +11,6 @@ import (
 	"github.com/fushiliang321/go-core/server/types"
 	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
-	"log"
 	"strings"
 )
 
@@ -36,7 +35,7 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 
 		var (
 			handlers  requestHandler
-			_ctx      = &types2.RequestCtx{}
+			_ctx      *types2.RequestCtx
 			_, httpOk = ctx.UserValue(types.SERVER_HTTP_KEY).(*server.Server)
 			_, wsOk   = ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
 		)
@@ -61,22 +60,7 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 			return
 		}
 		ctx.RemoveUserValue(types.SERVER_HTTP_KEY)
-
-		_ctx.RequestCtx = ctx
-		write(ctx, handlers.Process(_ctx))
-	}
-}
-
-func write(ctx *fasthttp.RequestCtx, data any) {
-	bytes, err := helper.AnyToBytes(data)
-	if err != nil {
-		log.Printf("server result err:%s\n", err)
-		return
-	}
-	if len(bytes) > gzipMinSize {
-		ctx.Response.Header.Add("Content-Encoding", "gzip")
-		ctx.Write(fasthttp.AppendGzipBytes([]byte{}, bytes))
-	} else {
-		ctx.Write(bytes)
+		_ctx = (*types2.RequestCtx)(ctx)
+		_ctx.WriteAny(handlers.Process(_ctx))
 	}
 }
