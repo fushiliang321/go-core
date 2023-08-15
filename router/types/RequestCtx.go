@@ -1,6 +1,7 @@
 package types
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,11 +9,15 @@ import (
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
+	"io"
 	"log"
+	"mime/multipart"
+	"net"
 	"net/url"
 	"reflect"
 	strconv2 "strconv"
 	"strings"
+	"time"
 )
 
 const gzipMinSize = 10000 //触发gzip压缩的最小长度
@@ -384,4 +389,288 @@ func typeAssign(value any, typeValue reflect.Value) (err error) {
 		return NewDataError("不受支持的数据类型", typeValue.Interface())
 	}
 	return nil
+}
+
+func (ctx *RequestCtx) Hijack(handler fasthttp.HijackHandler) {
+	ctx.Raw().Hijack(handler)
+}
+
+func (ctx *RequestCtx) HijackSetNoResponse(noResponse bool) {
+	ctx.Raw().HijackSetNoResponse(noResponse)
+}
+
+func (ctx *RequestCtx) Hijacked() bool {
+	return ctx.Raw().Hijacked()
+}
+
+func (ctx *RequestCtx) SetUserValue(key interface{}, value interface{}) {
+	ctx.Raw().SetUserValue(key, value)
+}
+
+func (ctx *RequestCtx) SetUserValueBytes(key []byte, value interface{}) {
+	ctx.Raw().SetUserValueBytes(key, value)
+}
+
+func (ctx *RequestCtx) UserValue(key interface{}) interface{} {
+	return ctx.Raw().UserValue(key)
+}
+func (ctx *RequestCtx) UserValueBytes(key []byte) interface{} {
+	return ctx.Raw().UserValueBytes(key)
+}
+func (ctx *RequestCtx) VisitUserValues(visitor func([]byte, interface{})) {
+	ctx.Raw().VisitUserValues(visitor)
+}
+
+func (ctx *RequestCtx) VisitUserValuesAll(visitor func(interface{}, interface{})) {
+	ctx.Raw().VisitUserValuesAll(visitor)
+}
+
+func (ctx *RequestCtx) ResetUserValues() {
+	ctx.Raw().ResetUserValues()
+}
+
+func (ctx *RequestCtx) RemoveUserValue(key interface{}) {
+	ctx.Raw().RemoveUserValue(key)
+}
+
+func (ctx *RequestCtx) IsTLS() bool {
+	return ctx.Raw().IsTLS()
+}
+
+func (ctx *RequestCtx) TLSConnectionState() *tls.ConnectionState {
+	return ctx.Raw().TLSConnectionState()
+}
+
+func (ctx *RequestCtx) Conn() net.Conn {
+	return ctx.Raw().Conn()
+}
+func (ctx *RequestCtx) String() string {
+	return ctx.Raw().String()
+}
+func (ctx *RequestCtx) ID() uint64 {
+	return ctx.Raw().ID()
+}
+func (ctx *RequestCtx) ConnID() uint64 {
+	return ctx.Raw().ConnID()
+}
+func (ctx *RequestCtx) Time() time.Time {
+	return ctx.Raw().Time()
+}
+func (ctx *RequestCtx) ConnTime() time.Time {
+	return ctx.Raw().ConnTime()
+}
+func (ctx *RequestCtx) ConnRequestNum() uint64 {
+	return ctx.Raw().ConnRequestNum()
+}
+func (ctx *RequestCtx) SetConnectionClose() {
+	ctx.Raw().SetConnectionClose()
+}
+func (ctx *RequestCtx) SetStatusCode(statusCode int) {
+	ctx.Raw().SetStatusCode(statusCode)
+}
+func (ctx *RequestCtx) SetContentType(contentType string) {
+	ctx.Raw().SetContentType(contentType)
+}
+func (ctx *RequestCtx) SetContentTypeBytes(contentType []byte) {
+	ctx.Raw().SetContentTypeBytes(contentType)
+}
+func (ctx *RequestCtx) RequestURI() []byte {
+	return ctx.Raw().RequestURI()
+}
+func (ctx *RequestCtx) URI() *fasthttp.URI {
+	return ctx.Raw().URI()
+}
+
+func (ctx *RequestCtx) Referer() []byte {
+	return ctx.Raw().Referer()
+}
+
+func (ctx *RequestCtx) UserAgent() []byte {
+	return ctx.Raw().UserAgent()
+}
+
+func (ctx *RequestCtx) Path() []byte {
+	return ctx.Raw().Path()
+}
+
+func (ctx *RequestCtx) Host() []byte {
+	return ctx.Raw().Host()
+}
+
+func (ctx *RequestCtx) QueryArgs() *fasthttp.Args {
+	return ctx.Raw().QueryArgs()
+}
+
+func (ctx *RequestCtx) PostArgs() *fasthttp.Args {
+	return ctx.Raw().PostArgs()
+}
+
+func (ctx *RequestCtx) MultipartForm() (*multipart.Form, error) {
+	return ctx.Raw().MultipartForm()
+}
+
+func (ctx *RequestCtx) FormFile(key string) (*multipart.FileHeader, error) {
+	return ctx.Raw().FormFile(key)
+}
+
+func (ctx *RequestCtx) FormValue(key string) []byte {
+	return ctx.Raw().FormValue(key)
+}
+
+func (ctx *RequestCtx) IsGet() bool {
+	return ctx.Raw().IsGet()
+}
+
+func (ctx *RequestCtx) IsPost() bool {
+	return ctx.Raw().IsPost()
+}
+func (ctx *RequestCtx) IsPut() bool {
+	return ctx.Raw().IsPut()
+}
+func (ctx *RequestCtx) IsDelete() bool {
+	return ctx.Raw().IsDelete()
+}
+func (ctx *RequestCtx) IsConnect() bool {
+	return ctx.Raw().IsConnect()
+}
+func (ctx *RequestCtx) IsOptions() bool {
+	return ctx.Raw().IsOptions()
+}
+func (ctx *RequestCtx) IsTrace() bool {
+	return ctx.Raw().IsTrace()
+}
+func (ctx *RequestCtx) IsPatch() bool {
+	return ctx.Raw().IsPatch()
+}
+func (ctx *RequestCtx) Method() []byte {
+	return ctx.Raw().Method()
+}
+func (ctx *RequestCtx) IsHead() bool {
+	return ctx.Raw().IsHead()
+}
+func (ctx *RequestCtx) RemoteAddr() net.Addr {
+	return ctx.Raw().RemoteAddr()
+}
+func (ctx *RequestCtx) SetRemoteAddr(remoteAddr net.Addr) {
+	ctx.Raw().SetRemoteAddr(remoteAddr)
+}
+func (ctx *RequestCtx) LocalAddr() net.Addr {
+	return ctx.Raw().LocalAddr()
+}
+func (ctx *RequestCtx) RemoteIP() net.IP {
+	return ctx.Raw().RemoteIP()
+}
+func (ctx *RequestCtx) LocalIP() net.IP {
+	return ctx.Raw().LocalIP()
+}
+func (ctx *RequestCtx) Error(msg string, statusCode int) {
+	ctx.Raw().Error(msg, statusCode)
+}
+func (ctx *RequestCtx) Success(contentType string, body []byte) {
+	ctx.Raw().Success(contentType, body)
+}
+func (ctx *RequestCtx) SuccessString(contentType, body string) {
+	ctx.Raw().SuccessString(contentType, body)
+}
+func (ctx *RequestCtx) Redirect(uri string, statusCode int) {
+	ctx.Raw().Redirect(uri, statusCode)
+}
+func (ctx *RequestCtx) RedirectBytes(uri []byte, statusCode int) {
+	ctx.Raw().RedirectBytes(uri, statusCode)
+}
+func (ctx *RequestCtx) SetBody(body []byte) {
+	ctx.Raw().SetBody(body)
+}
+func (ctx *RequestCtx) SetBodyString(body string) {
+	ctx.Raw().SetBodyString(body)
+}
+func (ctx *RequestCtx) ResetBody() {
+	ctx.Raw().ResetBody()
+}
+func (ctx *RequestCtx) SendFile(path string) {
+	ctx.Raw().SendFile(path)
+}
+
+func (ctx *RequestCtx) SendFileBytes(path []byte) {
+	ctx.Raw().SendFileBytes(path)
+}
+
+func (ctx *RequestCtx) IfModifiedSince(lastModified time.Time) bool {
+	return ctx.Raw().IfModifiedSince(lastModified)
+}
+
+func (ctx *RequestCtx) NotModified() {
+	ctx.Raw().NotModified()
+}
+
+func (ctx *RequestCtx) NotFound() {
+	ctx.Raw().NotFound()
+}
+
+func (ctx *RequestCtx) Write(p []byte) (int, error) {
+	return ctx.Raw().Write(p)
+}
+
+func (ctx *RequestCtx) WriteString(s string) (int, error) {
+	return ctx.Raw().WriteString(s)
+}
+
+func (ctx *RequestCtx) PostBody() []byte {
+	return ctx.Raw().PostBody()
+}
+
+func (ctx *RequestCtx) SetBodyStream(bodyStream io.Reader, bodySize int) {
+	ctx.Raw().SetBodyStream(bodyStream, bodySize)
+}
+
+func (ctx *RequestCtx) SetBodyStreamWriter(sw fasthttp.StreamWriter) {
+	ctx.Raw().SetBodyStreamWriter(sw)
+}
+
+func (ctx *RequestCtx) IsBodyStream() bool {
+	return ctx.Raw().IsBodyStream()
+}
+
+func (ctx *RequestCtx) Logger() fasthttp.Logger {
+	return ctx.Raw().Logger()
+}
+
+func (ctx *RequestCtx) TimeoutError(msg string) {
+	ctx.Raw().TimeoutError(msg)
+}
+
+func (ctx *RequestCtx) TimeoutErrorWithCode(msg string, statusCode int) {
+	ctx.Raw().TimeoutErrorWithCode(msg, statusCode)
+}
+
+func (ctx *RequestCtx) TimeoutErrorWithResponse(resp *fasthttp.Response) {
+	ctx.Raw().TimeoutErrorWithResponse(resp)
+}
+
+func (ctx *RequestCtx) LastTimeoutErrorResponse() *fasthttp.Response {
+	return ctx.Raw().LastTimeoutErrorResponse()
+}
+
+func (ctx *RequestCtx) Init2(conn net.Conn, logger fasthttp.Logger, reduceMemoryUsage bool) {
+	ctx.Raw().Init2(conn, logger, reduceMemoryUsage)
+}
+
+func (ctx *RequestCtx) Init(req *fasthttp.Request, remoteAddr net.Addr, logger fasthttp.Logger) {
+	ctx.Raw().Init(req, remoteAddr, logger)
+}
+
+func (ctx *RequestCtx) Deadline() (deadline time.Time, ok bool) {
+	return ctx.Raw().Deadline()
+}
+
+func (ctx *RequestCtx) Done() <-chan struct{} {
+	return ctx.Raw().Done()
+}
+
+func (ctx *RequestCtx) Err() error {
+	return ctx.Raw().Err()
+}
+
+func (ctx *RequestCtx) Value(key interface{}) interface{} {
+	return ctx.Raw().Value(key)
 }
