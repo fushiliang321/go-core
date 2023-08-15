@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/fushiliang321/go-core/config/init"
+	"github.com/fushiliang321/go-core/config/initialize"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
 	"sync"
@@ -37,7 +37,7 @@ func Start() {
 	startOnce.Do(func() {
 		event.Dispatch(event.NewRegistered(event.BeforeServerStart, nil))
 		wg := &sync.WaitGroup{}
-		servers := init.Get()
+		servers := initialize.Get()
 		for _, ser := range servers {
 			ser.Start(wg)
 		}
