@@ -2,12 +2,16 @@ package types
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/bitly/go-simplejson"
+	"github.com/fushiliang321/go-core/helper"
 	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
 	"log"
 	"net/url"
 	"reflect"
+	strconv2 "strconv"
 	"strings"
 )
 
@@ -166,11 +170,12 @@ func (ctx *RequestCtx) Inputs() map[string]any {
 	inputs := ctx.Raw().UserValue("inputs")
 	if inputs == nil {
 		ctx.initParams()
+		inputs = ctx.Raw().UserValue("inputs")
 	}
 	return inputs.(map[string]any)
 }
 
-func (ctx *RequestCtx) Input(key string, defaultVal ...any) any {
+func (ctx *RequestCtx) Input(key string, defaultVals ...any) any {
 	input := ctx.Inputs()
 	if input == nil {
 		return nil
@@ -178,8 +183,205 @@ func (ctx *RequestCtx) Input(key string, defaultVal ...any) any {
 	if value, ok := input[key]; ok {
 		return value
 	}
-	if len(defaultVal) > 0 {
-		return defaultVal[0]
+	if len(defaultVals) > 0 {
+		return defaultVals[0]
+	}
+	return nil
+}
+
+func (ctx *RequestCtx) InputAssign(key string, valPtr any) (err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = errors.New("recover:" + fmt.Sprint(rec))
+		}
+	}()
+	input := ctx.Inputs()
+	if input == nil {
+		return nil
+	}
+
+	value, ok := input[key]
+	if !ok {
+		return nil
+	}
+
+	_reflect := reflect.TypeOf(valPtr)
+	if _reflect.Kind() != reflect.Pointer {
+		return errors.New("参数必须是指针类型")
+	}
+	if err = typeAssign(value, reflect.ValueOf(valPtr).Elem()); err != nil {
+		return err
+	}
+	return nil
+}
+
+func typeAssign(value any, typeValue reflect.Value) (err error) {
+
+	typeReflect := typeValue.Type()
+	switch typeValue.Kind() {
+
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		fmt.Println(1)
+		var _v int64
+		switch raw := value.(type) {
+		case json.Number:
+			if _v, err = value.(json.Number).Int64(); err != nil {
+				return err
+			}
+		case string:
+			if _v, err = strconv2.ParseInt(raw, 10, 64); err != nil {
+				return err
+			}
+		case int:
+			_v = int64(raw)
+		case int8:
+			_v = int64(raw)
+		case int16:
+			_v = int64(raw)
+		case int32:
+			_v = int64(raw)
+		case int64:
+			_v = raw
+		case uint:
+			_v = int64(raw)
+		case uint8:
+			_v = int64(raw)
+		case uint16:
+			_v = int64(raw)
+		case uint32:
+			_v = int64(raw)
+		case uint64:
+			_v = int64(raw)
+		case float32:
+			_v = int64(raw)
+		case float64:
+			_v = int64(raw)
+		case uintptr:
+			_v = int64(raw)
+		default:
+			return NewDataError("数据类型错误", value)
+		}
+		_reflect := reflect.New(typeReflect).Elem()
+		_reflect.SetInt(_v)
+		fmt.Println(_reflect.Interface())
+		typeValue.Set(_reflect)
+		fmt.Println(typeValue.Interface())
+
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		var _v uint64
+		switch raw := value.(type) {
+		case json.Number:
+			if i, err := raw.Int64(); err != nil {
+				return err
+			} else {
+				_v = uint64(i)
+			}
+		case string:
+			if i, err := strconv2.ParseInt(raw, 10, 64); err != nil {
+				return err
+			} else {
+				_v = uint64(i)
+			}
+		case int:
+			_v = uint64(raw)
+		case int8:
+			_v = uint64(raw)
+		case int16:
+			_v = uint64(raw)
+		case int32:
+			_v = uint64(raw)
+		case int64:
+			_v = uint64(raw)
+		case uint:
+			_v = uint64(raw)
+		case uint8:
+			_v = uint64(raw)
+		case uint16:
+			_v = uint64(raw)
+		case uint32:
+			_v = uint64(raw)
+		case uint64:
+			_v = raw
+		case float32:
+			_v = uint64(raw)
+		case float64:
+			_v = uint64(raw)
+		case uintptr:
+			_v = uint64(raw)
+		default:
+			return NewDataError("数据类型错误", value)
+		}
+		_reflect := reflect.New(typeReflect).Elem()
+		_reflect.SetUint(_v)
+		typeValue.Set(_reflect)
+
+	case reflect.Float64, reflect.Float32:
+		var _v float64
+		switch raw := value.(type) {
+		case json.Number:
+			if _v, err = raw.Float64(); err != nil {
+				return err
+			}
+		case string:
+			if _v, err = strconv2.ParseFloat(raw, 64); err != nil {
+				return err
+			}
+		case int:
+			_v = float64(raw)
+		case int8:
+			_v = float64(raw)
+		case int16:
+			_v = float64(raw)
+		case int32:
+			_v = float64(raw)
+		case int64:
+			_v = float64(raw)
+		case uint:
+			_v = float64(raw)
+		case uint8:
+			_v = float64(raw)
+		case uint16:
+			_v = float64(raw)
+		case uint32:
+			_v = float64(raw)
+		case uint64:
+			_v = float64(raw)
+		case float32:
+			_v = float64(raw)
+		case float64:
+			_v = raw
+		case uintptr:
+			_v = float64(raw)
+		default:
+			return NewDataError("数据类型错误", value)
+		}
+		_reflect := reflect.New(typeReflect).Elem()
+		_reflect.SetFloat(_v)
+		typeValue.Set(_reflect)
+
+	case reflect.Array, reflect.Map, reflect.Slice, reflect.Struct:
+		marshal, err := helper.AnyToBytes(value)
+		if err != nil {
+			return err
+		}
+		_v := reflect.New(typeReflect).Interface()
+		if err = json.Unmarshal(marshal, _v); err != nil {
+			return err
+		}
+		typeValue.Set(reflect.ValueOf(_v).Elem())
+
+	case reflect.String:
+		_v, ok := value.(string)
+		if !ok {
+			_v, err = helper.JsonEncode(value)
+			if err != nil {
+				return err
+			}
+		}
+		typeValue.SetString(_v)
+
+	default:
+		return NewDataError("不受支持的数据类型", typeValue.Interface())
 	}
 	return nil
 }
