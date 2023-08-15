@@ -1,15 +1,9 @@
 package core
 
 import (
-	"github.com/fushiliang321/go-core/amqp"
-	"github.com/fushiliang321/go-core/consul"
+	"github.com/fushiliang321/go-core/config/init"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
-	grpc "github.com/fushiliang321/go-core/grpc/server"
-	jsonRpcHttp "github.com/fushiliang321/go-core/jsonRpcHttp/server"
-	"github.com/fushiliang321/go-core/rateLimit"
-	"github.com/fushiliang321/go-core/server"
-	"github.com/fushiliang321/go-core/task"
 	"sync"
 	"sync/atomic"
 )
@@ -27,30 +21,13 @@ type (
 var (
 	startOnce            sync.Once
 	awaitStartFinishOnce sync.Once
-	servers              = []Server{
-		&amqp.Service{},
-		&consul.Service{},
-		&jsonRpcHttp.Service{},
-		&grpc.Service{},
-		&task.Service{},
-		&rateLimit.Service{},
-		&server.Service{},
-	}
-	_serverStartMonitor = &serverStartMonitor{
+	_serverStartMonitor  = &serverStartMonitor{
 		awaitChan: make(chan byte),
 	}
 )
 
 func init() {
 	_serverStartMonitor.isFinish.Store(false)
-}
-
-func Register(s Server) {
-	servers = append(servers, s)
-}
-
-func Registers(sers []Server) {
-	servers = append(servers, sers...)
 }
 
 func Start() {
@@ -60,6 +37,7 @@ func Start() {
 	startOnce.Do(func() {
 		event.Dispatch(event.NewRegistered(event.BeforeServerStart, nil))
 		wg := &sync.WaitGroup{}
+		servers := init.Get()
 		for _, ser := range servers {
 			ser.Start(wg)
 		}
