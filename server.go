@@ -68,8 +68,7 @@ func AwaitStartFinish(funs ...func()) {
 				//启动完成后把等待通道关闭
 				_serverStartMonitor.isFinish.Store(true)
 				close(_serverStartMonitor.awaitChan)
-				for len(_serverStartMonitor.awaitChan) > 0 {
-					<-_serverStartMonitor.awaitChan
+				for range _serverStartMonitor.awaitChan {
 				}
 			},
 		})
