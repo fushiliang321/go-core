@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/bitly/go-simplejson"
+	"github.com/fushiliang321/go-core"
+	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
@@ -20,9 +22,16 @@ import (
 	"time"
 )
 
-const gzipMinSize = 10000 //触发gzip压缩的最小长度
-
 type RequestCtx fasthttp.RequestCtx
+
+var AutoResponseGzipSize int //响应数据达到指定大小自动触发gzip压缩
+
+func init() {
+	go core.AwaitStartFinish(func() {
+		serversConfig := server.Get()
+		AutoResponseGzipSize = serversConfig.Settings.AutoResponseGzipSize
+	})
+}
 
 // any转bytes
 func anyToBytes(data any) (bts []byte, err error) {
@@ -55,7 +64,7 @@ func (ctx *RequestCtx) WriteAny(data any) (int, error) {
 		log.Printf("write data err:%s\n", err)
 		return 0, err
 	}
-	if len(bytes) > gzipMinSize {
+	if AutoResponseGzipSize > 0 && len(bytes) >= AutoResponseGzipSize {
 		ctx.Response.Header.Add("Content-Encoding", "gzip")
 		return ctx.Raw().Write(fasthttp.AppendGzipBytes([]byte{}, bytes))
 	}
@@ -194,6 +203,26 @@ func (ctx *RequestCtx) Input(key string, defaultVals ...any) any {
 	return nil
 }
 
+func (ctx *RequestCtx) InputsAssign(valPtr any) (err error) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			err = errors.New("recover:" + fmt.Sprint(rec))
+		}
+	}()
+	input := ctx.Inputs()
+	if input == nil {
+		return nil
+	}
+	marshal, err := json.Marshal(input)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(marshal, valPtr); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (ctx *RequestCtx) InputAssign(key string, valPtr any) (err error) {
 	defer func() {
 		if rec := recover(); rec != nil {
@@ -226,7 +255,6 @@ func typeAssign(value any, typeValue reflect.Value) (err error) {
 	switch typeValue.Kind() {
 
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		fmt.Println(1)
 		var _v int64
 		switch raw := value.(type) {
 		case json.Number:
@@ -268,9 +296,7 @@ func typeAssign(value any, typeValue reflect.Value) (err error) {
 		}
 		_reflect := reflect.New(typeReflect).Elem()
 		_reflect.SetInt(_v)
-		fmt.Println(_reflect.Interface())
 		typeValue.Set(_reflect)
-		fmt.Println(typeValue.Interface())
 
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		var _v uint64
