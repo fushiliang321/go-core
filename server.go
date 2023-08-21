@@ -7,20 +7,13 @@ import (
 	"sync"
 )
 
-type (
-	Server interface {
-		Start(wg *sync.WaitGroup)
-	}
-)
-
-var (
-	startOnce sync.Once
-)
+var startOnce sync.Once
 
 func Start() {
 	defer func() {
 		exception.Listener("core start", recover())
 	}()
+
 	startOnce.Do(func() {
 		event.Dispatch(event.NewRegistered(event.BeforeServerStart, nil))
 		wg := &sync.WaitGroup{}
