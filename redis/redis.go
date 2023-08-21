@@ -3,8 +3,8 @@ package redis
 import (
 	"context"
 	"fmt"
-	"github.com/fushiliang321/go-core"
 	redisConfig "github.com/fushiliang321/go-core/config/redis"
+	"github.com/fushiliang321/go-core/event/handles/core"
 	"github.com/redis/go-redis/v9"
 	"strconv"
 	"sync"
