@@ -67,3 +67,29 @@ func AnyToBytes(data any) (bts []byte, err error) {
 	}
 	return
 }
+
+// any转string
+func AnyToString(data any) (str string, err error) {
+	switch data.(type) {
+	case string:
+		str = data.(string)
+	case *string:
+		str = *data.(*string)
+	case []byte:
+		str = strconv.B2S(data.([]byte))
+	case *[]byte:
+		str = strconv.B2S(*data.(*[]byte))
+
+	case byte:
+		str = strconv.B2S([]byte{data.(byte)})
+	case *byte:
+		str = strconv.B2S([]byte{*(data.(*byte))})
+	default:
+		marshal, err := json.Marshal(data)
+		if err != nil {
+			return "", err
+		}
+		return strconv.B2S(marshal), nil
+	}
+	return
+}

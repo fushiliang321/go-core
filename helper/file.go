@@ -5,6 +5,8 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"os"
+	"sort"
 )
 
 // 获取文件内的所有变量名
@@ -32,4 +34,45 @@ func GetFileVariateNameAll(FilePath string) (names []string) {
 	mapData[FilePath] = names
 	cacheData["GetFileVariateNameAll"] = mapData
 	return
+}
+
+type byModTime []*os.FileInfo
+
+func (fis byModTime) Len() int {
+	return len(fis)
+}
+
+func (fis byModTime) Swap(i, j int) {
+	fis[i], fis[j] = fis[j], fis[i]
+}
+
+func (fis byModTime) Less(i, j int) bool {
+	return (*fis[i]).ModTime().Before((*fis[j]).ModTime())
+}
+
+// 指定目录下的文件按时间大小排序，从远到近
+func SortFile(path string) ([]*os.FileInfo, error) {
+	dirEntrys, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var files byModTime
+	files = make(byModTime, len(dirEntrys))
+	j := 0
+	for _, dirEntry := range dirEntrys {
+		if dirEntry.IsDir() {
+			continue
+		}
+		info, err := dirEntry.Info()
+		if err != nil {
+			continue
+		}
+		files[j] = &info
+		j++
+	}
+	files = files[:j]
+
+	sort.Sort(files)
+	return files, nil
 }
