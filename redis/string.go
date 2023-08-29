@@ -3,7 +3,7 @@ package redis
 import (
 	"encoding/json"
 	"errors"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/savsgio/gotils/strconv"
 	"reflect"
 	"time"

@@ -4,7 +4,7 @@ import (
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/types"
 	"github.com/fushiliang321/go-core/exception"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"sync"
 	"time"

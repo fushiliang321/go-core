@@ -5,7 +5,7 @@ import (
 	"github.com/fushiliang321/go-core/config/exceptions"
 	"github.com/fushiliang321/go-core/exception/helper"
 	"github.com/fushiliang321/go-core/exception/types"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 )
 
 func Listener(mark string, err any) {

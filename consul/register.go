@@ -3,7 +3,7 @@ package consul
 import (
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/hashicorp/consul/api"
 	"strconv"
 	"strings"

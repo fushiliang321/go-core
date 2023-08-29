@@ -3,7 +3,7 @@ package types
 import (
 	"bytes"
 	"encoding/json"
-	"log"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"os"
 )
 
@@ -51,7 +51,7 @@ func (res *Result) Error(errCode int, msg string, data any) {
 func (res *Result) JsonMarshal() (marshal []byte) {
 	marshal, err := json.Marshal(res)
 	if err != nil {
-		log.Printf("server result err:%s\n", err)
+		logger.Warn("server result err:", err)
 		return
 	}
 	return

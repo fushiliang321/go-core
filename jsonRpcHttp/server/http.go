@@ -3,7 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/fushiliang321/jsonrpc/common"
 	"io"
 	"net/http"

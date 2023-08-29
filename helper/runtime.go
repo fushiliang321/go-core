@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"log"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"runtime"
 	"strings"
 	"time"
@@ -47,7 +47,7 @@ func Time() string {
 func CurrentFile() string {
 	_, file, _, ok := runtime.Caller(1)
 	if !ok {
-		log.Println("Can not get current file info")
+		logger.Warn("Can not get current file info")
 	}
 	return file
 }

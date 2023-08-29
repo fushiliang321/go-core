@@ -4,7 +4,7 @@ import (
 	"github.com/fushiliang321/go-core/config/routers"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/event"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/fushiliang321/go-core/server/types"
 	"github.com/fushiliang321/go-core/server/websocket"
 	"github.com/valyala/fasthttp"

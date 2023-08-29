@@ -1,7 +1,7 @@
 package helper
 
 import (
-	"log"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"net"
 	"os"
 )
@@ -82,6 +82,6 @@ func GetLocalIP(address ...string) string {
 		conn.Close()
 		return localAddr.IP.String()
 	}
-	log.Println("GetLocalIP error：", err)
+	logger.Warn("GetLocalIP error：", err)
 	return ""
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	redisConfig "github.com/fushiliang321/go-core/config/redis"
 	"github.com/fushiliang321/go-core/event/handles/core"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/redis/go-redis/v9"
 	"strconv"
 	"sync"

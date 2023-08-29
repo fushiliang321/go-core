@@ -2,7 +2,7 @@ package connection
 
 import (
 	config "github.com/fushiliang321/go-core/config/amqp"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"sync"
 )

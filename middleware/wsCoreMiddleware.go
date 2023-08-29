@@ -6,7 +6,7 @@ import (
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
-	"github.com/fushiliang321/go-core/logger"
+	"github.com/fushiliang321/go-core/helper/logger"
 	types2 "github.com/fushiliang321/go-core/router/types"
 	"github.com/fushiliang321/go-core/server/types"
 	websocket2 "github.com/fushiliang321/go-core/server/websocket"
