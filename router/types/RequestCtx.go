@@ -30,7 +30,9 @@ var AutoResponseGzipSize int //响应数据达到指定大小自动触发gzip压
 func init() {
 	go core.AwaitStartFinish(func() {
 		serversConfig := server.Get()
-		AutoResponseGzipSize = serversConfig.Settings.AutoResponseGzipSize
+		if serversConfig.Settings != nil {
+			AutoResponseGzipSize = serversConfig.Settings.AutoResponseGzipSize
+		}
 	})
 }
 
