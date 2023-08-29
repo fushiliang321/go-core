@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/fushiliang321/go-core/helper/logger"
-	"os"
+	"github.com/fushiliang321/go-core/helper/system"
 )
 
 type Result struct {
@@ -23,16 +23,7 @@ type WsResult struct {
 var appName string
 
 func init() {
-	appName = getEnvDefault("APP_NAME", "")
-}
-
-// 取环境变量
-func getEnvDefault(key, defVal string) string {
-	val, ex := os.LookupEnv(key)
-	if !ex {
-		return defVal
-	}
-	return val
+	appName = system.AppName()
 }
 
 func (res *Result) Error(errCode int, msg string, data any) {

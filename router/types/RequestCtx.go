@@ -34,33 +34,12 @@ func init() {
 	})
 }
 
-// any转bytes
-func anyToBytes(data any) (bts []byte, err error) {
-	switch data.(type) {
-	case string:
-		bts = strconv.S2B(data.(string))
-	case *string:
-		bts = strconv.S2B(*(data.(*string)))
-	case []byte:
-		return data.([]byte), nil
-	case *[]byte:
-		bts = *data.(*[]byte)
-	case byte:
-		bts = []byte{data.(byte)}
-	case *byte:
-		bts = []byte{*(data.(*byte))}
-	default:
-		bts, err = json.Marshal(data)
-	}
-	return
-}
-
 func (ctx *RequestCtx) Raw() *fasthttp.RequestCtx {
 	return (*fasthttp.RequestCtx)(ctx)
 }
 
 func (ctx *RequestCtx) WriteAny(data any) (int, error) {
-	bytes, err := anyToBytes(data)
+	bytes, err := helper.AnyToBytes(data)
 	if err != nil {
 		log.Printf("write data err:%s\n", err)
 		return 0, err
