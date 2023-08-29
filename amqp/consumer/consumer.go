@@ -42,6 +42,7 @@ func (consumer *Consumer) monitor() {
 	}
 	defer func() {
 		if err := recover(); err != nil {
+			logger.Error(consumer.Exchange+" amqp monitor recover:", err)
 			exception.Listener(consumer.Exchange+" amqp monitor", err)
 			// 监听异常 要重试
 			go consumer.retryMonitor()

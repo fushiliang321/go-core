@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/fushiliang321/go-core/config/middlewares"
 	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/fushiliang321/go-core/helper/response"
 	"github.com/fushiliang321/go-core/router/types"
 )
@@ -23,6 +24,7 @@ func (h *requestHandler) Process(ctx *types.RequestCtx) (res any) {
 		if err := recover(); err != nil {
 			ctx.Response.SetStatusCode(500)
 			res = response.Error(500, fmt.Sprintln("server middleware exception:", err), nil)
+			logger.Error("server middleware exception", err)
 			exception.Listener("server middleware exception", err)
 		}
 	}()

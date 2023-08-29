@@ -5,6 +5,7 @@ import (
 	"github.com/fushiliang321/go-core/config/database"
 	"github.com/fushiliang321/go-core/db/model"
 	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"time"
@@ -24,6 +25,7 @@ func db() *gorm.DB {
 	}
 	_db, err = gorm.Open(mysql.Open(dsn), config.Settings)
 	if err != nil {
+		logger.Warn("open db error:", err)
 		exception.Listener("open db", err)
 		return _db
 	}

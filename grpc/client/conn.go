@@ -30,7 +30,10 @@ const maxMultiplexNum = 1000 //连接最大复用次数
 
 func dial(serviceName string) (*grpc.ClientConn, *consul.ServiceNode, error) {
 	defer func() {
-		exception.Listener("grpc dial exception", recover())
+		if err := recover(); err != nil {
+			logger.Error("grpc dial exception:", err)
+			exception.Listener("grpc dial exception", err)
+		}
 	}()
 	node, err := consul.GetNode(serviceName, consul.GrpcProtocol)
 	if err != nil {
@@ -177,7 +180,10 @@ func (cc *ClientConn) GetMethodConfig(method string) grpc.MethodConfig {
 
 func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 	defer func() {
-		exception.Listener("grpc conn exception", recover())
+		if err := recover(); err != nil {
+			logger.Error("server middleware exception", err)
+			exception.Listener("grpc conn exception", err)
+		}
 	}()
 	return &ClientConn{
 		serviceName: serviceName,

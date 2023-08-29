@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"google.golang.org/grpc"
 	"reflect"
 )
@@ -17,7 +18,10 @@ var (
 func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
 	return func(isMultiplex ...bool) t {
 		defer func() {
-			exception.Listener("grpc call exception:", recover())
+			if err := recover(); err != nil {
+				logger.Error("grpc call exception:", err)
+				exception.Listener("grpc call exception:", err)
+			}
 		}()
 		var multiplex bool
 		if len(isMultiplex) > 0 {
@@ -26,6 +30,7 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 		conn, err := GetConn(serviceName, multiplex)
 		var client t
 		if err != nil {
+			logger.Warn("grpc newClient Error:["+serviceName+"]", err)
 			exception.Listener("grpc newClient Error:["+serviceName+"]", err)
 			return fun(ErrCon{
 				error: err,

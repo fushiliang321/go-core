@@ -46,7 +46,10 @@ func IsRegister(name string, protocol string, address string, port int) bool {
 
 func RegisterServer(name string, protocol string, address string, port int, check *api.AgentServiceCheck) (b bool, err error) {
 	defer func() {
-		exception.Listener("RegisterServer error:", recover())
+		if _err := recover(); _err != nil {
+			logger.Error("RegisterServer error:", _err)
+			exception.Listener("RegisterServer error:", _err)
+		}
 	}()
 	if IsRegister(name, protocol, address, port) {
 		return true, nil

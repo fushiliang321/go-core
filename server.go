@@ -3,7 +3,6 @@ package core
 import (
 	"github.com/fushiliang321/go-core/config/initialize"
 	"github.com/fushiliang321/go-core/event"
-	"github.com/fushiliang321/go-core/exception"
 	"sync"
 )
 
@@ -11,7 +10,10 @@ var startOnce sync.Once
 
 func Start() {
 	defer func() {
-		exception.Listener("core start", recover())
+		//if err := recover(); err != nil {
+		//	logger.Error("core start error:", err)
+		//	exception.Listener("core start", err)
+		//}
 	}()
 
 	startOnce.Do(func() {

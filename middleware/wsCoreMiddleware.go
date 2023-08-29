@@ -45,7 +45,10 @@ func init() {
 
 func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2.RequestHandler) (_ any) {
 	defer func() {
-		exception.Listener("ws process", recover())
+		if err := recover(); err != nil {
+			logger.Error("ws process error:", err)
+			exception.Listener("ws process", err)
+		}
 	}()
 	ws, ok := ctx.Raw().UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
 	if !ok {
@@ -69,7 +72,10 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 		do := sync.Once{}
 		closeHandler := func(code int, text string) error {
 			defer func() {
-				exception.Listener("ws on close handler", recover())
+				if err := recover(); err != nil {
+					logger.Warn("ws on close handler error:", err)
+					exception.Listener("ws on close handler", err)
+				}
 			}()
 
 			do.Do(func() {
@@ -84,7 +90,10 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 		}
 
 		defer func() {
-			exception.Listener("ws handler", recover())
+			if err := recover(); err != nil {
+				logger.Error("ws handler error:", err)
+				exception.Listener("ws handler", err)
+			}
 			closeHandler(0, "")
 		}()
 
@@ -155,6 +164,7 @@ func callOnMessage(on event.OnMessage, ser *websocket2.WsServer, p []byte) (err 
 	defer func() {
 		if err = recover(); err != nil {
 			ser.Push(response.Error(500, fmt.Sprintln("ws onMessage exception:", err)))
+			logger.Error("ws onMessage exception:", err)
 			exception.Listener("ws onMessage exception", err)
 		}
 	}()

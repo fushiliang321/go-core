@@ -5,6 +5,7 @@ import (
 	config "github.com/fushiliang321/go-core/config/middlewares"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/fushiliang321/go-core/helper/response"
 	"github.com/fushiliang321/go-core/middleware"
 	types2 "github.com/fushiliang321/go-core/router/types"
@@ -29,6 +30,7 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 		defer func() {
 			if err := recover(); err != nil {
 				response.ErrorResponse(ctx, 500, fmt.Sprintln("server exception:", err), nil)
+				logger.Error("server exception:", err)
 				exception.Listener("server exception", err)
 			}
 		}()

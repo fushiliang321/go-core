@@ -23,7 +23,10 @@ func New(server string) *Client {
 
 func (c *Client) Call(method string, params any, res any) error {
 	defer func() {
-		exception.Listener("rpc call", recover())
+		if err := recover(); err != nil {
+			logger.Error("rpc call error：", recover())
+			exception.Listener("rpc call", recover())
+		}
 	}()
 	rpcClient, err := newRpcClient(c.serverName)
 	if err == nil {
@@ -38,6 +41,7 @@ func (c *Client) Call(method string, params any, res any) error {
 func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
 	node, err := consul.GetNode(name+"Service", consul.HttpProtocol)
 	if err != nil {
+		logger.Warn("rpc newClient Error: ["+name+"]", err.Error())
 		exception.Listener("rpc newClient Error: ["+name+"]", err)
 		return nil, err
 	}
