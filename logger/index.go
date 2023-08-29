@@ -3,13 +3,21 @@ package logger
 import (
 	logger2 "github.com/fushiliang321/go-core/config/logger"
 	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/logger/agency"
 	"golang.org/x/exp/slog"
 	"os"
 	"strings"
+	"sync"
+)
+
+type (
+	Service struct{}
+
+	Logger slog.Logger
 )
 
 var (
-	logger     *slog.Logger
+	slogger    *Logger
 	config     *logger2.Logger
 	lumberjack *logger2.Lumberjack
 )
@@ -50,17 +58,17 @@ func init() {
 		} else {
 			handler = slog.NewTextHandler(writer, &slog.HandlerOptions{Level: config.Level})
 		}
-
 	} else {
 		handler = *config.Handler
 	}
-	logger = slog.New(handler)
+	slogger = (*Logger)(slog.New(handler))
 }
 
-func Info(msgs ...any) {
-	if logger == nil {
-		return
-	}
+func (s *Service) Start(wg *sync.WaitGroup) {
+	agency.Set(slogger)
+}
+
+func (l *Logger) Info(msgs ...any) {
 	var build strings.Builder
 	for _, msg := range msgs {
 		bytes, _ := helper.AnyToBytes(msg)
@@ -69,13 +77,10 @@ func Info(msgs ...any) {
 	if build.Len() == 0 {
 		return
 	}
-	logger.Info(build.String())
+	(*slog.Logger)(l).Info(build.String())
 }
 
-func Debug(msgs ...any) {
-	if logger == nil {
-		return
-	}
+func (l *Logger) Debug(msgs ...any) {
 	var build strings.Builder
 	for _, msg := range msgs {
 		bytes, _ := helper.AnyToBytes(msg)
@@ -84,29 +89,10 @@ func Debug(msgs ...any) {
 	if build.Len() == 0 {
 		return
 	}
-	logger.Debug(build.String())
+	(*slog.Logger)(l).Debug(build.String())
 }
 
-func Warn(msgs ...any) {
-	if logger == nil {
-		return
-	}
-
-	var build strings.Builder
-	for _, msg := range msgs {
-		bytes, _ := helper.AnyToBytes(msg)
-		build.Write(bytes)
-	}
-	if build.Len() == 0 {
-		return
-	}
-	logger.Warn(build.String())
-}
-
-func Error(msgs ...any) {
-	if logger == nil {
-		return
-	}
+func (l *Logger) Warn(msgs ...any) {
 
 	var build strings.Builder
 	for _, msg := range msgs {
@@ -116,5 +102,18 @@ func Error(msgs ...any) {
 	if build.Len() == 0 {
 		return
 	}
-	logger.Error(build.String())
+	(*slog.Logger)(l).Warn(build.String())
+}
+
+func (l *Logger) Error(msgs ...any) {
+
+	var build strings.Builder
+	for _, msg := range msgs {
+		bytes, _ := helper.AnyToBytes(msg)
+		build.Write(bytes)
+	}
+	if build.Len() == 0 {
+		return
+	}
+	(*slog.Logger)(l).Error(build.String())
 }
