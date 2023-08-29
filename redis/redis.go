@@ -2,9 +2,9 @@ package redis
 
 import (
 	"context"
-	"fmt"
 	redisConfig "github.com/fushiliang321/go-core/config/redis"
 	"github.com/fushiliang321/go-core/event/handles/core"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/redis/go-redis/v9"
 	"strconv"
 	"sync"
@@ -28,7 +28,7 @@ func NewClient() *redis.Client {
 		_, err = c.Ping(_ctx).Result()
 	)
 	if err != nil {
-		fmt.Println("connection redis error：", err.Error())
+		logger.Warn("connection redis error：" + err.Error())
 		return nil
 	}
 	return c

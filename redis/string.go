@@ -3,7 +3,7 @@ package redis
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/savsgio/gotils/strconv"
 	"reflect"
 	"time"
@@ -34,14 +34,14 @@ func Set(key string, val any, expiration ...int64) error {
 	default:
 		valBytes, err := json.Marshal(val)
 		if err != nil {
-			fmt.Println("redis set serialization error:", err.Error())
+			logger.Warn("redis set serialization error:", err)
 			return err
 		}
 		valStr = strconv.B2S(valBytes)
 	}
 	err := client().Set(_ctx, key, valStr, exp).Err()
 	if err != nil {
-		fmt.Println("redis set error:", err.Error())
+		logger.Warn("redis set error:", err.Error())
 		return err
 	}
 	return nil
@@ -51,7 +51,7 @@ func Set(key string, val any, expiration ...int64) error {
 func GetString(key string) (string, error) {
 	val, err := client().Get(_ctx, key).Result()
 	if err != nil {
-		fmt.Println("redis get error:", err.Error())
+		logger.Warn("redis get error:", err.Error())
 		return "", err
 	}
 	return val, nil
@@ -61,7 +61,7 @@ func GetString(key string) (string, error) {
 func Get[t any](key string) (*t, error) {
 	var res t
 	if reflect.TypeOf(res).Kind() == reflect.Ptr {
-		fmt.Println("redis get error：", "the type cannot be a pointer")
+		logger.Warn("redis get error：", "the type cannot be a pointer")
 		return nil, errors.New("the type cannot be a pointer")
 	}
 	v, err := GetString(key)
@@ -79,7 +79,7 @@ func Get[t any](key string) (*t, error) {
 	}
 	err = json.Unmarshal(strconv.S2B(v), &res)
 	if err != nil {
-		fmt.Println("redis get deserialization error：", err.Error())
+		logger.Warn("redis get deserialization error：", err.Error())
 		return nil, err
 	}
 	return &res, nil

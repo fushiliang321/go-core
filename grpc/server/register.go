@@ -8,6 +8,7 @@ import (
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/hashicorp/consul/api"
 	grpc1 "google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -60,7 +61,7 @@ func listen(host string, port int) *serverListen {
 func (s *serverListen) Serve() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("grpc Serve error:", err)
+			logger.Error("grpc Serve error:", err)
 			exception.Listener("grpc Serve error:", err)
 		}
 	}()
@@ -92,7 +93,7 @@ func (s *serverListen) Serve() {
 func (s *serverListen) RegisterServer(srv any, fun any) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("grpc RegisterServer error:", err)
+			logger.Error("grpc RegisterServer error:", err)
 			exception.Listener("grpc RegisterServer error:", err)
 		}
 	}()
@@ -103,11 +104,11 @@ func (s *serverListen) RegisterServer(srv any, fun any) {
 		reflectValue = reflect.ValueOf(fun)
 	}
 	if reflectValue.Kind() != reflect.Func {
-		fmt.Println("Not a GRPC registration function")
+		logger.Warn("Not a GRPC registration function")
 		return
 	}
 	if reflect.TypeOf(srv).Kind() != reflect.Ptr {
-		fmt.Println("GRPC registration parameter error")
+		logger.Warn("GRPC registration parameter error")
 		return
 	}
 	reflectValue.Call([]reflect.Value{

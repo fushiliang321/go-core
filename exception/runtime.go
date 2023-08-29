@@ -5,7 +5,7 @@ import (
 	"github.com/fushiliang321/go-core/config/exceptions"
 	"github.com/fushiliang321/go-core/exception/helper"
 	"github.com/fushiliang321/go-core/exception/types"
-	"log"
+	"github.com/fushiliang321/go-core/logger"
 )
 
 func Listener(mark string, err any) {
@@ -14,7 +14,7 @@ func Listener(mark string, err any) {
 	}
 	go func() {
 		if e := recover(); e != nil {
-			log.Println("exception listener error", e)
+			logger.Error("exception listener error", e)
 		}
 	}()
 	handle(&types.Runtime{

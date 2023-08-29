@@ -4,8 +4,8 @@ import (
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/types"
 	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 	"sync"
 	"time"
 )
@@ -56,7 +56,7 @@ func (consumer *Consumer) monitor() {
 	var err error
 	consumer.channel, err = _amqp.Consumer.Channel()
 	if err != nil {
-		log.Println(consumer.Exchange, "consumer channel error", err)
+		logger.Warn(consumer.Exchange, "consumer channel error", err)
 		// 监听失败 要重试
 		go consumer.retryMonitor()
 		return
@@ -72,7 +72,7 @@ func (consumer *Consumer) monitor() {
 		}
 	}()
 	if err != nil {
-		log.Println(consumer.Exchange, "consumer channel error", err)
+		logger.Warn(consumer.Exchange, "consumer channel error", err)
 		return
 	}
 	err = channelInit(consumer.channel, consumer.Exchange, consumer.RoutingKey, consumer.Queue, consumer.Type, consumer.Durable, consumer.AutoDeletedExchange, consumer.AutoDeletedQueue)
@@ -81,7 +81,7 @@ func (consumer *Consumer) monitor() {
 	}
 	msgs, err := consumer.channel.Consume(consumer.Queue, "", false, false, false, true, amqp.Table{})
 	if err != nil {
-		log.Println(consumer.Exchange, "consumer consume error", err)
+		logger.Warn(consumer.Exchange, "consumer consume error", err)
 		return
 	}
 	closeChannel = false
@@ -101,7 +101,7 @@ func (consumer *Consumer) monitor() {
 		for d := range msgs {
 			fun(&d)
 		}
-		log.Println(consumer.Exchange, "channel close")
+		logger.Info(consumer.Exchange, "channel close")
 		// 断开后 要重新监听
 		go consumer.retryMonitor()
 	}()
@@ -133,7 +133,7 @@ func channelInit(channel *amqp.Channel, Exchange string, RoutingKey string, Queu
 	}
 	err = channel.ExchangeDeclare(Exchange, kind, durable, AutoDeletedExchange, false, false, nil)
 	if err != nil {
-		log.Println("consumer exchange error", err)
+		logger.Warn("consumer exchange error", err)
 		return
 	}
 	if Queue == "" {
@@ -148,12 +148,12 @@ func channelInit(channel *amqp.Channel, Exchange string, RoutingKey string, Queu
 		nil,
 	)
 	if err != nil {
-		log.Println("consumer queue error", err)
+		logger.Warn("consumer queue error", err)
 		return
 	}
 	err = channel.QueueBind(q.Name, RoutingKey, Exchange, false, nil)
 	if err != nil {
-		log.Println("consumer queue error", err)
+		logger.Warn("consumer queue error", err)
 		return
 	}
 	return

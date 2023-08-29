@@ -2,8 +2,8 @@ package connection
 
 import (
 	config "github.com/fushiliang321/go-core/config/amqp"
+	"github.com/fushiliang321/go-core/logger"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"log"
 	"sync"
 )
 
@@ -30,12 +30,12 @@ func amqpInit() *AmqpConnection {
 	url := "amqp://" + configData.User + ":" + configData.Password + "@" + configData.Host + ":" + configData.Port
 	consumer, err := amqp.Dial(url)
 	if err != nil {
-		log.Println("amqp err", err)
+		logger.Warn("amqp err", err)
 		return nil
 	}
 	producer, err := amqp.Dial(url)
 	if err != nil {
-		log.Println("amqp err", err)
+		logger.Warn("amqp err", err)
 		return nil
 	}
 	connection.Consumer = consumer

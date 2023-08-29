@@ -7,8 +7,8 @@ import (
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/logger"
 	amqp3 "github.com/rabbitmq/amqp091-go"
-	"log"
 	"sync"
 )
 
@@ -38,7 +38,7 @@ func Publish(producer *types.Producer) {
 	var err error
 	channel, err := Amqp.Producer.Channel()
 	if err != nil {
-		log.Println("producer channel error", err)
+		logger.Warn("producer channel error", err)
 		return
 	}
 	defer channel.Close()
@@ -58,6 +58,6 @@ func Publish(producer *types.Producer) {
 		Priority:     producer.Priority,
 	})
 	if err != nil {
-		log.Println("publish producer error", err)
+		logger.Warn("publish producer error", err)
 	}
 }

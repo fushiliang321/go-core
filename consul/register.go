@@ -1,11 +1,10 @@
 package consul
 
 import (
-	"fmt"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/hashicorp/consul/api"
-	"log"
 	"strconv"
 	"strings"
 )
@@ -19,7 +18,7 @@ func newConsulClient() (*api.Client, error) {
 	}
 	client, err = api.NewClient(GetConfig())
 	if err != nil {
-		fmt.Println("api new client is failed, err:", err)
+		logger.Warn("api new client is failed, error:" + err.Error())
 		client = nil
 	}
 	return client, err
@@ -54,7 +53,7 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 	}
 	_client, err := newConsulClient()
 	if err != nil {
-		log.Println("consul client error : ", err)
+		logger.Warn("consul client error:" + err.Error())
 		return
 	}
 	if check != nil {
@@ -71,7 +70,7 @@ func RegisterServer(name string, protocol string, address string, port int, chec
 	}
 	err = _client.Agent().ServiceRegister(registration)
 	if err != nil {
-		log.Println("register server error : ", err)
+		logger.Warn("register server error:" + err.Error())
 		return
 	}
 	event.Dispatch(event.NewRegistered(event.ConsulServiceRegister, *registration))

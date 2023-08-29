@@ -1,8 +1,8 @@
 package consul
 
 import (
-	"fmt"
 	"github.com/fushiliang321/go-core/event"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/hashicorp/consul/api"
 	"strconv"
 	"time"
@@ -23,7 +23,7 @@ const (
 func (s *serviceMonitor) syncService() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("error getService", err)
+			logger.Error("error getService", err)
 		}
 		if s.status == monitorOff {
 			return
@@ -42,7 +42,7 @@ func (s *serviceMonitor) syncService() {
 		WaitIndex: s.lastIndex, // 同步点，这个调用将一直阻塞，直到有新的更新
 	})
 	if err != nil {
-		fmt.Println("error retrieving instances from Consul: ", err)
+		logger.Warn("error retrieving instances from Consul: ", err)
 		return
 	}
 	if s.status == monitorOff {

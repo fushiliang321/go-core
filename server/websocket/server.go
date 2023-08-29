@@ -6,8 +6,8 @@ import (
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/fushiliang321/go-core/router/types"
-	"log"
 	"time"
 )
 
@@ -73,7 +73,8 @@ func (s *WsServer) init() {
 			func() {
 				defer func() {
 					if rec := recover(); rec != nil {
-						log.Println("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, writeData.data, writeData.deadline, s.Conn.NetConn())
+						logger.Error("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, writeData.data, writeData.deadline, s.Conn.NetConn())
+
 						s.Conn.Close()
 						exception.Listener("["+fmt.Sprint(s.Fd)+"]ws write message exception", rec)
 					}
@@ -81,14 +82,14 @@ func (s *WsServer) init() {
 				switch writeData.messageType {
 				case s.MessageType: //发送消息帧
 					if err = s.Conn.WriteMessage(s.MessageType, writeData.data); err != nil {
-						log.Println("ws write message err:", err)
+						logger.Warn("ws write message err:", err)
 					}
 				case websocket.CloseMessage: //发送关闭帧
 					s.Conn.WriteControl(writeData.messageType, writeData.data, writeData.deadline)
 					s.Conn.Close()
 				default: //发送其他控制帧
 					if err = s.Conn.WriteControl(writeData.messageType, writeData.data, writeData.deadline); err != nil {
-						log.Println("ws write control err:", err)
+						logger.Warn("ws write control err:", err)
 					}
 				}
 			}()
@@ -102,7 +103,7 @@ func (s *WsServer) Push(data any) {
 	}
 	bytes, err := helper.AnyToBytes(data)
 	if err != nil {
-		log.Println("ws push data err:", err)
+		logger.Warn("ws push data err:", err)
 		return
 	}
 	s.ConnWriteChan <- &ConnWriteChanParams{

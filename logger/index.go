@@ -5,6 +5,7 @@ import (
 	"github.com/fushiliang321/go-core/helper"
 	"golang.org/x/exp/slog"
 	"os"
+	"strings"
 )
 
 var (
@@ -56,47 +57,64 @@ func init() {
 	logger = slog.New(handler)
 }
 
-func Info(msg any, args ...any) {
+func Info(msgs ...any) {
 	if logger == nil {
 		return
 	}
-	str, err := helper.AnyToString(msg)
-	if err != nil {
+	var build strings.Builder
+	for _, msg := range msgs {
+		bytes, _ := helper.AnyToBytes(msg)
+		build.Write(bytes)
+	}
+	if build.Len() == 0 {
 		return
 	}
-	logger.Info(str, args...)
+	logger.Info(build.String())
 }
 
-func Debug(msg any, args ...any) {
+func Debug(msgs ...any) {
 	if logger == nil {
 		return
 	}
-
-	str, err := helper.AnyToString(msg)
-	if err != nil {
+	var build strings.Builder
+	for _, msg := range msgs {
+		bytes, _ := helper.AnyToBytes(msg)
+		build.Write(bytes)
+	}
+	if build.Len() == 0 {
 		return
 	}
-	logger.Debug(str, args...)
+	logger.Debug(build.String())
 }
 
-func Warn(msg any, args ...any) {
+func Warn(msgs ...any) {
 	if logger == nil {
 		return
 	}
-	str, err := helper.AnyToString(msg)
-	if err != nil {
+
+	var build strings.Builder
+	for _, msg := range msgs {
+		bytes, _ := helper.AnyToBytes(msg)
+		build.Write(bytes)
+	}
+	if build.Len() == 0 {
 		return
 	}
-	logger.Warn(str, args...)
+	logger.Warn(build.String())
 }
 
-func Error(msg any, args ...any) {
+func Error(msgs ...any) {
 	if logger == nil {
 		return
 	}
-	str, err := helper.AnyToString(msg)
-	if err != nil {
+
+	var build strings.Builder
+	for _, msg := range msgs {
+		bytes, _ := helper.AnyToBytes(msg)
+		build.Write(bytes)
+	}
+	if build.Len() == 0 {
 		return
 	}
-	logger.Error(str, args...)
+	logger.Error(build.String())
 }

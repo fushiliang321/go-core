@@ -27,7 +27,7 @@ func RunPackageName() string {
 	countSplit := strings.Split(fn, "/")
 	splitLen := len(countSplit)
 	if splitLen > 0 {
-		countSplit := strings.Split(countSplit[splitLen-1], ".")
+		countSplit = strings.Split(countSplit[splitLen-1], ".")
 		if len(countSplit) > 0 {
 			return countSplit[0]
 		}

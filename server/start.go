@@ -1,10 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"github.com/fushiliang321/go-core/config/routers"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/event"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/fushiliang321/go-core/server/types"
 	"github.com/fushiliang321/go-core/server/websocket"
 	"github.com/valyala/fasthttp"
@@ -80,7 +80,7 @@ func listenAndServe(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer, wsSe
 	wg.Add(1)
 	go func(addr string) {
 		if err := serve.ListenAndServe(addr); err != nil {
-			fmt.Println("start fasthttp fail", err.Error())
+			logger.Warn("start fasthttp fail", err.Error())
 		}
 		wg.Done()
 	}(addr)

@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/fushiliang321/jsonrpc/common"
 	"io"
 	"net/http"
@@ -41,13 +42,13 @@ func (p *Http) Start() {
 	)
 	mux.HandleFunc("/", p.handleFunc)
 	if err := http.ListenAndServe(url, mux); err != nil {
-		fmt.Println("json rpc http server start error", err)
+		logger.Warn("json rpc http server start error", err)
 	}
 }
 
 func (p *Http) Register(s interface{}) {
 	if err := p.Server.Register(s); err != nil {
-		fmt.Println("json rpc http server register error", err)
+		logger.Warn("json rpc http server register error", err)
 	}
 }
 
@@ -71,25 +72,25 @@ func (p *Http) handleFunc(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var (
-		res         = p.Server.Handler(data)
-		internalErr *common.InternalErr
+		res           = p.Server.Handler(data)
+		internalError *common.InternalErr
 	)
 
 	switch res.(type) {
 	case common.ErrorResponse:
 		_res := res.(common.ErrorResponse)
 		if _internalErr, ok := _res.Error.Data.(common.InternalErr); ok && _internalErr.Data != nil {
-			internalErr = &_internalErr
+			internalError = &_internalErr
 		}
 	case common.ErrorNotifyResponse:
 		_res := res.(common.ErrorNotifyResponse)
 		if _internalErr, ok := _res.Error.Data.(common.InternalErr); ok && _internalErr.Data != nil {
-			internalErr = &_internalErr
+			internalError = &_internalErr
 		}
 	}
 
-	if internalErr != nil {
-		if errData, ok := internalErr.Data.(ErrorResponse); ok {
+	if internalError != nil {
+		if errData, ok := internalError.Data.(ErrorResponse); ok {
 			w.WriteHeader(errData.Code)
 		}
 	}

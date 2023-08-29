@@ -6,12 +6,12 @@ import (
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/logger"
 	types2 "github.com/fushiliang321/go-core/router/types"
 	"github.com/fushiliang321/go-core/server/types"
 	websocket2 "github.com/fushiliang321/go-core/server/websocket"
 	"github.com/fushiliang321/go-core/server/websocket/event"
 	"github.com/valyala/fasthttp"
-	"log"
 	"strconv"
 	"sync"
 	"time"
@@ -56,7 +56,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 	upgrader := upgraderDefault
 	onHandshake, ok := ws.Callbacks[event.ON_HAND_SHAKE].(event.OnHandshake)
 	if ok {
-		log.Println(ctx.Raw().ID(), "onHandshake")
+		logger.Debug(ctx.Raw().ID(), "onHandshake")
 		onHandshake(ser, &upgrader)
 	}
 	if ctx.Response.StatusCode() != 200 {
@@ -76,7 +76,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 				conn.Close()
 				ser.OnClose()
 				if onClose, ok := ws.Callbacks[event.ON_CLOSE].(event.OnClose); ok {
-					log.Println(ctx.Raw().ID(), "onClose")
+					logger.Debug(ctx.Raw().ID(), "onClose")
 					onClose(ser, code, text)
 				}
 			})
@@ -97,7 +97,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 		}
 
 		if onOpen, ok := ws.Callbacks[event.ON_OPEN].(event.OnOpen); ok {
-			log.Println(ctx.Raw().ID(), "onOpen")
+			logger.Debug(ctx.Raw().ID(), "onOpen")
 			onOpen(ser)
 		}
 

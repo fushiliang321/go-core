@@ -3,16 +3,15 @@ package client
 import (
 	goContext "context"
 	"errors"
-	"fmt"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
-	"log"
 	"sync"
 )
 
@@ -112,7 +111,7 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 	}
 	err = con.Invoke(ctx, method, args, reply, opts...)
 	if err != nil {
-		fmt.Println("grpc client Invoke error：", err)
+		logger.Warn("grpc client Invoke error：", err)
 	}
 	return err
 }
@@ -151,7 +150,7 @@ func (cc *ClientConn) Close() error {
 		cc.serviceNode = nil
 		cc.cc = nil
 		if err := recover(); err != nil {
-			log.Println("conn close error:", err)
+			logger.Error("conn close error:", err)
 		}
 	}()
 	if cc.cc == nil {

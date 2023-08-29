@@ -1,8 +1,8 @@
 package consul
 
 import (
-	"fmt"
 	"github.com/fushiliang321/go-core/event"
+	"github.com/fushiliang321/go-core/logger"
 	"github.com/hashicorp/consul/api"
 	"sync"
 )
@@ -18,7 +18,7 @@ var (
 func newClient() (client *api.Client, err error) {
 	client, err = api.NewClient(apiConfig)
 	if err != nil {
-		fmt.Println("api new client is failed, err:", err)
+		logger.Warn("api new client is failed, err:", err)
 	}
 	return
 }
