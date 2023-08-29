@@ -1,6 +1,7 @@
 package amqp
 
 import (
+	"context"
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/consumer"
 	"github.com/fushiliang321/go-core/amqp/types"
@@ -50,7 +51,8 @@ func Publish(producer *types.Producer) {
 	if !producer.Persistence {
 		deliveryMode = amqp3.Transient
 	}
-	err = channel.Publish(producer.Exchange, producer.RoutingKey, false, false, amqp3.Publishing{
+
+	_, err = channel.PublishWithDeferredConfirmWithContext(context.Background(), producer.Exchange, producer.RoutingKey, false, false, amqp3.Publishing{
 		ContentType:  "text/plain",
 		DeliveryMode: deliveryMode,
 		Body:         body,
