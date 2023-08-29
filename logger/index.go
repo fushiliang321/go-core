@@ -69,11 +69,7 @@ func (s *Service) Start(wg *sync.WaitGroup) {
 }
 
 func (l *Logger) Info(msgs ...any) {
-	var build strings.Builder
-	for _, msg := range msgs {
-		bytes, _ := helper.AnyToBytes(msg)
-		build.Write(bytes)
-	}
+	var build = msgBuild(msgs)
 	if build.Len() == 0 {
 		return
 	}
@@ -81,11 +77,7 @@ func (l *Logger) Info(msgs ...any) {
 }
 
 func (l *Logger) Debug(msgs ...any) {
-	var build strings.Builder
-	for _, msg := range msgs {
-		bytes, _ := helper.AnyToBytes(msg)
-		build.Write(bytes)
-	}
+	var build = msgBuild(msgs)
 	if build.Len() == 0 {
 		return
 	}
@@ -93,12 +85,7 @@ func (l *Logger) Debug(msgs ...any) {
 }
 
 func (l *Logger) Warn(msgs ...any) {
-
-	var build strings.Builder
-	for _, msg := range msgs {
-		bytes, _ := helper.AnyToBytes(msg)
-		build.Write(bytes)
-	}
+	var build = msgBuild(msgs)
 	if build.Len() == 0 {
 		return
 	}
@@ -106,14 +93,21 @@ func (l *Logger) Warn(msgs ...any) {
 }
 
 func (l *Logger) Error(msgs ...any) {
-
-	var build strings.Builder
-	for _, msg := range msgs {
-		bytes, _ := helper.AnyToBytes(msg)
-		build.Write(bytes)
-	}
+	var build = msgBuild(msgs)
 	if build.Len() == 0 {
 		return
 	}
 	(*slog.Logger)(l).Error(build.String())
+}
+
+func msgBuild(msgs []any) *strings.Builder {
+	var build = strings.Builder{}
+	for i, msg := range msgs {
+		if i > 0 {
+			build.WriteByte(32)
+		}
+		bytes, _ := helper.AnyToBytes(msg)
+		build.Write(bytes)
+	}
+	return &build
 }
