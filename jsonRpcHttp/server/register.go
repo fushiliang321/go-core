@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/event"
-	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/helper/serialize"
 	"github.com/hashicorp/consul/api"
 )
 
@@ -32,7 +32,7 @@ func RegisterServer(name string, s any) {
 			address:  ip,
 			port:     port,
 		}
-		bodyStr, _ = helper.JsonEncode(checkBody{
+		bodyStr, _ = serialize.JsonEncode(checkBody{
 			Jsonrpc: "2.0",
 			Method:  "Health.Check",
 			Params:  _registerInfo,

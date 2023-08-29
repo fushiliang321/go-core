@@ -4,8 +4,8 @@ import (
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
-	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/helper/logger"
+	string2 "github.com/fushiliang321/go-core/helper/string"
 	"github.com/fushiliang321/jsonrpc"
 )
 
@@ -17,7 +17,7 @@ type Client struct {
 func New(server string) *Client {
 	return &Client{
 		serverName:      server,
-		serverNameSnake: helper.SnakeString(server),
+		serverNameSnake: string2.SnakeString(server),
 	}
 }
 

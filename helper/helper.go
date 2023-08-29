@@ -7,8 +7,6 @@ import (
 	"reflect"
 )
 
-var cacheData = map[string]any{}
-
 // map转struc
 func MapToStruc[_type interface {
 	int | string

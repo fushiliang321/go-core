@@ -1,4 +1,4 @@
-package helper
+package string
 
 import (
 	"github.com/savsgio/gotils/strconv"

@@ -7,8 +7,9 @@ import (
 	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
-	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/helper/logger"
+	"github.com/fushiliang321/go-core/helper/serialize"
+	"github.com/fushiliang321/go-core/helper/system"
 	"github.com/hashicorp/consul/api"
 	grpc1 "google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -42,7 +43,7 @@ func listen(host string, port int) *serverListen {
 			contextDataStr := md.Get("contextData")
 			if contextDataStr != nil && len(contextDataStr) > 0 && len(contextDataStr[0]) > 0 {
 				var contextData map[string]any
-				if helper.JsonDecode(contextDataStr[0], &contextData) == nil {
+				if serialize.JsonDecode(contextDataStr[0], &contextData) == nil {
 					context.SetBatch(contextData)
 				}
 			}
@@ -67,7 +68,7 @@ func (s *serverListen) Serve() {
 	}()
 	serviceInfos := s.server.GetServiceInfo()
 	consulConfig := consul.GetConfig()
-	ip := helper.GetLocalIP(consulConfig.Address)
+	ip := system.GetLocalIP(consulConfig.Address)
 	var serviceNames []string
 	for serviceName := range serviceInfos {
 		b, err := consul.RegisterServer(serviceName, "grpc", ip, s.port, &api.AgentServiceCheck{

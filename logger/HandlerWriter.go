@@ -3,7 +3,7 @@ package logger
 import (
 	"fmt"
 	logger2 "github.com/fushiliang321/go-core/config/logger"
-	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/helper/file"
 	"golang.org/x/exp/slog"
 	"io"
 	"os"
@@ -179,15 +179,15 @@ func (f *logFile) lumberjackHandle() {
 				break
 			}
 		}
-		file, err := os.Create(fileFullPath)
+		_file, err := os.Create(fileFullPath)
 		if err != nil {
 			return
 		}
-		file.Write(oldB)
-		file.Close()
+		_file.Write(oldB)
+		_file.Close()
 
 		if f.lumberjack.MaxBackups > 0 || f.lumberjack.MaxAge > 0 {
-			sortFile, err := helper.SortFile(f.dirPath)
+			sortFile, err := file.SortFile(f.dirPath)
 			if err != nil {
 				return
 			}

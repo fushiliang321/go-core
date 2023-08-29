@@ -6,8 +6,8 @@ import (
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
-	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/helper/logger"
+	"github.com/fushiliang321/go-core/helper/serialize"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
@@ -105,7 +105,7 @@ func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply i
 	contextData := context.GetAll()
 	if contextData != nil && len(contextData) > 0 {
 		var str string
-		if str, err = helper.JsonEncode(contextData); err == nil {
+		if str, err = serialize.JsonEncode(contextData); err == nil {
 			ctx = metadata.AppendToOutgoingContext(ctx, "contextData", str)
 		}
 	}

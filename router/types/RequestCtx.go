@@ -9,6 +9,7 @@ import (
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/event/handles/core"
 	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/helper/serialize"
 	"github.com/savsgio/gotils/strconv"
 	"github.com/valyala/fasthttp"
 	"io"
@@ -404,7 +405,7 @@ func typeAssign(value any, typeValue reflect.Value) (err error) {
 	case reflect.String:
 		_v, ok := value.(string)
 		if !ok {
-			_v, err = helper.JsonEncode(value)
+			_v, err = serialize.JsonEncode(value)
 			if err != nil {
 				return err
 			}

@@ -1,6 +1,7 @@
-package helper
+package system
 
 import (
+	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/helper/logger"
 	"net"
 	"os"
@@ -67,7 +68,7 @@ func GetLocalIP(address ...string) string {
 	for _, addr := range address {
 		ip := net.ParseIP(addr)
 		if ip != nil {
-			switch IpType(ip.String()) {
+			switch helper.IpType(ip.String()) {
 			case 4:
 				addr = addr + ":80"
 			case 6:

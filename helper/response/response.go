@@ -1,6 +1,7 @@
-package helper
+package response
 
 import (
+	"github.com/fushiliang321/go-core/helper/system"
 	"github.com/fushiliang321/go-core/helper/types"
 	"github.com/valyala/fasthttp"
 )
@@ -18,7 +19,7 @@ func Success(msg string, datas ...any) (res *types.Result) {
 		Msg:     msg,
 		Data:    data,
 		ErrCode: 0,
-		Service: appName,
+		Service: system.AppName(),
 	}
 }
 
@@ -35,7 +36,7 @@ func Error(errCode int, msg string, datas ...any) (res *types.Result) {
 		Msg:     msg,
 		Data:    data,
 		ErrCode: errCode,
-		Service: appName,
+		Service: system.AppName(),
 	}
 }
 

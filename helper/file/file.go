@@ -1,4 +1,4 @@
-package helper
+package file
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 	"os"
 	"sort"
 )
+
+var cacheData = map[string]any{}
 
 // 获取文件内的所有变量名
 func GetFileVariateNameAll(FilePath string) (names []string) {

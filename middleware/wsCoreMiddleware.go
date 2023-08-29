@@ -5,8 +5,8 @@ import (
 	"github.com/fasthttp/websocket"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/exception"
-	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/helper/logger"
+	"github.com/fushiliang321/go-core/helper/response"
 	types2 "github.com/fushiliang321/go-core/router/types"
 	"github.com/fushiliang321/go-core/server/types"
 	websocket2 "github.com/fushiliang321/go-core/server/websocket"
@@ -50,7 +50,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 	ws, ok := ctx.Raw().UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
 	if !ok {
 		ctx.Response.SetStatusCode(500)
-		return helper.Error(500, fmt.Sprintln("upgrader exception:"), nil)
+		return response.Error(500, fmt.Sprintln("upgrader exception:"), nil)
 	}
 	ser := websocket2.SetServer(ctx)
 	upgrader := upgraderDefault
@@ -145,7 +145,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 	if err != nil {
 		websocket2.RemoveServer(ser)
 		ctx.Response.SetStatusCode(500)
-		return helper.Error(500, fmt.Sprintln("upgrader exception:", err), nil)
+		return response.Error(500, fmt.Sprintln("upgrader exception:", err), nil)
 	}
 	return
 }
@@ -154,7 +154,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 func callOnMessage(on event.OnMessage, ser *websocket2.WsServer, p []byte) (err any) {
 	defer func() {
 		if err = recover(); err != nil {
-			ser.Push(helper.Error(500, fmt.Sprintln("ws onMessage exception:", err)))
+			ser.Push(response.Error(500, fmt.Sprintln("ws onMessage exception:", err)))
 			exception.Listener("ws onMessage exception", err)
 		}
 	}()

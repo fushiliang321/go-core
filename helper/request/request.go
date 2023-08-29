@@ -1,6 +1,7 @@
-package helper
+package request
 
 import (
+	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/jsonRpcHttp/context"
 	"github.com/fushiliang321/go-core/rpc"
 	"github.com/savsgio/gotils/strconv"
@@ -45,7 +46,7 @@ func ClientIP(ctx *fasthttp.RequestCtx) (string, uint8) {
 		return "", 0
 	}
 	s := ip.String()
-	return s, IpType(s)
+	return s, helper.IpType(s)
 }
 
 // 判断是否为内网ip
@@ -105,7 +106,7 @@ func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
 		if !ok {
 			return
 		}
-		err := MapToStruc[string](mapData, &rpcRequestData)
+		err := helper.MapToStruc[string](mapData, &rpcRequestData)
 		if err != nil {
 			return
 		}

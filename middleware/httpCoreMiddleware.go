@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/fushiliang321/go-core/exception"
-	"github.com/fushiliang321/go-core/helper"
+	"github.com/fushiliang321/go-core/helper/response"
 	"github.com/fushiliang321/go-core/router/types"
 )
 
@@ -15,7 +15,7 @@ func (m *HttpCoreMiddleware) Process(ctx *types.RequestCtx, handler types.Reques
 	defer func() {
 		if err := recover(); err != nil {
 			ctx.Response.SetStatusCode(500)
-			res = helper.Error(500, fmt.Sprintln("server process exception:", err), nil)
+			res = response.Error(500, fmt.Sprintln("server process exception:", err), nil)
 			exception.Listener("server process exception", err)
 		}
 	}()
