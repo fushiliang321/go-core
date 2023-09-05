@@ -27,7 +27,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 				event.NewRegistered(event.AfterTaskExecute, sign)
 			},
 		}
-		event.Dispatch(event.NewRegistered(event.BeforeTaskServerStart, nil))
+		event.Dispatch(event.NewRegistered(event.BeforeTaskServerStart))
 		for i := range config.Crontabs {
 			crontab := config.Crontabs[i]
 			callback := crontab.Callback
@@ -37,7 +37,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 			}
 			event.Dispatch(event.NewRegistered(event.TaskRegister, crontab))
 		}
-		event.Dispatch(event.NewRegistered(event.AfterTaskServerStart, nil))
+		event.Dispatch(event.NewRegistered(event.AfterTaskServerStart))
 		cron.Run()
 	}(wg)
 }

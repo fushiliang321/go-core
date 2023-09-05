@@ -32,9 +32,9 @@ func (*Service) Start(_ *sync.WaitGroup) {
 	}
 	if len(consumerServiceNames) > 0 {
 		// 获取服务信息
-		event.Dispatch(event.NewRegistered(event.BeforeConsulConsumerServerStart, nil))
+		event.Dispatch(event.NewRegistered(event.BeforeConsulConsumerServerStart))
 		AddServices(consumerServiceNames)
-		event.Dispatch(event.NewRegistered(event.AfterConsulConsumerServerStart, nil))
+		event.Dispatch(event.NewRegistered(event.AfterConsulConsumerServerStart))
 	}
 }
 

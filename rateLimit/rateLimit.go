@@ -28,7 +28,7 @@ func (*Service) Start(_ *sync.WaitGroup) {
 	if configData == nil {
 		return
 	}
-	event.Dispatch(event.NewRegistered(event.BeforeRateLimitServerStart, nil))
+	event.Dispatch(event.NewRegistered(event.BeforeRateLimitServerStart))
 	go func() {
 		var (
 			t      int64
@@ -51,7 +51,7 @@ func (*Service) Start(_ *sync.WaitGroup) {
 			bucket = nil
 		}
 	}()
-	event.Dispatch(event.NewRegistered(event.AfterRateLimitServerStart, nil))
+	event.Dispatch(event.NewRegistered(event.AfterRateLimitServerStart))
 }
 
 func Process(key string, path string) bool {

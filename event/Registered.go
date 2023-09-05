@@ -5,7 +5,11 @@ type Registered struct {
 	data any
 }
 
-func NewRegistered(name EventName, data any) *Registered {
+func NewRegistered(name EventName, datas ...any) *Registered {
+	var data any
+	if len(datas) > 0 {
+		data = datas[0]
+	}
 	return &Registered{
 		name: name,
 		data: data,

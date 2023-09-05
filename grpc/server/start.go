@@ -15,7 +15,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 	if config.Services == nil || len(config.Services) == 0 {
 		return
 	}
-	event.Dispatch(event.NewRegistered(event.BeforeGrpcServerStart, nil))
+	event.Dispatch(event.NewRegistered(event.BeforeGrpcServerStart))
 	server := listen(config.Host, config.Port)
 	for _, service := range config.Services {
 		server.RegisterServer(service.Handle, service.RegisterFun)
@@ -26,5 +26,5 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		// 启动服务监听
 		server.Serve()
 	}(wg)
-	event.Dispatch(event.NewRegistered(event.AfterGrpcServerStart, nil))
+	event.Dispatch(event.NewRegistered(event.AfterGrpcServerStart))
 }

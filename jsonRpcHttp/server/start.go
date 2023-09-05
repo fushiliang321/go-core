@@ -47,5 +47,5 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		RegisterServer(reflect.Indirect(reflect.ValueOf(s)).Type().Name()+"Service", s)
 	}
 	server.Register(new(Health))
-	event.Dispatch(event.NewRegistered(event.AfterJsonRpcServerStart, nil))
+	event.Dispatch(event.NewRegistered(event.AfterJsonRpcServerStart))
 }

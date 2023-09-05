@@ -20,14 +20,14 @@ func Start() {
 	}()
 
 	startOnce.Do(func() {
-		event.Dispatch(event.NewRegistered(event.BeforeServerStart, nil))
+		event.Dispatch(event.NewRegistered(event.BeforeServerStart))
 		wg := &sync.WaitGroup{}
 		servers := initialize.Get()
 		for _, ser := range servers {
 			ser.Start(wg)
 		}
-		event.Dispatch(event.NewRegistered(event.AfterServerStart, nil))
+		event.Dispatch(event.NewRegistered(event.AfterServerStart))
 		wg.Wait()
-		event.Dispatch(event.NewRegistered(event.ServerEnd, nil))
+		event.Dispatch(event.NewRegistered(event.ServerEnd))
 	})
 }

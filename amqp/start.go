@@ -18,7 +18,6 @@ type Service struct{}
 func (*Service) Start(_ *sync.WaitGroup) {
 	config := amqp2.Get()
 	if len(config.Consumers) > 0 {
-		event.Dispatch(event.NewRegistered(event.BeforeAmqpConsumerServerStart, nil))
 		//有消费者
 		for _, _consumer := range config.Consumers {
 			con := consumer.Consumer{
@@ -27,7 +26,7 @@ func (*Service) Start(_ *sync.WaitGroup) {
 			con.Start()
 			event.Dispatch(event.NewRegistered(event.AmqpConsumerServerStart, _consumer))
 		}
-		event.Dispatch(event.NewRegistered(event.AfterAmqpConsumerServerStart, nil))
+		event.Dispatch(event.NewRegistered(event.AfterAmqpConsumerServerStart))
 	}
 }
 
