@@ -8,6 +8,7 @@ type DataError struct {
 func (err *DataError) Error() string {
 	return err.text
 }
+
 func (err *DataError) Data() any {
 	return err.data
 }

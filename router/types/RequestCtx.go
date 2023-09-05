@@ -422,9 +422,11 @@ func (ctx *RequestCtx) SetUserValueBytes(key []byte, value interface{}) {
 func (ctx *RequestCtx) UserValue(key interface{}) interface{} {
 	return (*fasthttp.RequestCtx)(ctx).UserValue(key)
 }
+
 func (ctx *RequestCtx) UserValueBytes(key []byte) interface{} {
 	return (*fasthttp.RequestCtx)(ctx).UserValueBytes(key)
 }
+
 func (ctx *RequestCtx) VisitUserValues(visitor func([]byte, interface{})) {
 	(*fasthttp.RequestCtx)(ctx).VisitUserValues(visitor)
 }
@@ -452,39 +454,51 @@ func (ctx *RequestCtx) TLSConnectionState() *tls.ConnectionState {
 func (ctx *RequestCtx) Conn() net.Conn {
 	return (*fasthttp.RequestCtx)(ctx).Conn()
 }
+
 func (ctx *RequestCtx) String() string {
 	return (*fasthttp.RequestCtx)(ctx).String()
 }
+
 func (ctx *RequestCtx) ID() uint64 {
 	return (*fasthttp.RequestCtx)(ctx).ID()
 }
+
 func (ctx *RequestCtx) ConnID() uint64 {
 	return (*fasthttp.RequestCtx)(ctx).ConnID()
 }
+
 func (ctx *RequestCtx) Time() time.Time {
 	return (*fasthttp.RequestCtx)(ctx).Time()
 }
+
 func (ctx *RequestCtx) ConnTime() time.Time {
 	return (*fasthttp.RequestCtx)(ctx).ConnTime()
 }
+
 func (ctx *RequestCtx) ConnRequestNum() uint64 {
 	return (*fasthttp.RequestCtx)(ctx).ConnRequestNum()
 }
+
 func (ctx *RequestCtx) SetConnectionClose() {
 	(*fasthttp.RequestCtx)(ctx).SetConnectionClose()
 }
+
 func (ctx *RequestCtx) SetStatusCode(statusCode int) {
 	(*fasthttp.RequestCtx)(ctx).SetStatusCode(statusCode)
 }
+
 func (ctx *RequestCtx) SetContentType(contentType string) {
 	(*fasthttp.RequestCtx)(ctx).SetContentType(contentType)
 }
+
 func (ctx *RequestCtx) SetContentTypeBytes(contentType []byte) {
 	(*fasthttp.RequestCtx)(ctx).SetContentTypeBytes(contentType)
 }
+
 func (ctx *RequestCtx) RequestURI() []byte {
 	return (*fasthttp.RequestCtx)(ctx).RequestURI()
 }
+
 func (ctx *RequestCtx) URI() *fasthttp.URI {
 	return (*fasthttp.RequestCtx)(ctx).URI()
 }
@@ -532,69 +546,91 @@ func (ctx *RequestCtx) IsGet() bool {
 func (ctx *RequestCtx) IsPost() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsPost()
 }
+
 func (ctx *RequestCtx) IsPut() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsPut()
 }
+
 func (ctx *RequestCtx) IsDelete() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsDelete()
 }
+
 func (ctx *RequestCtx) IsConnect() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsConnect()
 }
+
 func (ctx *RequestCtx) IsOptions() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsOptions()
 }
+
 func (ctx *RequestCtx) IsTrace() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsTrace()
 }
+
 func (ctx *RequestCtx) IsPatch() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsPatch()
 }
+
 func (ctx *RequestCtx) Method() []byte {
 	return (*fasthttp.RequestCtx)(ctx).Method()
 }
+
 func (ctx *RequestCtx) IsHead() bool {
 	return (*fasthttp.RequestCtx)(ctx).IsHead()
 }
+
 func (ctx *RequestCtx) RemoteAddr() net.Addr {
 	return (*fasthttp.RequestCtx)(ctx).RemoteAddr()
 }
+
 func (ctx *RequestCtx) SetRemoteAddr(remoteAddr net.Addr) {
 	(*fasthttp.RequestCtx)(ctx).SetRemoteAddr(remoteAddr)
 }
+
 func (ctx *RequestCtx) LocalAddr() net.Addr {
 	return (*fasthttp.RequestCtx)(ctx).LocalAddr()
 }
+
 func (ctx *RequestCtx) RemoteIP() net.IP {
 	return (*fasthttp.RequestCtx)(ctx).RemoteIP()
 }
+
 func (ctx *RequestCtx) LocalIP() net.IP {
 	return (*fasthttp.RequestCtx)(ctx).LocalIP()
 }
+
 func (ctx *RequestCtx) Error(msg string, statusCode int) {
 	(*fasthttp.RequestCtx)(ctx).Error(msg, statusCode)
 }
+
 func (ctx *RequestCtx) Success(contentType string, body []byte) {
 	(*fasthttp.RequestCtx)(ctx).Success(contentType, body)
 }
+
 func (ctx *RequestCtx) SuccessString(contentType, body string) {
 	(*fasthttp.RequestCtx)(ctx).SuccessString(contentType, body)
 }
+
 func (ctx *RequestCtx) Redirect(uri string, statusCode int) {
 	(*fasthttp.RequestCtx)(ctx).Redirect(uri, statusCode)
 }
+
 func (ctx *RequestCtx) RedirectBytes(uri []byte, statusCode int) {
 	(*fasthttp.RequestCtx)(ctx).RedirectBytes(uri, statusCode)
 }
+
 func (ctx *RequestCtx) SetBody(body []byte) {
 	(*fasthttp.RequestCtx)(ctx).SetBody(body)
 }
+
 func (ctx *RequestCtx) SetBodyString(body string) {
 	(*fasthttp.RequestCtx)(ctx).SetBodyString(body)
 }
+
 func (ctx *RequestCtx) ResetBody() {
 	(*fasthttp.RequestCtx)(ctx).ResetBody()
 }
+
 func (ctx *RequestCtx) SendFile(path string) {
 	(*fasthttp.RequestCtx)(ctx).SendFile(path)
 }
