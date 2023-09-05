@@ -3,7 +3,7 @@ package response
 import (
 	"github.com/fushiliang321/go-core/helper/system"
 	"github.com/fushiliang321/go-core/helper/types"
-	"github.com/valyala/fasthttp"
+	types2 "github.com/fushiliang321/go-core/router/types"
 )
 
 // 响应成功数据
@@ -41,7 +41,7 @@ func Error(errCode int, msg string, datas ...any) (res *types.Result) {
 }
 
 // 响应错误数据
-func ErrorResponse(ctx *fasthttp.RequestCtx, errCode int, msg string, datas ...any) {
+func ErrorResponse(ctx *types2.RequestCtx, errCode int, msg string, datas ...any) {
 	var data any
 	if len(datas) == 0 || datas[0] == nil {
 		data = map[string]string{}

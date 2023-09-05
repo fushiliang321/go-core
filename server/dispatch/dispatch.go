@@ -29,7 +29,7 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 	return func(ctx *fasthttp.RequestCtx) {
 		defer func() {
 			if err := recover(); err != nil {
-				response.ErrorResponse(ctx, 500, fmt.Sprintln("server exception:", err), nil)
+				response.ErrorResponse((*types2.RequestCtx)(ctx), 500, fmt.Sprintln("server exception:", err), nil)
 				logger.Error("server exception:", err)
 				exception.Listener("server exception", err)
 			}
