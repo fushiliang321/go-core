@@ -20,8 +20,6 @@ func Start() {
 	}()
 
 	startOnce.Do(func() {
-		var a = []string{}
-		fmt.Println(a[1])
 		event.Dispatch(event.NewRegistered(event.BeforeServerStart, nil))
 		wg := &sync.WaitGroup{}
 		servers := initialize.Get()
