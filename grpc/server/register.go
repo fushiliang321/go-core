@@ -62,7 +62,7 @@ func listen(host string, port int) *serverListen {
 func (s *serverListen) Serve() {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error("grpc Serve error:", err)
+			logger.Error("grpc Serve error:", fmt.Sprint(err))
 			exception.Listener("grpc Serve error:", err)
 		}
 	}()
@@ -94,7 +94,7 @@ func (s *serverListen) Serve() {
 func (s *serverListen) RegisterServer(srv any, fun any) {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error("grpc RegisterServer error:", err)
+			logger.Error("grpc RegisterServer error:", fmt.Sprint(err))
 			exception.Listener("grpc RegisterServer error:", err)
 		}
 	}()

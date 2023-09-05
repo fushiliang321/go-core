@@ -3,6 +3,7 @@ package client
 import (
 	goContext "context"
 	"errors"
+	"fmt"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
@@ -31,7 +32,7 @@ const maxMultiplexNum = 1000 //连接最大复用次数
 func dial(serviceName string) (*grpc.ClientConn, *consul.ServiceNode, error) {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error("grpc dial exception:", err)
+			logger.Error("grpc dial exception:", fmt.Sprint(err))
 			exception.Listener("grpc dial exception", err)
 		}
 	}()
@@ -153,7 +154,7 @@ func (cc *ClientConn) Close() error {
 		cc.serviceNode = nil
 		cc.cc = nil
 		if err := recover(); err != nil {
-			logger.Error("conn close error:", err)
+			logger.Error("conn close error:", fmt.Sprint(err))
 		}
 	}()
 	if cc.cc == nil {
@@ -181,7 +182,7 @@ func (cc *ClientConn) GetMethodConfig(method string) grpc.MethodConfig {
 func GetConn(serviceName string, multiplex bool) (*ClientConn, error) {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error("server middleware exception", err)
+			logger.Error("server middleware exception", fmt.Sprint(err))
 			exception.Listener("grpc conn exception", err)
 		}
 	}()

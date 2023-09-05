@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper/logger"
 	"google.golang.org/grpc"
@@ -19,7 +20,7 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 	return func(isMultiplex ...bool) t {
 		defer func() {
 			if err := recover(); err != nil {
-				logger.Error("grpc call exception:", err)
+				logger.Error("grpc call exception:", fmt.Sprint(err))
 				exception.Listener("grpc call exception:", err)
 			}
 		}()

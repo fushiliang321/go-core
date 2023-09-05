@@ -17,7 +17,7 @@ func (m *HttpCoreMiddleware) Process(ctx *types.RequestCtx, handler types.Reques
 		if err := recover(); err != nil {
 			ctx.Response.SetStatusCode(500)
 			res = response.Error(500, fmt.Sprintln("server process exception:", err), nil)
-			logger.Error("server process exception:", err)
+			logger.Error("server process exception:", fmt.Sprint(err))
 			exception.Listener("server process exception", err)
 		}
 	}()

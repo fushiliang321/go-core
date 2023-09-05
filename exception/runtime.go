@@ -14,7 +14,7 @@ func Listener(mark string, err any) {
 	}
 	go func() {
 		if e := recover(); e != nil {
-			logger.Error("exception listener error", e)
+			logger.Error("exception listener error", fmt.Sprint(e))
 		}
 	}()
 	handle(&types.Runtime{

@@ -24,7 +24,7 @@ func (h *requestHandler) Process(ctx *types.RequestCtx) (res any) {
 		if err := recover(); err != nil {
 			ctx.Response.SetStatusCode(500)
 			res = response.Error(500, fmt.Sprintln("server middleware exception:", err), nil)
-			logger.Error("server middleware exception", err)
+			logger.Error("server middleware exception", fmt.Sprint(err))
 			exception.Listener("server middleware exception", err)
 		}
 	}()

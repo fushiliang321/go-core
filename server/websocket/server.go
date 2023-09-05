@@ -61,7 +61,7 @@ func (s *WsServer) init() {
 	go func() {
 		defer func() {
 			if err := recover(); err != nil {
-				logger.Error("ws dispose exception:", err)
+				logger.Error("ws dispose exception:", fmt.Sprint(err))
 				exception.Listener("ws dispose exception", err)
 			}
 		}()
@@ -77,7 +77,7 @@ func (s *WsServer) init() {
 				defer func() {
 					if rec := recover(); rec != nil {
 						s.Conn.Close()
-						logger.Error("["+fmt.Sprint(s.Fd)+"]ws write message exception", writeData.messageType, writeData.data, writeData.deadline, s.Conn.NetConn())
+						logger.Error("["+fmt.Sprint(s.Fd)+"]ws write message exception", fmt.Sprint(err), writeData.messageType, writeData.data, writeData.deadline, s.Conn.NetConn())
 						exception.Listener("["+fmt.Sprint(s.Fd)+"]ws write message exception", rec)
 					}
 				}()

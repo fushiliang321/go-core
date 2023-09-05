@@ -1,6 +1,7 @@
 package consumer
 
 import (
+	"fmt"
 	"github.com/fushiliang321/go-core/amqp/connection"
 	"github.com/fushiliang321/go-core/amqp/types"
 	"github.com/fushiliang321/go-core/exception"
@@ -42,7 +43,7 @@ func (consumer *Consumer) monitor() {
 	}
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error(consumer.Exchange+" amqp monitor recover:", err)
+			logger.Error(consumer.Exchange+" amqp monitor recover:", fmt.Sprint(err))
 			exception.Listener(consumer.Exchange+" amqp monitor", err)
 			// 监听异常 要重试
 			go consumer.retryMonitor()

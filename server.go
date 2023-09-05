@@ -1,8 +1,11 @@
 package core
 
 import (
+	"fmt"
 	"github.com/fushiliang321/go-core/config/initialize"
 	"github.com/fushiliang321/go-core/event"
+	"github.com/fushiliang321/go-core/exception"
+	"github.com/fushiliang321/go-core/helper/logger"
 	"sync"
 )
 
@@ -10,13 +13,15 @@ var startOnce sync.Once
 
 func Start() {
 	defer func() {
-		//if err := recover(); err != nil {
-		//	logger.Error("core start error:", err)
-		//	exception.Listener("core start", err)
-		//}
+		if err := recover(); err != nil {
+			logger.Error("core start error:", fmt.Sprint(err))
+			exception.Listener("core start", err)
+		}
 	}()
 
 	startOnce.Do(func() {
+		var a = []string{}
+		fmt.Println(a[1])
 		event.Dispatch(event.NewRegistered(event.BeforeServerStart, nil))
 		wg := &sync.WaitGroup{}
 		servers := initialize.Get()

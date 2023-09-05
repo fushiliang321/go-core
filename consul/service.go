@@ -1,6 +1,7 @@
 package consul
 
 import (
+	"fmt"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/hashicorp/consul/api"
@@ -23,7 +24,7 @@ const (
 func (s *serviceMonitor) syncService() {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error("error getService", err)
+			logger.Error("error getService", fmt.Sprint(err))
 		}
 		if s.status == monitorOff {
 			return

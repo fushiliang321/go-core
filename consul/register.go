@@ -1,6 +1,7 @@
 package consul
 
 import (
+	"fmt"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper/logger"
@@ -47,7 +48,7 @@ func IsRegister(name string, protocol string, address string, port int) bool {
 func RegisterServer(name string, protocol string, address string, port int, check *api.AgentServiceCheck) (b bool, err error) {
 	defer func() {
 		if _err := recover(); _err != nil {
-			logger.Error("RegisterServer error:", _err)
+			logger.Error("RegisterServer error:", fmt.Sprint(_err))
 			exception.Listener("RegisterServer error:", _err)
 		}
 	}()

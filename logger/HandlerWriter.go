@@ -47,8 +47,8 @@ func (w *handlerWriter) Write(b []byte) (n int, err error) {
 	w.Lock()
 	defer func() {
 		w.Unlock()
-		if err := recover(); err != nil {
-			slog.Error(fmt.Sprint(err))
+		if _err := recover(); _err != nil {
+			slog.Error(fmt.Sprint(_err))
 		}
 	}()
 
@@ -155,8 +155,8 @@ func (f *logFile) lumberjackHandle() {
 
 	go func() {
 		defer func() {
-			if err := recover(); err != nil {
-				slog.Error(fmt.Sprint(err))
+			if _err := recover(); _err != nil {
+				slog.Error(fmt.Sprint(_err))
 			}
 		}()
 		var (

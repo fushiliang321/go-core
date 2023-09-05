@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/exception"
@@ -24,8 +25,8 @@ func New(server string) *Client {
 func (c *Client) Call(method string, params any, res any) error {
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Error("rpc call error：", recover())
-			exception.Listener("rpc call", recover())
+			logger.Error("rpc call error：", fmt.Sprint(err))
+			exception.Listener("rpc call", err)
 		}
 	}()
 	rpcClient, err := newRpcClient(c.serverName)
