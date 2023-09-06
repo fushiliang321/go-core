@@ -392,6 +392,23 @@ func typeAssign(value any, typeValue reflect.Value) (err error) {
 			}
 		}
 		typeValue.SetString(_v)
+	case reflect.Bool:
+		var b = false
+		switch value.(type) {
+		case string:
+			_value := value.(string)
+			if len(_value) != 0 && _value != "false" && _value != "0" {
+				b = true
+			}
+		default:
+			b = func() bool {
+				defer func() {
+					recover()
+				}()
+				return !reflect.ValueOf(value).IsZero()
+			}()
+		}
+		typeValue.SetBool(b)
 
 	default:
 		return NewDataError("不受支持的数据类型", typeValue.Interface())
