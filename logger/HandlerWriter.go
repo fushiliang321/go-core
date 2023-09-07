@@ -2,7 +2,7 @@ package logger
 
 import (
 	"fmt"
-	logger2 "github.com/fushiliang321/go-core/config/logger"
+	loggerConfig "github.com/fushiliang321/go-core/config/logger"
 	"github.com/fushiliang321/go-core/helper/file"
 	"golang.org/x/exp/slog"
 	"io"
@@ -25,7 +25,7 @@ type (
 		fileName              string
 		file                  *os.File
 		writeInterval         time.Duration //日志文件写入间隔
-		lumberjack            *logger2.Lumberjack
+		lumberjack            *loggerConfig.Lumberjack
 		lumberjackMaxSizeByte int64
 		writeChan             chan []byte
 		buffer                []byte
@@ -73,17 +73,17 @@ func (f *logFile) open() error {
 	if f.lumberjack.MaxSize > 0 {
 		f.lumberjackMaxSizeByte = int64(f.lumberjack.MaxSize) * 1024 * 1024
 	}
-	err := os.MkdirAll(f.dirPath, 0666)
+	err := os.MkdirAll(f.dirPath, os.ModePerm)
 	if err != nil {
 		slog.Error(err.Error())
 		return err
 	}
-	file, err := os.OpenFile(f.dirPath+"/"+f.fileName+LogFileSuffix, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	_file, err := os.OpenFile(f.dirPath+"/"+f.fileName+LogFileSuffix, os.O_CREATE|os.O_APPEND|os.O_RDWR, os.ModePerm)
 	if err != nil {
 		slog.Error(err.Error())
 		return err
 	}
-	f.file = file
+	f.file = _file
 	go f.writeJoint()
 	return nil
 }
