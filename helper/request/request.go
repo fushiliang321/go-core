@@ -7,6 +7,7 @@ import (
 	"github.com/fushiliang321/go-core/rpc"
 	"github.com/savsgio/gotils/strconv"
 	"net"
+	"reflect"
 )
 
 var ipHeaderKeys = []string{ //请求头中可以获取到客户端ip的字段
@@ -119,4 +120,17 @@ func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
 // 设置rpc上下文请求数据
 func SetRpcRequestData(rpcRequestData rpc.RpcRequestData) {
 	context.Set(internalRequestKey, rpcRequestData)
+}
+
+func Input[T any](ctx *types.RequestCtx, key string, defaultVal ...T) (*T, error) {
+	var v T
+	_reflect := reflect.New(reflect.TypeOf(v)).Elem()
+	if len(defaultVal) > 0 {
+		_reflect.Set(reflect.ValueOf(defaultVal[0]))
+	}
+	v = _reflect.Interface().(T)
+	if err := ctx.InputAssign(key, &v); err != nil {
+		return nil, err
+	}
+	return &v, nil
 }
