@@ -34,13 +34,15 @@ var (
 			return true
 		},
 	}
-	config *server.Servers
+	config             *server.Servers
+	openHeartbeatCheck bool //开启心跳检测
 
 	pongData = []byte{1}
 )
 
 func init() {
 	config = server.Get()
+	openHeartbeatCheck = config.Settings != nil && config.Settings.HeartbeatCheckInterval > 0
 }
 
 func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2.RequestHandler) (_ any) {
@@ -119,7 +121,7 @@ func (m *WebsocketCoreMiddleware) Process(ctx *types2.RequestCtx, handler types2
 			return nil
 		})
 
-		if config.Settings.HeartbeatCheckInterval > 0 {
+		if openHeartbeatCheck {
 			//心跳检测
 			conn.SetPongHandler(func(appData string) error {
 				ser.LastResponseTimestamp = time.Now().Unix()

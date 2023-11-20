@@ -42,6 +42,10 @@ var (
 func Start() {
 	config := server.Get()
 
+	if config.Settings == nil {
+		return
+	}
+
 	//消息类型
 	switch config.Settings.MessageType {
 	case websocket.BinaryMessage:

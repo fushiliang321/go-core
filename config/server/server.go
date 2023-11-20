@@ -25,8 +25,8 @@ type (
 )
 
 var servers = &Servers{
-	Settings: &Settings{},
 	Servers:  []Server{},
+	Settings: &Settings{},
 }
 
 func Set(s *Servers) {
