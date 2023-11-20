@@ -22,21 +22,31 @@ func Start() {
 
 	startOnce.Do(func() {
 		event.Dispatch(event.NewRegistered(event.BeforeServerStart))
-		wg := &sync.WaitGroup{}
-		servers := initialize.Get()
+		var (
+			servers    = initialize.Get()
+			serStartWg = &sync.WaitGroup{} //等待所有服务启动
+			serEndWg   = &sync.WaitGroup{} //等待所有服务结束
+		)
 		for _, ser := range servers {
-			func(s initialize.Service) {
-				defer func() {
-					if err := recover(); err != nil {
-						logger.Error("core start error:", reflect.ValueOf(s).Elem().Type().String(), fmt.Sprint(err))
-						exception.Listener("core start error", err)
-					}
-				}()
-				s.Start(wg)
-			}(ser)
+			serStartWg.Add(1)
+			go func(ser initialize.Service, serEndWg, serStartWg *sync.WaitGroup) {
+				serviceStart(ser, serEndWg)
+				serStartWg.Done()
+			}(ser, serEndWg, serStartWg)
 		}
+		serStartWg.Wait()
 		event.Dispatch(event.NewRegistered(event.AfterServerStart))
-		wg.Wait()
+		serEndWg.Wait()
 		event.Dispatch(event.NewRegistered(event.ServerEnd))
 	})
+}
+
+func serviceStart(ser initialize.Service, wg *sync.WaitGroup) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("core start error:", reflect.ValueOf(ser).Elem().Type().String(), fmt.Sprint(err))
+			exception.Listener("core start error", err)
+		}
+	}()
+	ser.Start(wg)
 }

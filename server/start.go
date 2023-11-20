@@ -78,12 +78,13 @@ func listenAndServe(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer, wsSe
 		return
 	}
 	wg.Add(1)
-	go func(addr string) {
+	go func(httpServer, wsServer *server.Server, addr string) {
 		if err := serve.ListenAndServe(addr); err != nil {
 			logger.Warn("start fasthttp fail", err.Error())
 		}
+		serverEnd(httpServer, wsServer, addr)
 		wg.Done()
-	}(addr)
+	}(httpServer, wsServer, addr)
 }
 
 func generateHandler(httpServer, wsServer *server.Server, addr string) func(ctx *fasthttp.RequestCtx) {
@@ -115,4 +116,13 @@ func generateHandler(httpServer, wsServer *server.Server, addr string) func(ctx 
 		}
 	}
 	return nil
+}
+
+func serverEnd(httpServer, wsServer *server.Server, addr string) {
+	if wsServer != nil {
+		event.Dispatch(event.NewRegistered(event.WebsocketServerListenEnd, addr))
+	}
+	if httpServer != nil {
+		event.Dispatch(event.NewRegistered(event.HttpServerListenEnd, addr))
+	}
 }

@@ -3,39 +3,7 @@ package core
 import (
 	"github.com/fushiliang321/go-core/event"
 	"sync"
-	"sync/atomic"
 )
-
-type (
-	serverStartMonitor struct {
-		isFinish  atomic.Bool //是否完成启动
-		awaitChan chan byte   //等待通道
-	}
-)
-
-var (
-	awaitStartFinishOnce sync.Once
-	_serverStartMonitor  = &serverStartMonitor{
-		awaitChan: make(chan byte),
-	}
-)
-
-func init() {
-	_serverStartMonitor.isFinish.Store(false)
-	//监听服务启动完成事件
-	awaitStartFinishOnce.Do(func() {
-		event.Listener(event.Listen{
-			EventNames: []string{event.AfterServerStart},
-			Process: func(registered event.Registered) {
-				//启动完成后把等待通道关闭
-				_serverStartMonitor.isFinish.Store(true)
-				close(_serverStartMonitor.awaitChan)
-				for range _serverStartMonitor.awaitChan {
-				}
-			},
-		})
-	})
-}
 
 // AwaitStartFinish 等待所有服务启动完成
 func AwaitStartFinish(funs ...func()) {
@@ -44,13 +12,31 @@ func AwaitStartFinish(funs ...func()) {
 			go fun()
 		}
 	}()
-	if _serverStartMonitor.isFinish.Load() {
-		//已经完成启动
-		return
-	}
-	defer func() {
-		recover()
+	AwaitEvents([]string{event.AfterServerStart})
+}
+
+// 等待指定核心事件全部触发
+func AwaitEvents(eventNames []string) {
+	wg := &sync.WaitGroup{}
+	func() {
+		event.CoreServiceEventLog.RLock()
+		defer event.CoreServiceEventLog.RUnlock()
+		for _, name := range eventNames {
+			if event.CoreServiceEventLog.AlreadyTriggered(name) {
+				continue
+			}
+
+			var listen event.Listen
+			listen = event.Listen{
+				EventNames: []string{name},
+				Process: func(registered event.Registered) {
+					wg.Done()
+					event.RemoveListener(&listen)
+				},
+			}
+			wg.Add(1)
+			event.AddListener(&listen)
+		}
 	}()
-	//还没启动完成就等待启动完成
-	_serverStartMonitor.awaitChan <- 1
+	wg.Wait()
 }

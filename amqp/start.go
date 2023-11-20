@@ -19,6 +19,7 @@ func (*Service) Start(_ *sync.WaitGroup) {
 	config := amqp2.Get()
 	if len(config.Consumers) > 0 {
 		//有消费者
+		event.Dispatch(event.NewRegistered(event.BeforeAmqpConsumerServerStart))
 		for _, _consumer := range config.Consumers {
 			con := consumer.Consumer{
 				Consumer: _consumer,

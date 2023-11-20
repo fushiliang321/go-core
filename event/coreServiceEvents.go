@@ -1,5 +1,6 @@
 package event
 
+// 核心服务事件
 const (
 	BeforeServerStart = "BeforeServerStart" //服务启动之前
 	AfterServerStart  = "AfterServerStart"  //服务启动之后
@@ -32,6 +33,9 @@ const (
 	BeforeRateLimitServerStart = "BeforeRateLimitServerStart" //RateLimit服务启动之前
 	AfterRateLimitServerStart  = "AfterRateLimitServerStart"  //RateLimit服务启动之后
 
-	HttpServerListen      = "HttpServerListen"      //http服务监听
-	WebsocketServerListen = "WebsocketServerListen" //Websocket服务监听
+	HttpServerListen         = "HttpServerListenStart"      //http服务监听开始
+	HttpServerListenEnd      = "HttpServerListenEnd"        //http服务监听结束
+	WebsocketServerListen    = "WebsocketServerListenStart" //Websocket服务监听开始
+	WebsocketServerListenEnd = "WebsocketServerListenEnd"   //Websocket服务监听结束
+
 )
