@@ -39,7 +39,7 @@ func client() (*redis.Client, error) {
 		_lock.Lock()
 		if _client == nil {
 			_newClient, err := NewClient()
-			if err != nil {
+			if err == nil {
 				_client = _newClient
 			} else {
 				return nil, err
