@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/config/routers"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/event"
@@ -11,7 +12,9 @@ import (
 	"sync"
 )
 
-type Service struct{}
+type Service struct {
+	service.BaseStruct
+}
 
 func (*Service) Start(wg *sync.WaitGroup) {
 	var (

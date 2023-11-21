@@ -1,12 +1,15 @@
 package task
 
 import (
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/config/task"
 	"github.com/fushiliang321/go-core/event"
 	"sync"
 )
 
-type Service struct{}
+type Service struct {
+	service.BaseStruct
+}
 
 func (*Service) Start(wg *sync.WaitGroup) {
 	config := task.Get()

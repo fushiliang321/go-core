@@ -1,6 +1,7 @@
 package rateLimit
 
 import (
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/config/rateLimit"
 	"github.com/fushiliang321/go-core/event"
 	"sync"
@@ -9,7 +10,9 @@ import (
 )
 
 type (
-	Service     struct{}
+	Service struct {
+		service.BaseStruct
+	}
 	tokenBucket struct {
 		global atomic.Int32
 		//paths       map[string]int //地址令牌桶

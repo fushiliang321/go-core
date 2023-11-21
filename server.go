@@ -3,7 +3,9 @@ package core
 import (
 	"fmt"
 	"github.com/fushiliang321/go-core/config/initialize"
+	"github.com/fushiliang321/go-core/config/initialize/Service"
 	"github.com/fushiliang321/go-core/event"
+	"github.com/fushiliang321/go-core/event/handles/core"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper/logger"
 	"reflect"
@@ -29,7 +31,7 @@ func Start() {
 		)
 		for _, ser := range servers {
 			serStartWg.Add(1)
-			go func(ser initialize.Service, serEndWg, serStartWg *sync.WaitGroup) {
+			go func(ser service.Service, serEndWg, serStartWg *sync.WaitGroup) {
 				serviceStart(ser, serEndWg)
 				serStartWg.Done()
 			}(ser, serEndWg, serStartWg)
@@ -41,12 +43,17 @@ func Start() {
 	})
 }
 
-func serviceStart(ser initialize.Service, wg *sync.WaitGroup) {
+func serviceStart(ser service.Service, wg *sync.WaitGroup) {
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Error("core start error:", reflect.ValueOf(ser).Elem().Type().String(), fmt.Sprint(err))
 			exception.Listener("core start error", err)
 		}
 	}()
+	preServices := ser.PreServices()
+	if preServices == nil {
+		//等待前置服务启动
+		core.AwaitEvents(preServices)
+	}
 	ser.Start(wg)
 }

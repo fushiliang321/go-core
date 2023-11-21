@@ -2,11 +2,14 @@ package server
 
 import (
 	"github.com/fushiliang321/go-core/config/grpc"
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/event"
 	"sync"
 )
 
-type Service struct{}
+type Service struct {
+	service.BaseStruct
+}
 
 var config *grpc.Grpc
 

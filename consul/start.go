@@ -3,6 +3,7 @@ package consul
 import (
 	"github.com/fushiliang321/go-core/config/consul"
 	"github.com/fushiliang321/go-core/config/grpc"
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/config/jsonRpcHttp"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/hashicorp/consul/api"
@@ -11,7 +12,9 @@ import (
 
 var consulConfig *consul.Consul
 
-type Service struct{}
+type Service struct {
+	service.BaseStruct
+}
 
 func (*Service) Start(_ *sync.WaitGroup) {
 	consulConfig = consul.Get()

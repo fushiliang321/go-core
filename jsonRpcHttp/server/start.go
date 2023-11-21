@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	config "github.com/fushiliang321/go-core/config/jsonRpcHttp"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/event"
@@ -11,7 +12,9 @@ import (
 	"sync"
 )
 
-type Service struct{}
+type Service struct {
+	service.BaseStruct
+}
 
 var (
 	server jsonrpc.ServerInterface

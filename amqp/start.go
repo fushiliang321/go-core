@@ -6,6 +6,7 @@ import (
 	"github.com/fushiliang321/go-core/amqp/consumer"
 	"github.com/fushiliang321/go-core/amqp/types"
 	amqp2 "github.com/fushiliang321/go-core/config/amqp"
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/helper/logger"
@@ -13,7 +14,9 @@ import (
 	"sync"
 )
 
-type Service struct{}
+type Service struct {
+	service.BaseStruct
+}
 
 func (*Service) Start(_ *sync.WaitGroup) {
 	config := amqp2.Get()
