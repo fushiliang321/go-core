@@ -2,14 +2,11 @@ package server
 
 import (
 	"github.com/fushiliang321/go-core/config/grpc"
-	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/event"
 	"sync"
 )
 
-type Service struct {
-	service.BaseStruct
-}
+type Service struct{}
 
 var config *grpc.Grpc
 
@@ -30,4 +27,8 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		server.Serve()
 	}(wg)
 	event.Dispatch(event.NewRegistered(event.AfterGrpcServerStart))
+}
+
+func (*Service) PreEvents() []string {
+	return []string{event.AfterLoggerServerStart}
 }

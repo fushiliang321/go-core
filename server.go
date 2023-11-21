@@ -3,7 +3,7 @@ package core
 import (
 	"fmt"
 	"github.com/fushiliang321/go-core/config/initialize"
-	"github.com/fushiliang321/go-core/config/initialize/Service"
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/event/handles/core"
 	"github.com/fushiliang321/go-core/exception"
@@ -50,10 +50,10 @@ func serviceStart(ser service.Service, wg *sync.WaitGroup) {
 			exception.Listener("core start error", err)
 		}
 	}()
-	preServices := ser.PreServices()
-	if preServices == nil {
-		//等待前置服务启动
-		core.AwaitEvents(preServices)
+	preEvents := ser.PreEvents()
+	if preEvents != nil {
+		//等待前置事件触发
+		core.AwaitEvents(preEvents)
 	}
 	ser.Start(wg)
 }

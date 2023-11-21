@@ -3,6 +3,7 @@ package logger
 import (
 	"github.com/fushiliang321/go-core/config/initialize/service"
 	logger2 "github.com/fushiliang321/go-core/config/logger"
+	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper"
 	"github.com/fushiliang321/go-core/logger/agency"
 	"golang.org/x/exp/slog"
@@ -68,7 +69,9 @@ func init() {
 }
 
 func (s *Service) Start(wg *sync.WaitGroup) {
+	event.Dispatch(event.NewRegistered(event.BeforeLoggerServerStart))
 	agency.Set(slogger)
+	event.Dispatch(event.NewRegistered(event.AfterLoggerServerStart))
 }
 
 func (l *Logger) Info(msgs ...any) {

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/config/routers"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/event"
@@ -12,9 +11,7 @@ import (
 	"sync"
 )
 
-type Service struct {
-	service.BaseStruct
-}
+type Service struct{}
 
 func (*Service) Start(wg *sync.WaitGroup) {
 	var (
@@ -73,6 +70,10 @@ func (*Service) Start(wg *sync.WaitGroup) {
 			listenAndServe(wg, &fasthttp.Server{}, httpServer, wsServer, addr)
 		}
 	}
+}
+
+func (*Service) PreEvents() []string {
+	return []string{event.AfterLoggerServerStart}
 }
 
 func listenAndServe(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer, wsServer *server.Server, addr string) {

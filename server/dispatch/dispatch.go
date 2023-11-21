@@ -15,8 +15,6 @@ import (
 	"strings"
 )
 
-const gzipMinSize = 10000 //触发gzip压缩的最小长度
-
 // Dispatch 包装整合路由调度的中间件
 func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 	coreMiddlewares := middleware.GetCoreMiddlewares(handler)

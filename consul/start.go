@@ -41,6 +41,10 @@ func (*Service) Start(_ *sync.WaitGroup) {
 	}
 }
 
+func (*Service) PreEvents() []string {
+	return []string{event.AfterLoggerServerStart}
+}
+
 func initApiConfig() {
 	apiConfig = api.DefaultConfig()
 	if consulConfig.Address != "" {

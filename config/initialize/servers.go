@@ -2,7 +2,7 @@ package initialize
 
 import (
 	"github.com/fushiliang321/go-core/amqp"
-	"github.com/fushiliang321/go-core/config/initialize/Service"
+	"github.com/fushiliang321/go-core/config/initialize/service"
 	"github.com/fushiliang321/go-core/consul"
 	grpc "github.com/fushiliang321/go-core/grpc/server"
 	jsonRpcHttp "github.com/fushiliang321/go-core/jsonRpcHttp/server"

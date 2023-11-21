@@ -33,6 +33,9 @@ const (
 	BeforeRateLimitServerStart = "BeforeRateLimitServerStart" //RateLimit服务启动之前
 	AfterRateLimitServerStart  = "AfterRateLimitServerStart"  //RateLimit服务启动之后
 
+	BeforeLoggerServerStart = "BeforeLoggerServerStart" //Logger服务启动之前
+	AfterLoggerServerStart  = "AfterLoggerServerStart"  //Logger服务启动之后
+
 	HttpServerListen         = "HttpServerListenStart"      //http服务监听开始
 	HttpServerListenEnd      = "HttpServerListenEnd"        //http服务监听结束
 	WebsocketServerListen    = "WebsocketServerListenStart" //Websocket服务监听开始

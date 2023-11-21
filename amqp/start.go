@@ -34,6 +34,10 @@ func (*Service) Start(_ *sync.WaitGroup) {
 	}
 }
 
+func (*Service) PreEvents() []string {
+	return []string{event.AfterLoggerServerStart}
+}
+
 func Publish(producer *types.Producer) {
 	Amqp := connection.GetAmqp()
 	if Amqp == nil {

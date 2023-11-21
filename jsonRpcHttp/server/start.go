@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/fushiliang321/go-core/config/initialize/service"
 	config "github.com/fushiliang321/go-core/config/jsonRpcHttp"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/event"
@@ -12,9 +11,7 @@ import (
 	"sync"
 )
 
-type Service struct {
-	service.BaseStruct
-}
+type Service struct{}
 
 var (
 	server jsonrpc.ServerInterface
@@ -51,4 +48,8 @@ func (*Service) Start(wg *sync.WaitGroup) {
 	}
 	server.Register(new(Health))
 	event.Dispatch(event.NewRegistered(event.AfterJsonRpcServerStart))
+}
+
+func (*Service) PreEvents() []string {
+	return []string{event.AfterLoggerServerStart}
 }

@@ -5,15 +5,13 @@ import "sync"
 type (
 	Service interface {
 		Start(wg *sync.WaitGroup)
-		PreServices() []string //前置服务
+		PreEvents() []string //前置事件
 	}
 
-	BaseStruct struct {
-		preServices []string
-	}
+	BaseStruct struct{}
 )
 
 func (ser *BaseStruct) Start(wg *sync.WaitGroup) {}
-func (ser *BaseStruct) PreServices() []string {
-	return ser.preServices
+func (ser *BaseStruct) PreEvents() []string {
+	return nil
 }
