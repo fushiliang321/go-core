@@ -1,8 +1,8 @@
 package server
 
 import (
+	"github.com/fushiliang321/go-core/config/consul"
 	config "github.com/fushiliang321/go-core/config/jsonRpcHttp"
-	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/event"
 	"github.com/fushiliang321/go-core/helper/system"
 	"github.com/fushiliang321/jsonrpc"
@@ -25,7 +25,7 @@ func initialize() {
 
 	server = NewHttpServer(jsonRpcHttpConfig.Host, strconv.Itoa(port))
 
-	consulConfig := consul.GetConfig()
+	consulConfig := consul.Get()
 	ip = system.GetLocalIP(consulConfig.Address)
 }
 
