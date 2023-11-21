@@ -39,7 +39,11 @@ func Set(key string, val any, expiration ...int64) error {
 		}
 		valStr = strconv.B2S(valBytes)
 	}
-	err := client().Set(_ctx, key, valStr, exp).Err()
+	c, err := client()
+	if err != nil {
+		return err
+	}
+	err = c.Set(_ctx, key, valStr, exp).Err()
 	if err != nil {
 		logger.Warn("redis set error:", err.Error())
 		return err
@@ -49,7 +53,11 @@ func Set(key string, val any, expiration ...int64) error {
 
 // 获取指定 key 的字符串值
 func GetString(key string) (string, error) {
-	val, err := client().Get(_ctx, key).Result()
+	c, err := client()
+	if err != nil {
+		return "", err
+	}
+	val, err := c.Get(_ctx, key).Result()
 	if err != nil {
 		logger.Warn("redis get error:", err.Error())
 		return "", err
@@ -87,31 +95,51 @@ func Get[t any](key string) (*t, error) {
 
 // 自增
 func Inc(key string, v ...int64) (result int64, err error) {
-	if len(v) > 0 {
-		return client().IncrBy(_ctx, key, v[0]).Result()
+	c, err := client()
+	if err != nil {
+		return 0, err
 	}
-	return client().Incr(_ctx, key).Result()
+	if len(v) > 0 {
+		return c.IncrBy(_ctx, key, v[0]).Result()
+	}
+	return c.Incr(_ctx, key).Result()
 }
 
 // 自减
 func Dec(key string, v ...int64) (result int64, err error) {
-	if len(v) > 0 {
-		return client().DecrBy(_ctx, key, v[0]).Result()
+	c, err := client()
+	if err != nil {
+		return 0, err
 	}
-	return client().Decr(_ctx, key).Result()
+	if len(v) > 0 {
+		return c.DecrBy(_ctx, key, v[0]).Result()
+	}
+	return c.Decr(_ctx, key).Result()
 }
 
 // 字符串截取
 func GetRange(key string, start, end int64) (string, error) {
-	return client().GetRange(_ctx, key, start, end).Result()
+	c, err := client()
+	if err != nil {
+		return "", err
+	}
+	return c.GetRange(_ctx, key, start, end).Result()
 }
 
 // 追加到值的末尾
 func Append(key, value string) (int64, error) {
-	return client().Append(_ctx, key, value).Result()
+	c, err := client()
+	if err != nil {
+		return 0, err
+	}
+	return c.Append(_ctx, key, value).Result()
 }
 
 // 返回 key 所储存的字符串值的长度
 func StrLen(key string) (int64, error) {
-	return client().StrLen(_ctx, key).Result()
+	c, err := client()
+	if err != nil {
+		return 0, err
+	}
+	return c.StrLen(_ctx, key).Result()
 }

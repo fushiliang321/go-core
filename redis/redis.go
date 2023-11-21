@@ -16,7 +16,7 @@ var (
 	_ctx    = context.Background()
 )
 
-func NewClient() *redis.Client {
+func NewClient() (*redis.Client, error) {
 	core.AwaitStartFinish()
 	var (
 		config = redisConfig.Get()
@@ -29,18 +29,23 @@ func NewClient() *redis.Client {
 	)
 	if err != nil {
 		logger.Warn("connection redis error：" + err.Error())
-		return nil
+		return nil, err
 	}
-	return c
+	return c, nil
 }
 
-func client() *redis.Client {
+func client() (*redis.Client, error) {
 	if _client == nil {
 		_lock.Lock()
 		if _client == nil {
-			_client = NewClient()
+			_newClient, err := NewClient()
+			if err != nil {
+				_client = _newClient
+			} else {
+				return nil, err
+			}
 		}
 		_lock.Unlock()
 	}
-	return _client
+	return _client, nil
 }
