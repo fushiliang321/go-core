@@ -1,6 +1,8 @@
 package task
 
-import "github.com/robfig/cron"
+import (
+	"github.com/robfig/cron"
+)
 
 type (
 	Cron struct {
@@ -59,6 +61,9 @@ func (c *Cron) Schedule(schedule Schedule, cmd Job) {
 		}
 	} else {
 		_cmd = nil
+	}
+	if c.Cron == nil {
+		c.Cron = cron.New()
 	}
 	c.Cron.Schedule(schedule, cmd)
 }
