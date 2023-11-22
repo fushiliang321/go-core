@@ -1,6 +1,9 @@
 package redis
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 // 根据正则获取keys
 func Keys(pattern string) ([]string, error) {
@@ -43,6 +46,9 @@ func Expire(key string, exp int64) (bool, error) {
 	c, err := client()
 	if err != nil {
 		return false, err
+	}
+	if exp < 1 {
+		return false, errors.New("exp 值无效")
 	}
 	return c.Expire(_ctx, key, time.Duration(exp)*time.Second).Result()
 }

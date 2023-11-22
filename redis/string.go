@@ -15,7 +15,7 @@ func Set(key string, val any, expiration ...int64) error {
 		exp    time.Duration
 		valStr string
 	)
-	if len(expiration) > 0 {
+	if len(expiration) > 0 && expiration[0] > 0 {
 		exp = time.Duration(expiration[0]) * time.Second
 	}
 	switch val.(type) {
