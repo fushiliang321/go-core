@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/fushiliang321/go-core/helper/logger"
-	"github.com/redis/go-redis/v9"
 	"github.com/savsgio/gotils/strconv"
 	"reflect"
 	"time"
@@ -60,7 +59,7 @@ func GetString(key string) (string, error) {
 	}
 	val, err := c.Get(_ctx, key).Result()
 	if err != nil {
-		if err != redis.Nil {
+		if err != Nil {
 			//没取到值的时候不打印错误信息
 			logger.Warn("redis get error:", err.Error())
 		}

@@ -10,6 +10,8 @@ import (
 	"sync"
 )
 
+const Nil = redis.Nil
+
 var (
 	_client *redis.Client
 	_lock   sync.RWMutex
