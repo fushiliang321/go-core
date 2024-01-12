@@ -11,7 +11,7 @@ require (
 	github.com/fushiliang321/jsonrpc v1.2.1
 	github.com/hashicorp/consul/api v1.26.1
 	github.com/rabbitmq/amqp091-go v1.9.0
-	github.com/redis/go-redis/v9 v9.3.0
+	github.com/redis/go-redis/v9 v9.4.0
 	github.com/robfig/cron v1.2.0
 	github.com/savsgio/gotils v0.0.0-20230208104028-c358bd845dee
 	github.com/timandy/routine v1.1.3
