@@ -94,14 +94,14 @@ func ClientAddr(ctx *types.RequestCtx) string {
 const internalRequestKey = "internalRequest"
 
 // 获取rpc上下文请求数据
-func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
+func RpcRequestData() (rpcRequestData rpc.RequestData) {
 	data := context.Get(internalRequestKey)
 	if data == nil {
 		return
 	}
 	switch data.(type) {
-	case rpc.RpcRequestData:
-		rpcRequestData = data.(rpc.RpcRequestData)
+	case rpc.RequestData:
+		rpcRequestData = data.(rpc.RequestData)
 	case map[string]any:
 		mapData, ok := data.(map[string]any)
 		if !ok {
@@ -118,7 +118,7 @@ func RpcRequestData() (rpcRequestData rpc.RpcRequestData) {
 }
 
 // 设置rpc上下文请求数据
-func SetRpcRequestData(rpcRequestData rpc.RpcRequestData) {
+func SetRpcRequestData(rpcRequestData rpc.RequestData) {
 	context.Set(internalRequestKey, rpcRequestData)
 }
 

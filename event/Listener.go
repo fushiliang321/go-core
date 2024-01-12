@@ -6,15 +6,15 @@ import (
 )
 
 type (
-	EventName    = string
-	EventProcess = func(Registered)
-	Listen       struct {
-		EventNames []EventName
-		Process    EventProcess
+	Name    = string
+	Process = func(Registered)
+	Listen  struct {
+		EventNames []Name
+		Process    Process
 	}
 	eventListener struct {
 		sync.RWMutex
-		eventMap map[EventName][]EventProcess
+		eventMap map[Name][]Process
 	}
 )
 
@@ -22,7 +22,7 @@ var globalEventListeners *eventListener
 
 func init() {
 	globalEventListeners = &eventListener{
-		eventMap: map[EventName][]EventProcess{},
+		eventMap: map[Name][]Process{},
 	}
 }
 
@@ -75,7 +75,7 @@ func (l *eventListener) Trigger(reg *Registered) {
 	if !ok {
 		return
 	}
-	var funs []EventProcess
+	var funs []Process
 	//防止解锁之后_funs的值马上被其他协程修改
 	funs = append(funs, _funs...)
 	//使用协程调用，避免fun内有添加或移除监听事件导致死锁

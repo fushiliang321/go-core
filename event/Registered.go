@@ -1,11 +1,11 @@
 package event
 
 type Registered struct {
-	name EventName
+	name Name
 	data any
 }
 
-func NewRegistered(name EventName, datas ...any) *Registered {
+func NewRegistered(name Name, datas ...any) *Registered {
 	var data any
 	if len(datas) > 0 {
 		data = datas[0]

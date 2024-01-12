@@ -18,7 +18,7 @@ type (
 		RemoteIp         string  `json:"remote_ip"`
 		GatewayId        string  `json:"gateway_id"`
 	}
-	RpcRequestData struct {
+	RequestData struct {
 		FromId       uint              `json:"fromId"`
 		FromInfo     User              `json:"fromInfo"`
 		Timestamp    int64             `json:"timestamp"`

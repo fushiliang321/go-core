@@ -9,14 +9,14 @@ import (
 	"reflect"
 )
 
-type ClientGenerateFun[t any] func(isMultiplex ...bool) t
+type GenerateFun[t any] func(isMultiplex ...bool) t
 
 var (
 	multiplexConns = map[any]*ClientConn{}
 	ctx            = context.Background()
 )
 
-func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
+func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) t) GenerateFun[t] {
 	return func(isMultiplex ...bool) t {
 		defer func() {
 			if err := recover(); err != nil {
@@ -46,7 +46,7 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 	}
 }
 
-func ClientAuto[t any](fun func(cc grpc.ClientConnInterface) t) ClientGenerateFun[t] {
+func ClientAuto[t any](fun func(cc grpc.ClientConnInterface) t) GenerateFun[t] {
 	client := fun(clientServiceNameExtract{})
 	name := ""
 	if reflect.ValueOf(client).NumMethod() > 0 {
