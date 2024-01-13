@@ -30,7 +30,7 @@ func (s *serviceMonitor) syncService() {
 			return
 		}
 		go func() {
-			time.Sleep(time.Millisecond * 10)
+			time.Sleep(time.Second * 1)
 			s.syncService()
 		}()
 	}()
