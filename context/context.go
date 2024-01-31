@@ -33,7 +33,7 @@ func (ctx *Context) Get(key string) any {
 // 设置协程上下文数据
 func (ctx *Context) Set(key string, value any) {
 	data := ctx.Local.Get()
-	if data != nil {
+	if data == nil {
 		data = map[string]any{}
 	}
 	data[key] = value
@@ -42,8 +42,11 @@ func (ctx *Context) Set(key string, value any) {
 
 // 批量设置协程上下文数据
 func (ctx *Context) SetBatch(values map[string]any) {
+	if values == nil {
+		return
+	}
 	data := ctx.Local.Get()
-	if data != nil {
+	if data == nil {
 		data = map[string]any{}
 	}
 	for key, value := range values {
