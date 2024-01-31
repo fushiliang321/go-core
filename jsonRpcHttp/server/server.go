@@ -32,7 +32,7 @@ func (svr *Server) Handler(b []byte) any {
 
 func (svr *Server) SingleHandler(jsonMap map[string]any) any {
 	if ctx, ok := jsonMap["context"]; ok {
-		if ctx, ok := ctx.(map[string]any); ok {
+		if ctx, ok := ctx.(map[string]any); ok && ctx != nil {
 			context.SetBatch(ctx)
 		}
 	}
