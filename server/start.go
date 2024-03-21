@@ -50,19 +50,20 @@ func (*Service) Start(wg *sync.WaitGroup) {
 			httpServer *server.Server
 			wsServer   *server.Server
 		)
-		for _, ser := range sers {
-			switch ser.Type {
+		for _type := range sers {
+			_ser := sers[_type]
+			switch _ser.Type {
 			case types.SERVER_WEBSOCKET:
-				if ser.Server == nil {
-					wsServer = &ser
+				if _ser.Server == nil {
+					wsServer = &_ser
 				} else {
-					listenAndServe(wg, ser.Server, nil, &ser, addr)
+					listenAndServe(wg, _ser.Server, nil, &_ser, addr)
 				}
 			case types.SERVER_HTTP:
-				if ser.Server == nil {
-					httpServer = &ser
+				if _ser.Server == nil {
+					httpServer = &_ser
 				} else {
-					listenAndServe(wg, ser.Server, &ser, nil, addr)
+					listenAndServe(wg, _ser.Server, &_ser, nil, addr)
 				}
 			}
 		}
