@@ -10,10 +10,17 @@ import (
 	"sync"
 )
 
-var consulConfig *consul.Consul
-
 type Service struct {
 	service.BaseStruct
+}
+
+var (
+	consulConfig   *consul.Consul
+	configInitWait chan byte
+)
+
+func init() {
+	configInitWait = make(chan byte)
 }
 
 func (*Service) Start(_ *sync.WaitGroup) {
@@ -50,8 +57,10 @@ func initApiConfig() {
 	if consulConfig.Address != "" {
 		apiConfig.Address = consulConfig.Address
 	}
+	close(configInitWait)
 }
 
 func GetConfig() *api.Config {
+	<-configInitWait
 	return apiConfig
 }
