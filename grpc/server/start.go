@@ -30,5 +30,8 @@ func (*Service) Start(wg *sync.WaitGroup) {
 }
 
 func (*Service) PreEvents() []string {
-	return []string{event.AfterLoggerServerStart}
+	return []string{
+		event.AfterLoggerServerStart,
+		event.ConsulInitFinish,
+	}
 }
