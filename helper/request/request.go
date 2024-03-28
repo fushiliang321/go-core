@@ -107,7 +107,7 @@ func RpcRequestData() (rpcRequestData rpc.RequestData) {
 		if !ok {
 			return
 		}
-		err := helper.MapToStruc[string](mapData, &rpcRequestData)
+		err := helper.MapToStruct[string](mapData, &rpcRequestData)
 		if err != nil {
 			return
 		}

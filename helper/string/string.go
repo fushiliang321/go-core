@@ -1,24 +1,30 @@
 package string
 
 import (
-	"github.com/savsgio/gotils/strconv"
 	"strings"
+)
+
+var (
+	underlineByte = byte('_')
+	diffValue     = uint8('a' - 'A')
 )
 
 // 转为蛇形字符串
 func SnakeString(s string) string {
-	data := make([]byte, 0, len(s)*2)
-	j := false
-	num := len(s)
+	var (
+		num = len(s)
+		d   uint8
+		b   = strings.Builder{}
+	)
 	for i := 0; i < num; i++ {
-		d := s[i]
-		if i > 0 && d >= 'A' && d <= 'Z' && j {
-			data = append(data, '_')
+		d = s[i]
+		if d >= 'A' && d <= 'Z' {
+			b.WriteByte(d + diffValue)
+			b.WriteByte(underlineByte)
+		} else {
+			b.WriteByte(d)
 		}
-		if d != '_' {
-			j = true
-		}
-		data = append(data, d)
+
 	}
-	return strings.ToLower(strconv.B2S(data[:]))
+	return b.String()
 }

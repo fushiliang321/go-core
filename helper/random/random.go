@@ -1,8 +1,8 @@
 package random
 
 import (
+	"github.com/savsgio/gotils/strconv"
 	"math/rand"
-	"time"
 	"unsafe"
 )
 
@@ -25,10 +25,6 @@ const (
 	letterIdxMax  = letterIdxMask / letterIdxBits
 )
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
-
 // 取随机数
 func RangeRand(min, max int) int {
 	if min > max {
@@ -38,8 +34,8 @@ func RangeRand(min, max int) int {
 	return min + rand.Intn(dif)
 }
 
-// 获取指定长度的随机字符串
-func randString(n int, bytes string) string {
+// 获取指定长度的随机比特字符串
+func randBytes(n int, bytes string) []byte {
 	bytesLen := len(bytes)
 	b := make([]byte, n)
 	for i, cache, remain := n-1, rand.Int63(), letterIdxMax; i >= 0; {
@@ -53,20 +49,20 @@ func randString(n int, bytes string) string {
 		cache >>= letterIdxBits
 		remain--
 	}
-	return *(*string)(unsafe.Pointer(&b))
+	return b
 }
 
 // 获取指定长度的随机字符串,可自定义字符串
 func RandString(n int, bytes ...string) string {
 	switch len(bytes) {
 	case 0:
-		return randString(n, letterBytes)
+		return strconv.B2S(randBytes(n, letterBytes))
 	case 1:
 		switch bytes[0] {
 		case RangeLetter0:
-			return randString(n, letterBytes)
+			return strconv.B2S(randBytes(n, letterBytes))
 		case RangeLetter1:
-			return randString(n, letterBytes1)
+			return strconv.B2S(randBytes(n, letterBytes1))
 		}
 	}
 	var (
@@ -93,5 +89,5 @@ func RandString(n int, bytes ...string) string {
 		cache >>= letterIdxBits
 		remain--
 	}
-	return *(*string)(unsafe.Pointer(&b))
+	return unsafe.String(unsafe.SliceData(b), n)
 }
