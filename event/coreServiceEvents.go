@@ -15,7 +15,6 @@ const (
 	ConsulConsumerServiceInfoChange = "ConsulConsumerServiceInfoChange" //Consul Consumer服务节点信息变化
 	ConsulServiceRegister           = "ConsulConsumerServiceRegister"   //Consul服务注册
 	AfterConsulConsumerServerStart  = "AfterConsulConsumerServerStart"  //Consul Consumer服务启动之后
-	ConsulInitFinish                = "ConsulInitFinish"                //Consul初始化完成
 
 	BeforeJsonRpcServerStart = "BeforeJsonRpcHttpServerStart" //JsonRpc服务启动之前
 	JsonRpcServerRegister    = "JsonRpcServerRegister"        //JsonRpc服务注册

@@ -39,7 +39,6 @@ func (*Service) Start(_ *sync.WaitGroup) {
 		AddServices(consumerServiceNames)
 		event.Dispatch(event.NewRegistered(event.AfterConsulConsumerServerStart))
 	}
-	event.Dispatch(event.NewRegistered(event.ConsulInitFinish))
 }
 
 func (*Service) PreEvents() []string {
