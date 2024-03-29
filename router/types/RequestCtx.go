@@ -428,27 +428,27 @@ func (ctx *RequestCtx) Hijacked() bool {
 	return (*fasthttp.RequestCtx)(ctx).Hijacked()
 }
 
-func (ctx *RequestCtx) SetUserValue(key interface{}, value interface{}) {
+func (ctx *RequestCtx) SetUserValue(key any, value any) {
 	(*fasthttp.RequestCtx)(ctx).SetUserValue(key, value)
 }
 
-func (ctx *RequestCtx) SetUserValueBytes(key []byte, value interface{}) {
+func (ctx *RequestCtx) SetUserValueBytes(key []byte, value any) {
 	(*fasthttp.RequestCtx)(ctx).SetUserValueBytes(key, value)
 }
 
-func (ctx *RequestCtx) UserValue(key interface{}) interface{} {
+func (ctx *RequestCtx) UserValue(key any) any {
 	return (*fasthttp.RequestCtx)(ctx).UserValue(key)
 }
 
-func (ctx *RequestCtx) UserValueBytes(key []byte) interface{} {
+func (ctx *RequestCtx) UserValueBytes(key []byte) any {
 	return (*fasthttp.RequestCtx)(ctx).UserValueBytes(key)
 }
 
-func (ctx *RequestCtx) VisitUserValues(visitor func([]byte, interface{})) {
+func (ctx *RequestCtx) VisitUserValues(visitor func([]byte, any)) {
 	(*fasthttp.RequestCtx)(ctx).VisitUserValues(visitor)
 }
 
-func (ctx *RequestCtx) VisitUserValuesAll(visitor func(interface{}, interface{})) {
+func (ctx *RequestCtx) VisitUserValuesAll(visitor func(any, any)) {
 	(*fasthttp.RequestCtx)(ctx).VisitUserValuesAll(visitor)
 }
 
@@ -456,7 +456,7 @@ func (ctx *RequestCtx) ResetUserValues() {
 	(*fasthttp.RequestCtx)(ctx).ResetUserValues()
 }
 
-func (ctx *RequestCtx) RemoveUserValue(key interface{}) {
+func (ctx *RequestCtx) RemoveUserValue(key any) {
 	(*fasthttp.RequestCtx)(ctx).RemoveUserValue(key)
 }
 
@@ -732,6 +732,6 @@ func (ctx *RequestCtx) Err() error {
 	return (*fasthttp.RequestCtx)(ctx).Err()
 }
 
-func (ctx *RequestCtx) Value(key interface{}) interface{} {
+func (ctx *RequestCtx) Value(key any) any {
 	return (*fasthttp.RequestCtx)(ctx).Value(key)
 }

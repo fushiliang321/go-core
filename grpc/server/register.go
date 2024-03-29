@@ -38,7 +38,7 @@ func listen(host string, port int) *serverListen {
 	if err != nil {
 		log.Printf("grpc failed to listen: %v", err)
 	}
-	server := grpc1.NewServer(grpc1.UnaryInterceptor(func(ctx goContext.Context, req interface{}, info *grpc1.UnaryServerInfo, handler grpc1.UnaryHandler) (resp interface{}, err error) {
+	server := grpc1.NewServer(grpc1.UnaryInterceptor(func(ctx goContext.Context, req any, info *grpc1.UnaryServerInfo, handler grpc1.UnaryHandler) (resp any, err error) {
 		if md, ok := metadata.FromIncomingContext(ctx); ok {
 			contextDataStr := md.Get("contextData")
 			if contextDataStr != nil && len(contextDataStr) > 0 && len(contextDataStr[0]) > 0 {

@@ -10,6 +10,6 @@ type ErrCon struct {
 	connType
 }
 
-func (c ErrCon) Invoke(ctx context.Context, method string, args interface{}, reply interface{}, opts ...grpc.CallOption) error {
+func (c ErrCon) Invoke(ctx context.Context, method string, args any, reply any, opts ...grpc.CallOption) error {
 	return c
 }

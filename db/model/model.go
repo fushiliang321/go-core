@@ -39,7 +39,7 @@ func (m *Model[t]) SetDB(db *gorm.DB) *Model[t] {
 	return m
 }
 
-func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
+func (m *Model[t]) Where(where any, args ...any) *Model[t] {
 	if where == nil {
 		return m
 	}
@@ -122,7 +122,7 @@ func (m *Model[t]) Unscoped() *Model[t] {
 	return m
 }
 
-func (m *Model[t]) Distinct(args ...interface{}) *Model[t] {
+func (m *Model[t]) Distinct(args ...any) *Model[t] {
 	m.Db = m.Db.Distinct(args)
 	return m
 }

@@ -22,7 +22,7 @@ func GetConsumers() []string {
 	return consumers
 }
 
-func (c clientServiceNameExtract) Invoke(ctx context.Context, method string, args interface{}, reply interface{}, opts ...grpc.CallOption) error {
+func (c clientServiceNameExtract) Invoke(ctx context.Context, method string, args any, reply any, opts ...grpc.CallOption) error {
 	if method[0] == '/' {
 		method = method[1:]
 	}

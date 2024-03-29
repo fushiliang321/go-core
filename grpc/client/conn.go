@@ -44,7 +44,7 @@ func dial(serviceName string) (*grpc.ClientConn, *consul.ServiceNode, error) {
 	return conn, node, err
 }
 
-func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply interface{}, opts ...grpc.CallOption) (err error) {
+func (cc *ClientConn) Invoke(ctx goContext.Context, method string, args, reply any, opts ...grpc.CallOption) (err error) {
 	var con *grpc.ClientConn
 	if cc.multiplex {
 		//连接复用

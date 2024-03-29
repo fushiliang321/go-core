@@ -46,7 +46,7 @@ func (p *Http) Start() {
 	}
 }
 
-func (p *Http) Register(s interface{}) {
+func (p *Http) Register(s any) {
 	if err := p.Server.Register(s); err != nil {
 		logger.Warn("json rpc http server register error", err)
 	}
