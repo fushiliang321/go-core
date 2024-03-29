@@ -76,14 +76,12 @@ func (p *Http) handleFunc(w http.ResponseWriter, r *http.Request) {
 		internalError *common.InternalErr
 	)
 
-	switch res.(type) {
+	switch _res := res.(type) {
 	case common.ErrorResponse:
-		_res := res.(common.ErrorResponse)
 		if _internalErr, ok := _res.Error.Data.(common.InternalErr); ok && _internalErr.Data != nil {
 			internalError = &_internalErr
 		}
 	case common.ErrorNotifyResponse:
-		_res := res.(common.ErrorNotifyResponse)
 		if _internalErr, ok := _res.Error.Data.(common.InternalErr); ok && _internalErr.Data != nil {
 			internalError = &_internalErr
 		}

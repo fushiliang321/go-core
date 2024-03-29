@@ -1,8 +1,7 @@
 package agency
 
 import (
-	"encoding/json"
-	"github.com/savsgio/gotils/strconv"
+	"github.com/fushiliang321/go-core/helper"
 	"golang.org/x/exp/slog"
 	"strings"
 )
@@ -19,31 +18,10 @@ func msgBuild(msgs []any) *strings.Builder {
 		if i > 0 {
 			build.WriteByte(32)
 		}
-		bytes, _ := anyToBytes(msg)
+		bytes, _ := helper.AnyToBytes(msg)
 		build.Write(bytes)
 	}
 	return &build
-}
-
-// any转bytes
-func anyToBytes(data any) (bts []byte, err error) {
-	switch data.(type) {
-	case string:
-		bts = strconv.S2B(data.(string))
-	case *string:
-		bts = strconv.S2B(*(data.(*string)))
-	case []byte:
-		return data.([]byte), nil
-	case *[]byte:
-		bts = *data.(*[]byte)
-	case byte:
-		bts = []byte{data.(byte)}
-	case *byte:
-		bts = []byte{*(data.(*byte))}
-	default:
-		bts, err = json.Marshal(data)
-	}
-	return
 }
 
 func (l *defaultLogger) Info(msgs ...any) {

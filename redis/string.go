@@ -18,19 +18,19 @@ func Set(key string, val any, expiration ...int64) error {
 	if len(expiration) > 0 && expiration[0] > 0 {
 		exp = time.Duration(expiration[0]) * time.Second
 	}
-	switch val.(type) {
+	switch _val := val.(type) {
 	case string:
-		valStr = val.(string)
+		valStr = _val
 	case *string:
-		valStr = *(val.(*string))
+		valStr = *_val
 	case byte:
-		valStr = string(val.(byte))
+		valStr = string(_val)
 	case *byte:
-		valStr = string(*(val.(*byte)))
+		valStr = string(*_val)
 	case []byte:
-		valStr = strconv.B2S(val.([]byte))
+		valStr = strconv.B2S(_val)
 	case *[]byte:
-		valStr = strconv.B2S(*(val.(*[]byte)))
+		valStr = strconv.B2S(*_val)
 	default:
 		valBytes, err := json.Marshal(val)
 		if err != nil {
@@ -70,22 +70,20 @@ func GetString(key string) (string, error) {
 
 // 获取指定 key 的指定类型值
 func Get[t any](key string) (*t, error) {
-	var res t
-	if reflect.TypeOf(res).Kind() == reflect.Ptr {
+	var (
+		res  t
+		kind = reflect.TypeOf(res).Kind()
+	)
+	if kind == reflect.Ptr {
 		logger.Warn("redis get error：", "the type cannot be a pointer")
 		return nil, errors.New("the type cannot be a pointer")
 	}
 	v, err := GetString(key)
-	if v == "" {
+	if err != nil {
 		return nil, err
 	}
-	switch reflect.TypeOf(res).Kind() {
-	case reflect.String:
-		var t1 any = &res
-		switch v1 := t1.(type) {
-		case *string:
-			*v1 = v
-		}
+	if kind == reflect.String {
+		res = any(v).(t)
 		return &res, nil
 	}
 	err = json.Unmarshal(strconv.S2B(v), &res)

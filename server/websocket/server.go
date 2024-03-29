@@ -35,8 +35,8 @@ const (
 )
 
 var (
-	DataFramesDefault = []byte{} //默认数据帧
-	messageType       = 0        //消息类型 0客户端定义 1文本 2二进制
+	DataFramesDefault []byte
+	messageType       = 0 //消息类型 0客户端定义 1文本 2二进制
 )
 
 func Start() {

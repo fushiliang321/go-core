@@ -240,7 +240,7 @@ func typeAssign(value any, typeValue reflect.Value) (err error) {
 		var _v int64
 		switch raw := value.(type) {
 		case json.Number:
-			if _v, err = value.(json.Number).Int64(); err != nil {
+			if _v, err = raw.Int64(); err != nil {
 				return err
 			}
 		case string:

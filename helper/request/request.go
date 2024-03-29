@@ -99,22 +99,14 @@ func RpcRequestData() (rpcRequestData rpc.RequestData) {
 	if data == nil {
 		return
 	}
-	switch data.(type) {
+	switch data := data.(type) {
 	case rpc.RequestData:
-		rpcRequestData = data.(rpc.RequestData)
+		return data
 	case map[string]any:
-		mapData, ok := data.(map[string]any)
-		if !ok {
-			return
-		}
-		err := helper.MapToStruct[string](mapData, &rpcRequestData)
-		if err != nil {
-			return
-		}
-	default:
+		helper.MapToStruct[string](data, &rpcRequestData)
 		return
 	}
-	return rpcRequestData
+	return
 }
 
 // 设置rpc上下文请求数据

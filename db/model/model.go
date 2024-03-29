@@ -44,11 +44,11 @@ func (m *Model[t]) Where(where any, args ...interface{}) *Model[t] {
 		return m
 	}
 	if args == nil {
-		switch where.(type) {
+		switch w := where.(type) {
 		case map[string]any:
-			return m._where(where.(map[string]any))
+			return m._where(w)
 		case *map[string]any:
-			return m._where(*where.(*map[string]any))
+			return m._where(*w)
 		}
 	}
 	m.Db = m.Db.Where(where, args...)
@@ -65,13 +65,11 @@ func (m *Model[t]) _where(where map[string]any) *Model[t] {
 	for k, v = range where {
 		var value any
 		operator = "="
-		switch v.(type) {
+		switch vArr := v.(type) {
 		case []any:
-			vArr := v.([]any)
 			operator = getOperator(vArr[0].(string))
 			value = vArr[1]
 		case []string:
-			vArr := v.([]string)
 			operator = getOperator(vArr[0])
 			value = vArr[1]
 		default:
