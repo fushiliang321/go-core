@@ -17,12 +17,14 @@ import (
 
 // Dispatch 包装整合路由调度的中间件
 func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
-	coreMiddlewares := middleware.GetCoreMiddlewares(handler)
-	middlewares := config.Get()
-	middlewaresHttp := append(middlewares.Http, coreMiddlewares.Http...)
-	middlewaresWS := append(middlewares.WS, coreMiddlewares.WS...)
-	middlewaresHttpLen := len(middlewaresHttp)
-	middlewaresWsLen := len(middlewaresWS)
+	var (
+		coreMiddlewares    = middleware.GetCoreMiddlewares(handler)
+		middlewares        = config.Get()
+		middlewaresHttp    = append(middlewares.Http, coreMiddlewares.Http...)
+		middlewaresWS      = append(middlewares.WS, coreMiddlewares.WS...)
+		middlewaresHttpLen = len(middlewaresHttp)
+		middlewaresWsLen   = len(middlewaresWS)
+	)
 
 	return func(ctx *fasthttp.RequestCtx) {
 		defer func() {
@@ -36,9 +38,10 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 		var (
 			handlers  requestHandler
 			_ctx      *types2.RequestCtx
-			_, httpOk = ctx.UserValue(types.SERVER_HTTP_KEY).(*server.Server)
+			_, httpOk = ctx.UserValue(types.SERVER_HTTP_KEY).(bool)
 			_, wsOk   = ctx.UserValue(types.SERVER_WEBSOCKET_KEY).(*server.Server)
 		)
+		ctx.RemoveUserValue(types.SERVER_HTTP_KEY)
 		switch {
 		case wsOk && "websocket" == strings.ToLower(strconv.B2S(ctx.Request.Header.Peek("upgrade"))):
 			//优先判断websocket请求，避免同时开启http和websocket时无法升级到websocket
@@ -59,7 +62,6 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 			ctx.Write([]byte{})
 			return
 		}
-		ctx.RemoveUserValue(types.SERVER_HTTP_KEY)
 		_ctx = (*types2.RequestCtx)(ctx)
 		_ctx.WriteAny(handlers.Process(_ctx))
 	}
