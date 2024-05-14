@@ -9,9 +9,9 @@ type (
 		HeartbeatIdleTime      int64 //心跳超时时间
 		MessageType            int   //websocket消息类型
 		AutoResponseGzipSize   int   //响应数据达到指定大小自动触发gzip压缩
-		TlS                    *TlS  //tls配置
+		TLS                    *TLS  //tls配置
 	}
-	TlS struct {
+	TLS struct {
 		CertFile string
 		KeyFile  string
 	}
@@ -21,7 +21,7 @@ type (
 		Host      string
 		Port      string
 		Callbacks Callbacks
-		TlS       *TlS //每个服务可以单独配置tls
+		TLS       *TLS //每个服务可以单独配置tls
 		Server    *fasthttp.Server
 	}
 	Servers struct {

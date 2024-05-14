@@ -61,7 +61,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		for _type := range serTypeMap {
 			var (
 				_ser      = serTypeMap[_type]
-				TLSConfig = mergeTLSConfig(config.Settings.TlS, _ser.TlS)
+				TLSConfig = mergeTLSConfig(config.Settings.TLS, _ser.TLS)
 			)
 			switch _ser.Type {
 			case types.SERVER_WEBSOCKET:
@@ -87,28 +87,28 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		}
 		if httpServer != nil || wsServer != nil {
 			var (
-				httpTls *server.TlS
-				wsTls   *server.TlS
+				httpTls *server.TLS
+				wsTls   *server.TLS
 			)
 			if httpServer != nil {
-				httpTls = httpServer.TlS
+				httpTls = httpServer.TLS
 			}
 			if wsServer != nil {
-				wsTls = wsServer.TlS
+				wsTls = wsServer.TLS
 			}
-			TLSConfig := mergeTLSConfig(config.Settings.TlS, wsTls, httpTls) //合并tls配置，websocket和http同时配置了tls优先使用http的tls配置
+			TLSConfig := mergeTLSConfig(config.Settings.TLS, wsTls, httpTls) //合并tls配置，websocket和http同时配置了tls优先使用http的tls配置
 			listenAndServe(wg, &fasthttp.Server{}, httpServer, wsServer, addr, TLSConfig)
 		}
 	}
 }
 
-func mergeTLSConfig(configs ...*server.TlS) (config *server.TlS) {
+func mergeTLSConfig(configs ...*server.TLS) (config *server.TLS) {
 	for _, c := range configs {
 		if c == nil || c.KeyFile == "" || c.CertFile == "" {
 			continue
 		}
 		if config == nil {
-			config = &server.TlS{
+			config = &server.TLS{
 				KeyFile:  c.KeyFile,
 				CertFile: c.CertFile,
 			}
@@ -139,7 +139,7 @@ func listenAndServeCommon(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer
 	}(httpServer != nil, wsServer != nil, addr)
 }
 
-func listenAndServe(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer, wsServer *server.Server, addr string, TLSConfig *server.TlS) {
+func listenAndServe(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer, wsServer *server.Server, addr string, TLSConfig *server.TLS) {
 	if TLSConfig == nil {
 		listenAndServeCommon(wg, serve, httpServer, wsServer, addr, func() error {
 			return serve.ListenAndServe(addr)
