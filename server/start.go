@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/dgrr/http2"
+	"github.com/fushiliang321/fasthttp2"
 	"github.com/fushiliang321/go-core/config/routers"
 	"github.com/fushiliang321/go-core/config/server"
 	"github.com/fushiliang321/go-core/event"
@@ -77,7 +77,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 					listenAndServe(wg, _ser.Server, &_ser, nil, addr, TLSConfig)
 				}
 			case types.SERVER_HTTP2:
-				http2.ConfigureServer(_ser.Server, http2.ServerConfig{})
+				fasthttp2.ConfigureServer(_ser.Server, fasthttp2.ServerConfig{})
 				if _ser.Server == nil {
 					httpServer = &_ser
 				} else {
@@ -146,7 +146,7 @@ func listenAndServe(wg *sync.WaitGroup, serve *fasthttp.Server, httpServer, wsSe
 		})
 	} else {
 		//配置了tls自动升级为http2
-		http2.ConfigureServer(serve, http2.ServerConfig{})
+		fasthttp2.ConfigureServer(serve, fasthttp2.ServerConfig{})
 		listenAndServeCommon(wg, serve, httpServer, wsServer, addr, func() error {
 			return serve.ListenAndServeTLS(addr, TLSConfig.CertFile, TLSConfig.KeyFile)
 		})
