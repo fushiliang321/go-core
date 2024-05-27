@@ -53,6 +53,11 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		websocket.Start()
 	}
 
+	var configTLS *server.TLS
+	if config.Settings != nil {
+		configTLS = config.Settings.TLS
+	}
+
 	for addr, serTypeMap := range serverConfigMap {
 		var (
 			httpServer *server.Server
@@ -61,7 +66,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		for _type := range serTypeMap {
 			var (
 				_ser      = serTypeMap[_type]
-				TLSConfig = mergeTLSConfig(config.Settings.TLS, _ser.TLS)
+				TLSConfig = mergeTLSConfig(configTLS, _ser.TLS)
 			)
 			switch _ser.Type {
 			case types.SERVER_WEBSOCKET:
@@ -96,7 +101,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 			if wsServer != nil {
 				wsTls = wsServer.TLS
 			}
-			TLSConfig := mergeTLSConfig(config.Settings.TLS, wsTls, httpTls) //合并tls配置，websocket和http同时配置了tls优先使用http的tls配置
+			TLSConfig := mergeTLSConfig(configTLS, wsTls, httpTls) //合并tls配置，websocket和http同时配置了tls优先使用http的tls配置
 			listenAndServe(wg, &fasthttp.Server{}, httpServer, wsServer, addr, TLSConfig)
 		}
 	}
