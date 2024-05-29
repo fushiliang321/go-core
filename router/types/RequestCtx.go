@@ -55,11 +55,27 @@ func (ctx *RequestCtx) WriteAny(data any) (int, error) {
 
 func (ctx *RequestCtx) initParams() {
 	var (
-		body        = (*fasthttp.RequestCtx)(ctx).PostBody()
-		paramsStr   = (*fasthttp.RequestCtx)(ctx).QueryArgs().QueryString()
-		formDataStr = (*fasthttp.RequestCtx)(ctx).PostArgs().QueryString()
+		body                 = (*fasthttp.RequestCtx)(ctx).PostBody()
+		paramsStr            = (*fasthttp.RequestCtx)(ctx).QueryArgs().QueryString()
+		postQueryStr         = (*fasthttp.RequestCtx)(ctx).PostArgs().QueryString()
+		formDataMap, formErr = (*fasthttp.RequestCtx)(ctx).MultipartForm()
+
+		inputParams = splitParams(paramsStr, postQueryStr, body)
 	)
-	ctx.SetInputs(splitParams(paramsStr, formDataStr, body))
+
+	if formErr == nil {
+		var ok bool
+		for key, value := range formDataMap.Value {
+			if _, ok = inputParams[key]; !ok {
+				if len(value) == 1 {
+					inputParams[key] = value[0]
+				} else {
+					inputParams[key] = value
+				}
+			}
+		}
+	}
+	ctx.SetInputs(inputParams)
 }
 
 // 拆分字符串参数
