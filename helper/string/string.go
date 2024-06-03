@@ -4,7 +4,7 @@ import (
 	"strings"
 )
 
-var (
+const (
 	underlineByte = byte('_')
 	diffValue     = uint8('a' - 'A')
 )
@@ -19,8 +19,10 @@ func SnakeString(s string) string {
 	for i := 0; i < num; i++ {
 		d = s[i]
 		if d >= 'A' && d <= 'Z' {
+			if i > 0 {
+				b.WriteByte(underlineByte)
+			}
 			b.WriteByte(d + diffValue)
-			b.WriteByte(underlineByte)
 		} else {
 			b.WriteByte(d)
 		}
