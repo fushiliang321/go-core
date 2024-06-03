@@ -33,7 +33,7 @@ func (c *Client) Call(method string, params any, res any) error {
 	if err == nil {
 		err = rpcClient.Call(c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
 		if err != nil {
-			logger.Warn("rpc rpcClient error", err)
+			logger.Warn("rpc rpcClient error:", err.Error())
 		}
 	}
 	return err
