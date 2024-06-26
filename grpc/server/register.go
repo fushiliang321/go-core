@@ -106,23 +106,19 @@ func (s *serverListen) RegisterServer(srv any, fun any) (res bool) {
 		logger.Warn("GRPC registration parameter error")
 		return
 	}
-	var reflectValue reflect.Value
-	if reflect.TypeOf(fun).Kind() == reflect.Ptr {
-		reflectValue = reflect.ValueOf(fun).Elem()
-	} else {
-		reflectValue = reflect.ValueOf(fun)
-	}
-	if reflectValue.Kind() != reflect.Func {
+	funReflect := reflect.ValueOf(fun)
+	if funReflect.Kind() != reflect.Func {
 		logger.Warn("Not a GRPC registration function")
 		return
 	}
-	if reflect.TypeOf(srv).Kind() != reflect.Ptr {
+	srvReflect := reflect.ValueOf(srv)
+	if srvReflect.Kind() != reflect.Ptr {
 		logger.Warn("GRPC registration parameter error")
 		return
 	}
-	reflectValue.Call([]reflect.Value{
+	funReflect.Call([]reflect.Value{
 		reflect.ValueOf(s.server),
-		reflect.ValueOf(srv),
+		srvReflect,
 	})
 	return true
 }
