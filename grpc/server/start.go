@@ -17,15 +17,20 @@ func (*Service) Start(wg *sync.WaitGroup) {
 	}
 	event.Dispatch(event.NewRegistered(event.BeforeGrpcServerStart))
 	server := listen(config.Host, config.Port)
+	regSuccess := false
 	for _, service := range config.Services {
-		server.RegisterServer(service.Handle, service.RegisterFun)
+		if server.RegisterServer(service.Handle, service.RegisterFun) {
+			regSuccess = true
+		}
 	}
-	wg.Add(1)
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		// 启动服务监听
-		server.Serve()
-	}(wg)
+	if regSuccess {
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
+			// 启动服务监听
+			server.Serve()
+		}(wg)
+	}
 	event.Dispatch(event.NewRegistered(event.AfterGrpcServerStart))
 }
 

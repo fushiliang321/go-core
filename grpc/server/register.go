@@ -91,13 +91,21 @@ func (s *serverListen) Serve() {
 }
 
 // 注册服务
-func (s *serverListen) RegisterServer(srv any, fun any) {
+func (s *serverListen) RegisterServer(srv any, fun any) (res bool) {
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Error("grpc RegisterServer error:", fmt.Sprint(err))
 			exception.Listener("grpc RegisterServer error:", err)
 		}
 	}()
+	if fun == nil {
+		logger.Warn("Not a GRPC registration function")
+		return
+	}
+	if srv == nil {
+		logger.Warn("GRPC registration parameter error")
+		return
+	}
 	var reflectValue reflect.Value
 	if reflect.TypeOf(fun).Kind() == reflect.Ptr {
 		reflectValue = reflect.ValueOf(fun).Elem()
@@ -116,6 +124,7 @@ func (s *serverListen) RegisterServer(srv any, fun any) {
 		reflect.ValueOf(s.server),
 		reflect.ValueOf(srv),
 	})
+	return true
 }
 
 // 注册健康检测服务
