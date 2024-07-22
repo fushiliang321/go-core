@@ -63,6 +63,9 @@ func Dispatch(handler types2.RequestHandler) fasthttp.RequestHandler {
 			return
 		}
 		_ctx = (*types2.RequestCtx)(ctx)
-		_ctx.WriteAny(handlers.Process(_ctx))
+		res := handlers.Process(_ctx)
+		if res != nil || !ctx.IsBodyStream() {
+			_ctx.WriteAny(res)
+		}
 	}
 }
