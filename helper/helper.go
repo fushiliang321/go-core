@@ -54,14 +54,23 @@ func AnyToBytes(data any) ([]byte, error) {
 	case string:
 		return strconv.S2B(data), nil
 	case *string:
+		if data == nil {
+			return nil, nil
+		}
 		return strconv.S2B(*data), nil
 	case []byte:
 		return data, nil
 	case *[]byte:
+		if data == nil {
+			return nil, nil
+		}
 		return *data, nil
 	case byte:
 		return []byte{data}, nil
 	case *byte:
+		if data == nil {
+			return nil, nil
+		}
 		return []byte{*data}, nil
 	default:
 		return json.Marshal(data)
@@ -74,14 +83,23 @@ func AnyToString(data any) (string, error) {
 	case string:
 		return data, nil
 	case *string:
+		if data == nil {
+			return "", nil
+		}
 		return *data, nil
 	case []byte:
 		return strconv.B2S(data), nil
 	case *[]byte:
+		if data == nil {
+			return "", nil
+		}
 		return strconv.B2S(*data), nil
 	case byte:
 		return strconv.B2S([]byte{data}), nil
 	case *byte:
+		if data == nil {
+			return "", nil
+		}
 		return strconv.B2S([]byte{*data}), nil
 	default:
 		marshal, err := json.Marshal(data)
