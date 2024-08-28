@@ -716,6 +716,10 @@ func (ctx *RequestCtx) TimeoutError(msg string) {
 	(*fasthttp.RequestCtx)(ctx).TimeoutError(msg)
 }
 
+func (ctx *RequestCtx) RequestBodyStream() io.Reader {
+	return (*fasthttp.RequestCtx)(ctx).RequestBodyStream()
+}
+
 func (ctx *RequestCtx) TimeoutErrorWithCode(msg string, statusCode int) {
 	(*fasthttp.RequestCtx)(ctx).TimeoutErrorWithCode(msg, statusCode)
 }
