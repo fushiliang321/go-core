@@ -40,7 +40,7 @@ func dial(serviceName string) (*grpc.ClientConn, *consul.ServiceNode, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	conn, err := grpc.Dial(node.Address+":"+node.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(node.Address+":"+node.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	return conn, node, err
 }
 
