@@ -6,10 +6,11 @@ type (
 		Handle      any
 	}
 	Grpc struct {
-		Host      string
-		Port      int
-		Services  []Service
-		Consumers []string
+		Host                   string
+		Port                   int
+		ConnectMaxMultiplexNum int //连接最大复用次数
+		Services               []Service
+		Consumers              []string
 	}
 )
 
