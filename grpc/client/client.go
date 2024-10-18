@@ -4,15 +4,18 @@ import (
 	"context"
 	"fmt"
 	"github.com/fushiliang321/go-core/exception"
+	client "github.com/fushiliang321/go-core/grpc/client/Conn"
 	"github.com/fushiliang321/go-core/helper/logger"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"reflect"
+	"sync"
 )
 
 type GenerateFun[t any] func(isMultiplex ...bool) t
 
 var (
-	multiplexConns = map[any]*ClientConn{}
+	multiplexConns = map[any]client.Interface{}
 	ctx            = context.Background()
 )
 
@@ -29,7 +32,6 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 			multiplex = isMultiplex[0]
 		}
 		conn, err := GetConn(serviceName, multiplex)
-		var client t
 		if err != nil {
 			logger.Warn("grpc newClient Error:["+serviceName+"]", err)
 			exception.Listener("grpc newClient Error:["+serviceName+"]", err)
@@ -37,20 +39,19 @@ func NewClient[t any](serviceName string, fun func(cc grpc.ClientConnInterface) 
 				error: err,
 			})
 		}
-
-		client = fun(conn)
+		_client := fun(conn)
 		if multiplex {
-			multiplexConns[client] = conn
+			multiplexConns[_client] = conn
 		}
-		return client
+		return _client
 	}
 }
 
-func ClientAuto[t any](fun func(cc grpc.ClientConnInterface) t) GenerateFun[t] {
-	client := fun(clientServiceNameExtract{})
+func Auto[t any](fun func(cc grpc.ClientConnInterface) t) GenerateFun[t] {
+	_client := fun(clientServiceNameExtract{})
 	name := ""
-	if reflect.ValueOf(client).NumMethod() > 0 {
-		reflectMethod := reflect.ValueOf(client).Method(0)
+	if reflect.ValueOf(_client).NumMethod() > 0 {
+		reflectMethod := reflect.ValueOf(_client).Method(0)
 		res := reflectMethod.Call([]reflect.Value{
 			reflect.ValueOf(ctx),
 			reflect.New(reflectMethod.Type().In(1).Elem()),
@@ -66,19 +67,22 @@ func ClientAuto[t any](fun func(cc grpc.ClientConnInterface) t) GenerateFun[t] {
 // 关闭复用客户端
 func Close(client any) {
 	if conn, ok := multiplexConns[client]; ok {
-		defer delete(multiplexConns, client)
-		conn.isCloseClient = true
+		delete(multiplexConns, client)
 		conn.Close()
 	}
 }
 
 // 关闭复用客户端，等待所有请求结束后再关闭
 func CloseAwait(client any) {
+	wg := &sync.WaitGroup{}
 	if conn, ok := multiplexConns[client]; ok {
-		defer delete(multiplexConns, client)
-		conn.Lock()
-		defer conn.Unlock()
-		conn.isCloseClient = true
-		conn.Close()
+		delete(multiplexConns, client)
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			conn.WaitForStateChange(ctx, connectivity.Connecting)
+			conn.Close()
+		}()
 	}
+	wg.Wait()
 }
