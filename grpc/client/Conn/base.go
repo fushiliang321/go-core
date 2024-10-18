@@ -4,9 +4,7 @@ import (
 	goContext "context"
 	"errors"
 	"fmt"
-	grpcConfig "github.com/fushiliang321/go-core/config/grpc"
 	"github.com/fushiliang321/go-core/consul"
-	"github.com/fushiliang321/go-core/event/handles/core"
 	"github.com/fushiliang321/go-core/exception"
 	"github.com/fushiliang321/go-core/helper/logger"
 	"google.golang.org/grpc"
@@ -14,17 +12,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var maxMultiplexNum uint32 //连接最大复用次数
-
 type Base struct {
 	serviceName string
 	cc          *grpc.ClientConn
-}
-
-func init() {
-	core.AwaitStartFinish()
-	config := grpcConfig.Get()
-	maxMultiplexNum = config.ConnectMaxMultiplexNum
 }
 
 func (c *Base) NewStream(ctx goContext.Context, desc *grpc.StreamDesc, method string, opts ...grpc.CallOption) (grpc.ClientStream, error) {

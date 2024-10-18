@@ -3,8 +3,10 @@ package client
 import (
 	goContext "context"
 	"errors"
+	grpcConfig "github.com/fushiliang321/go-core/config/grpc"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
+	"github.com/fushiliang321/go-core/event/handles/core"
 	"github.com/fushiliang321/go-core/helper/logger"
 	"github.com/fushiliang321/go-core/helper/serialize"
 	context2 "golang.org/x/net/context"
@@ -21,6 +23,16 @@ type Multiplex struct {
 	serviceNode   *consul.ServiceNode
 	isCloseClient bool //客户端是否关闭
 	sync.RWMutex
+}
+
+var maxMultiplexNum uint32 //连接最大复用次数
+
+func init() {
+	go func() {
+		core.AwaitStartFinish()
+		config := grpcConfig.Get()
+		maxMultiplexNum = config.ConnectMaxMultiplexNum
+	}()
 }
 
 func NewMultiplex(serviceName string) *Multiplex {
