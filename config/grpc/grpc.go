@@ -8,7 +8,7 @@ type (
 	Grpc struct {
 		Host                   string
 		Port                   int
-		ConnectMaxMultiplexNum int //连接最大复用次数
+		ConnectMaxMultiplexNum uint32 //连接最大复用次数
 		Services               []Service
 		Consumers              []string
 	}
