@@ -1,6 +1,7 @@
 package client
 
 import (
+	context2 "context"
 	"fmt"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
@@ -22,7 +23,7 @@ func New(server string) *Client {
 	}
 }
 
-func (c *Client) Call(method string, params any, res any) error {
+func (c *Client) Call(ctx context2.Context, method string, params any, res any) error {
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Error("rpc call error：", fmt.Sprint(err))
@@ -31,7 +32,7 @@ func (c *Client) Call(method string, params any, res any) error {
 	}()
 	rpcClient, err := newRpcClient(c.serverName)
 	if err == nil {
-		err = rpcClient.Call(c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
+		err = rpcClient.Call(ctx, c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
 		if err != nil {
 			logger.Warn("rpc rpcClient error:", err.Error())
 		}
@@ -49,6 +50,6 @@ func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
 	return jsonrpc.NewClient(node.Protocol, node.Address, node.Port)
 }
 
-func Call(server string, method string, params any, res any) error {
-	return New(server).Call(method, params, res)
+func Call(ctx context2.Context, server string, method string, params any, res any) error {
+	return New(server).Call(ctx, method, params, res)
 }
