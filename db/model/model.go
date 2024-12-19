@@ -80,9 +80,9 @@ func (m *Model[t]) _where(where map[string]any) *Model[t] {
 		switch operator {
 		case "not between", "between":
 			betweenValues := value.([]any)
-			m.Db.Where(fmt.Sprintf("%s %s ? AND ?", k, operator), betweenValues[0], betweenValues[1])
+			m.Db.Where(fmt.Sprintf("`%s` %s ? AND ?", k, operator), betweenValues[0], betweenValues[1])
 		default:
-			m.Db.Where(fmt.Sprintf("%s %s ?", k, operator), value)
+			m.Db.Where(fmt.Sprintf("`%s` %s ?", k, operator), value)
 		}
 	}
 	return m
