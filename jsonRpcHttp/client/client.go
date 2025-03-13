@@ -18,7 +18,7 @@ type Client struct {
 	serverNameSnake string
 }
 
-var DefaultContext = context2.Background
+var DefaultContext func() context2.Context
 
 func init() {
 	go func() {
@@ -45,7 +45,7 @@ func (c *Client) Call(ctx context2.Context, method string, params any, res any) 
 	}()
 	rpcClient, err := newRpcClient(c.serverName)
 	if err == nil {
-		if ctx == nil {
+		if ctx == nil && DefaultContext != nil {
 			ctx = DefaultContext()
 		}
 		err = rpcClient.Call(ctx, c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
@@ -66,7 +66,7 @@ func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
 	return jsonrpc.NewClient(node.Protocol, node.Address, node.Port)
 }
 
-func CallContext(ctx context2.Context, server string, method string, params any, res any) error {
+func CallWithContext(ctx context2.Context, server string, method string, params any, res any) error {
 	return New(server).Call(ctx, method, params, res)
 }
 
