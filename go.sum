@@ -59,6 +59,8 @@ github.com/fushiliang321/jsonrpc v1.3.0 h1:xhfT6PUikFkmsoTxdpGusvMG9TnDAI6BJpy4P
 github.com/fushiliang321/jsonrpc v1.3.0/go.mod h1:A51MGZWmSU7JxllGUeOYH5B08H0sq8UapbdBNVsf5MU=
 github.com/fushiliang321/jsonrpc v1.3.1 h1:scmRXzPZztBQUXjvH/450X/sfz9X6YD9dqYp/5/ybbo=
 github.com/fushiliang321/jsonrpc v1.3.1/go.mod h1:A51MGZWmSU7JxllGUeOYH5B08H0sq8UapbdBNVsf5MU=
+github.com/fushiliang321/jsonrpc v1.3.2 h1:sD/gRLlBfM5TWXcQ3N4ttjHYj+xmoEIi4933kmYdi3g=
+github.com/fushiliang321/jsonrpc v1.3.2/go.mod h1:A51MGZWmSU7JxllGUeOYH5B08H0sq8UapbdBNVsf5MU=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-kit/kit v0.9.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-kit/log v0.1.0/go.mod h1:zbhenjAZHb184qTLMA9ZjW7ThYL0H2mk7Q6pNt4vbaY=

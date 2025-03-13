@@ -7,7 +7,7 @@ require (
 	github.com/fasthttp/router v1.5.4
 	github.com/fasthttp/websocket v1.5.12
 	github.com/fushiliang321/fasthttp2 v0.3.8
-	github.com/fushiliang321/jsonrpc v1.3.1
+	github.com/fushiliang321/jsonrpc v1.3.2
 	github.com/hashicorp/consul/api v1.31.2
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.7.0

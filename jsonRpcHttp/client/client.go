@@ -36,7 +36,24 @@ func New(server string) *Client {
 	}
 }
 
-func (c *Client) Call(ctx context2.Context, method string, params any, res any) error {
+func (c *Client) Call(method string, params any, res any) error {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error("rpc call error：", fmt.Sprint(err))
+			exception.Listener("rpc call", err)
+		}
+	}()
+	rpcClient, err := newRpcClient(c.serverName)
+	if err == nil {
+		err = rpcClient.Call(c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
+		if err != nil {
+			logger.Warn("rpc rpcClient error:", err.Error())
+		}
+	}
+	return err
+}
+
+func (c *Client) CallWithContext(ctx context2.Context, method string, params any, res any) error {
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Error("rpc call error：", fmt.Sprint(err))
@@ -48,7 +65,7 @@ func (c *Client) Call(ctx context2.Context, method string, params any, res any) 
 		if ctx == nil && DefaultContext != nil {
 			ctx = DefaultContext()
 		}
-		err = rpcClient.Call(ctx, c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
+		err = rpcClient.CallWithContext(ctx, c.serverNameSnake+"/"+method, params, res, false, context.GetAll())
 		if err != nil {
 			logger.Warn("rpc rpcClient error:", err.Error())
 		}
@@ -67,9 +84,9 @@ func newRpcClient(name string) (jsonrpc.ClientInterface, error) {
 }
 
 func CallWithContext(ctx context2.Context, server string, method string, params any, res any) error {
-	return New(server).Call(ctx, method, params, res)
+	return New(server).CallWithContext(ctx, method, params, res)
 }
 
 func Call(server string, method string, params any, res any) error {
-	return New(server).Call(nil, method, params, res)
+	return New(server).Call(method, params, res)
 }
