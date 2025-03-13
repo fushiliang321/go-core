@@ -1,10 +1,13 @@
 package jsonRpcHttp
 
+import "golang.org/x/net/context"
+
 type JsonRpcHttp struct {
-	Host      string
-	Port      int
-	Consumers []string
-	Services  []any
+	Host           string
+	Port           int
+	Consumers      []string
+	Services       []any
+	DefaultContext func() context.Context
 }
 
 var jsonRpcHttp = &JsonRpcHttp{
