@@ -22,7 +22,7 @@ type (
 )
 
 var (
-	tokenBucketMap sync.Map
+	tokenBucketMap = sync.Map{}
 	configData     *rateLimit.RateLimit
 )
 
