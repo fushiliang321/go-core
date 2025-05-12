@@ -1,6 +1,7 @@
 package types
 
 import (
+	bytes2 "bytes"
 	"crypto/tls"
 	"encoding/json"
 	"errors"
@@ -25,13 +26,53 @@ import (
 
 type RequestCtx fasthttp.RequestCtx
 
-var AutoResponseGzipSize int //响应数据达到指定大小自动触发gzip压缩
+type contentEncoding struct {
+	compressType server.CompressType
+	header       []byte
+	handle       func(dst, src []byte) []byte
+	handleLevel  func(dst, src []byte, level int) []byte
+}
+
+var (
+	compress            *server.Compress //响应数据压缩
+	contentEncodingList = []contentEncoding{
+		{
+			compressType: server.CompressTypeBrotli,
+			header:       []byte("br"),
+			handle:       fasthttp.AppendBrotliBytes,
+			handleLevel:  fasthttp.AppendBrotliBytesLevel,
+		},
+		{
+			compressType: server.CompressTypeGzip,
+			header:       []byte("gzip"),
+			handle:       fasthttp.AppendGzipBytes,
+			handleLevel:  fasthttp.AppendGzipBytesLevel,
+		},
+		{
+			compressType: server.CompressTypeZstd,
+			header:       []byte("zstd"),
+			handle:       fasthttp.AppendZstdBytes,
+			handleLevel:  fasthttp.AppendZstdBytesLevel,
+		},
+		{
+			compressType: server.CompressTypeDeflate,
+			header:       []byte("deflate"),
+			handle:       fasthttp.AppendDeflateBytes,
+			handleLevel:  fasthttp.AppendDeflateBytesLevel,
+		},
+	}
+	contentEncodingBytes = []byte("Content-Encoding")
+	contentEncodingMap   = map[server.CompressType]*contentEncoding{}
+)
 
 func init() {
+	for _, encoding := range contentEncodingList {
+		contentEncodingMap[encoding.compressType] = &encoding
+	}
 	go core.AwaitStartFinish(func() {
 		serversConfig := server.Get()
-		if serversConfig.Settings != nil {
-			AutoResponseGzipSize = serversConfig.Settings.AutoResponseGzipSize
+		if serversConfig.Settings != nil && serversConfig.Settings.Compress != nil {
+			compress = serversConfig.Settings.Compress
 		}
 	})
 }
@@ -46,9 +87,42 @@ func (ctx *RequestCtx) WriteAny(data any) (int, error) {
 		log.Printf("write data err:%s\n", err)
 		return 0, err
 	}
-	if AutoResponseGzipSize > 0 && len(bytes) >= AutoResponseGzipSize {
-		ctx.Response.Header.Add("Content-Encoding", "gzip")
-		return (*fasthttp.RequestCtx)(ctx).Write(fasthttp.AppendGzipBytes([]byte{}, bytes))
+	if compress != nil && len(bytes) > compress.MinSize {
+		var (
+			AcceptEncoding *contentEncoding
+			ok             bool
+		)
+		if compress.Type == server.CompressTypeAuto {
+			// 自动选择压缩算法
+			AcceptEncodingHeaderBytes := ctx.Request.Header.Peek("Accept-Encoding")
+			for _, ce := range contentEncodingList {
+				//遍历服务器支持的算法
+				if bytes2.Contains(AcceptEncodingHeaderBytes, ce.header) {
+					//客户端也支持该算法
+					ok = true
+					AcceptEncoding = &ce
+				}
+			}
+		} else {
+			AcceptEncoding, ok = contentEncodingMap[compress.Type]
+			if ok && !bytes2.Contains(ctx.Request.Header.Peek("Accept-Encoding"), AcceptEncoding.header) {
+				//客户端不支持该算法
+				ok = false
+			}
+		}
+		if ok && AcceptEncoding != nil {
+			//服务端和客户端同时支持该算法
+
+			//设置响应头
+			ctx.Response.Header.AddBytesKV(contentEncodingBytes, AcceptEncoding.header)
+			if compress.Level == 0 {
+				//默认压缩等级
+				bytes = AcceptEncoding.handle([]byte{}, bytes)
+			} else {
+				//指定压缩等级
+				bytes = AcceptEncoding.handleLevel([]byte{}, bytes, compress.Level)
+			}
+		}
 	}
 	return (*fasthttp.RequestCtx)(ctx).Write(bytes)
 }
