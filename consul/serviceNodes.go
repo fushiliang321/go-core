@@ -2,9 +2,8 @@ package consul
 
 import (
 	"errors"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
-	"time"
 )
 
 type (
@@ -30,10 +29,6 @@ const (
 	TcpProtocol  = "tcp"
 	GrpcProtocol = "grpc"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 // 判断服务信息是否存在
 func (sers *services) hasService(serviceName string) (ok bool) {
@@ -98,7 +93,7 @@ func (sers *services) getRandomNode(serviceName string, protocol string) (node *
 	case 1:
 		node = nodeList[0]
 	default:
-		node = nodeList[rand.Intn(nodeLen)]
+		node = nodeList[rand.IntN(nodeLen)]
 	}
 	return
 }

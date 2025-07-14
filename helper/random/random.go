@@ -2,7 +2,7 @@ package random
 
 import (
 	"github.com/savsgio/gotils/strconv"
-	"math/rand"
+	"math/rand/v2"
 	"unsafe"
 )
 
@@ -31,16 +31,16 @@ func RangeRand(min, max int) int {
 		panic("the min is greater than max!")
 	}
 	dif := max - min
-	return min + rand.Intn(dif)
+	return min + rand.IntN(dif)
 }
 
 // 获取指定长度的随机比特字符串
 func randBytes(n int, bytes string) []byte {
 	bytesLen := len(bytes)
 	b := make([]byte, n)
-	for i, cache, remain := n-1, rand.Int63(), letterIdxMax; i >= 0; {
+	for i, cache, remain := n-1, rand.Int64(), letterIdxMax; i >= 0; {
 		if remain == 0 {
-			cache, remain = rand.Int63(), letterIdxMax
+			cache, remain = rand.Int64(), letterIdxMax
 		}
 		if idx := int(cache & letterIdxMask); idx < bytesLen {
 			b[i] = bytes[idx]
@@ -78,9 +78,9 @@ func RandString(n int, bytes ...string) string {
 	letterIdxMax := letterIdxMask / letterIdxBits
 	letterIdxMaskInt64 := int64(letterIdxMask)
 	b := make([]byte, n)
-	for i, cache, remain := n-1, rand.Int63(), letterIdxMax; i >= 0; {
+	for i, cache, remain := n-1, rand.Int64(), letterIdxMax; i >= 0; {
 		if remain == 0 {
-			cache, remain = rand.Int63(), letterIdxMax
+			cache, remain = rand.Int64(), letterIdxMax
 		}
 		if idx := int(cache & letterIdxMaskInt64); idx < bytesLen {
 			b[i] = letterStr[idx]
