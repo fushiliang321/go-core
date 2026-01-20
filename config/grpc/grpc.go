@@ -11,6 +11,7 @@ type (
 		ConnectMaxMultiplexNum uint32 //连接最大复用次数
 		Services               []Service
 		Consumers              []string
+		MaxRecvMsgSize         int //接收的最大消息大小
 	}
 )
 

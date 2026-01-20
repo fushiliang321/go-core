@@ -3,6 +3,12 @@ package server
 import (
 	goContext "context"
 	"fmt"
+	"log"
+	"net"
+	"reflect"
+	"strconv"
+
+	grpcConfig "github.com/fushiliang321/go-core/config/grpc"
 	"github.com/fushiliang321/go-core/consul"
 	"github.com/fushiliang321/go-core/context"
 	"github.com/fushiliang321/go-core/event"
@@ -15,10 +21,6 @@ import (
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/metadata"
-	"log"
-	"net"
-	"reflect"
-	"strconv"
 )
 
 const HEALTHCHECK_SERVICE = "grpc.health.v1.Health"
@@ -31,14 +33,19 @@ type serverListen struct {
 	listener net.Listener
 }
 
-func listen(host string, port int) *serverListen {
-	address := host + ":" + strconv.Itoa(port)
+func listen(config *grpcConfig.Grpc) *serverListen {
+	address := config.Host + ":" + strconv.Itoa(config.Port)
 	// 监听端口
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Printf("grpc failed to listen: %v", err)
 	}
-	server := grpc1.NewServer(grpc1.UnaryInterceptor(func(ctx goContext.Context, req any, info *grpc1.UnaryServerInfo, handler grpc1.UnaryHandler) (resp any, err error) {
+
+	var serverOptions []grpc1.ServerOption
+	if config.MaxRecvMsgSize > 0 {
+		serverOptions = append(serverOptions, grpc1.MaxRecvMsgSize(config.MaxRecvMsgSize))
+	}
+	serverOptions = append(serverOptions, grpc1.UnaryInterceptor(func(ctx goContext.Context, req any, info *grpc1.UnaryServerInfo, handler grpc1.UnaryHandler) (resp any, err error) {
 		if md, ok := metadata.FromIncomingContext(ctx); ok {
 			contextDataStr := md.Get("contextData")
 			if contextDataStr != nil && len(contextDataStr) > 0 && len(contextDataStr[0]) > 0 {
@@ -50,10 +57,10 @@ func listen(host string, port int) *serverListen {
 		}
 		return handler(ctx, req)
 	}))
-
+	server := grpc1.NewServer(serverOptions...)
 	return &serverListen{
-		host:     host,
-		port:     port,
+		host:     config.Host,
+		port:     config.Port,
 		server:   server,
 		listener: lis,
 	}

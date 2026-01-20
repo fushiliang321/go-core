@@ -1,9 +1,10 @@
 package server
 
 import (
+	"sync"
+
 	"github.com/fushiliang321/go-core/config/grpc"
 	"github.com/fushiliang321/go-core/event"
-	"sync"
 )
 
 type Service struct{}
@@ -16,7 +17,7 @@ func (*Service) Start(wg *sync.WaitGroup) {
 		return
 	}
 	event.Dispatch(event.NewRegistered(event.BeforeGrpcServerStart))
-	server := listen(config.Host, config.Port)
+	server := listen(config)
 	regSuccess := false
 	for _, service := range config.Services {
 		if server.RegisterServer(service.Handle, service.RegisterFun) {
